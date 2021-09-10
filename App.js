@@ -3,10 +3,12 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
+import { AuthStack, ApplicationStack } from "./src/routes/Routes";
 
 export default function App() {
   return (
-    <Register />
+    <ApplicationStack />
+    // <Register />
     // <Login />
     // <View style={styles.container}>
     //   <Text>Open up App.js to start working on your app!</Text>
@@ -14,12 +16,3 @@ export default function App() {
     // </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

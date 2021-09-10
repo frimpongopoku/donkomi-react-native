@@ -10,7 +10,7 @@ export default function Register() {
         style={{
           paddingLeft: 14,
           paddingRight: 15,
-          paddingTop: 50,
+          paddingTop: 30,
           paddingBottom: 30,
         }}
       >

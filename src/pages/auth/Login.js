@@ -11,7 +11,7 @@ import FlatButton from "../../components/FlatButton";
 import TextBox from "../../components/TextBox";
 import { STYLES } from "../../shared/ui";
 import logo from "./../../shared/images/app_logo.png";
-export default function Login() {
+export default function Login({ navigation }) {
   const { container, content, bottomArea, logoStyle } = styles;
   return (
     <View style={container}>
@@ -37,7 +37,7 @@ export default function Login() {
             justifyContent: "flex-start",
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.push("Register")}>
             <Text style={{ fontWeight: "bold", color: STYLES.theme.maroon }}>
               Create New Account
             </Text>
