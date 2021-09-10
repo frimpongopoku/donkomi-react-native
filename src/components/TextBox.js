@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     color: STYLES.theme.blue,
     marginBottom: 10,
     width: "100%",
-    paddingLeft: 30,
+    paddingLeft: 25,
     fontSize: 15,
   },
 });

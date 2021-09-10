@@ -2,9 +2,10 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { STYLES } from "./../shared/ui";
 export default function FlatButton({
-  styles = {},
+  style = {},
   color,
   children = "FLAT BUTTON",
+  containerStyle = {},
 }) {
   return (
     <TouchableOpacity
@@ -12,10 +13,10 @@ export default function FlatButton({
         backgroundColor: color || STYLES.theme.maroon,
         padding: 15,
         ...STYLES.flex,
-        ...styles,
+        ...containerStyle,
       }}
     >
-      <Text style={{ color: "white" }}>{children}</Text>
+      <Text style={{ color: "white", ...style }}>{children}</Text>
     </TouchableOpacity>
   );
 }
