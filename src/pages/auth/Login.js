@@ -1,9 +1,18 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, TextInput } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import FlatButton from "../../components/FlatButton";
+import TextBox from "../../components/TextBox";
 import { STYLES } from "../../shared/ui";
 import logo from "./../../shared/images/app_logo.png";
 export default function Login() {
-  const { container, content, bottomArea, logoStyle, textbox } = styles;
+  const { container, content, bottomArea, logoStyle } = styles;
   return (
     <View style={container}>
       <View style={content}>
@@ -18,11 +27,37 @@ export default function Login() {
         >
           Sign In To Your Account
         </Text>
-        <TextInput placeholder="Email" style={textbox} />
-        <TextInput placeholder="Password" style={textbox} />
+        <TextBox />
+        <TextBox placeholder="password" />
+        <View
+          style={{
+            ...STYLES.flex,
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+          }}
+        >
+          <TouchableOpacity>
+            <Text style={{ fontWeight: "bold", color: STYLES.theme.maroon }}>
+              Create New Account
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              marginLeft: "auto",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", color: STYLES.theme.maroon }}>
+              Reset Password
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={bottomArea}></View>
+      <View style={bottomArea}>
+        <FlatButton>USE GOOGLE</FlatButton>
+        <FlatButton color={STYLES.theme.blue}>LOGIN</FlatButton>
+      </View>
     </View>
   );
 }
@@ -40,20 +75,14 @@ const styles = StyleSheet.create({
     paddingRight: "7%",
     marginTop: -270,
   },
-  bottomArea: {},
+  bottomArea: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
   logoStyle: {
     height: 80,
     width: 80,
     resizeMode: "contain",
-  },
-  textbox: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: STYLES.theme.blue,
-    color: STYLES.theme.blue,
-    marginBottom: 10,
-    width: "100%",
-    paddingLeft: 30,
-    fontSize: 15,
   },
 });
