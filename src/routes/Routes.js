@@ -7,6 +7,7 @@ import Register from "../pages/auth/Register";
 import { Text, TouchableOpacity } from "react-native";
 import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
+import RiderMainPage from "../pages/rider/RiderMainPage";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 export const AuthStack = () => (
@@ -98,7 +99,7 @@ export const ApplicationStack = () => (
       />
       <Tabs.Screen
         name="Rider"
-        component={Dummy}
+        component={RiderMainPage}
         options={{ title: "Rider", headerRight: makeHeaderRight() }}
       />
       <Tabs.Screen
