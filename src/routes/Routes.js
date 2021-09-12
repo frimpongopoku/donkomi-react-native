@@ -6,6 +6,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import { Text, TouchableOpacity } from "react-native";
 import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import ShopMainPage from "../pages/shop/ShopMainPage";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 export const AuthStack = () => (
@@ -92,7 +93,7 @@ export const ApplicationStack = () => (
       />
       <Tabs.Screen
         name="Shop"
-        component={Dummy}
+        component={ShopMainPage}
         options={{ title: "Shop", headerRight: makeHeaderRight() }}
       />
       <Tabs.Screen
