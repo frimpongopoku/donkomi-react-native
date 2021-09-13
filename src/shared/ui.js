@@ -7,7 +7,8 @@ export const STYLES = {
   },
   theme: { 
     blue: "#2E3C84", 
-    maroon: "#D13123"
+    maroon: "#D13123", 
+    lightGrey: "#EAEAEA"
   }
 };
 
