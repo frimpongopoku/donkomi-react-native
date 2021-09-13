@@ -4,6 +4,7 @@ import { TabView } from "react-native-tab-view";
 import CustomTabView from "../../shared/components/CustomTabView";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import { STYLES } from "../../shared/ui";
+import Orders from "./Orders";
 import RiderManagement from "./RiderManagement";
 
 export default class RiderMainPage extends Component {
@@ -15,7 +16,7 @@ export default class RiderMainPage extends Component {
   renderScene = ({ route }) => {
     switch (route.key) {
       case "orders":
-        return <Text>THis is the stock page bana</Text>;
+        return <Orders />;
       case "manage":
         return <RiderManagement />;
       default:
