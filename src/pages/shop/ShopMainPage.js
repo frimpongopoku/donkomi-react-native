@@ -24,9 +24,9 @@ export default class ShopMainPage extends Component {
       case "stock":
         return <Stock text={route.key} />;
       case "manage":
-        return <Stock text={route.key} />;
+        return <Text>I am managing my shop bana</Text>;
       default:
-        return <Stock text={route.key} />;
+        return <Text>These are the orders from my shop</Text>;
     }
   };
 
@@ -41,7 +41,7 @@ export default class ShopMainPage extends Component {
       />
     );
   }
- 
+
   handleIndexChange = (index) => this.setState({ index });
   render() {
     return (
