@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { TabView, SceneMap } from "react-native-tab-view";
 import TabBarHeader from "../../shared/components/TabBarHeader";
+import ShopManagement from "./ShopManagement";
+import ShopOrders from "./ShopOrders";
 import Stock from "./Stock";
 
 export default class ShopMainPage extends Component {
@@ -15,7 +17,7 @@ export default class ShopMainPage extends Component {
 
   routes = [
     { key: "stock", title: "Stock" },
-    { key: "manage ", title: "Manage Your Shop" },
+    { key: "shop-management", title: "Manage Your Shop" },
     { key: "orders", title: "Orders" },
   ];
 
@@ -23,8 +25,10 @@ export default class ShopMainPage extends Component {
     switch (route.key) {
       case "stock":
         return <Stock text={route.key} />;
-      case "manage":
-        return <Text>I am managing my shop bana</Text>;
+      case "shop-management":
+        return <ShopManagement />;
+      case "orders":
+        return <ShopOrders />;
       default:
         return <Text>These are the orders from my shop</Text>;
     }

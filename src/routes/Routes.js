@@ -9,6 +9,7 @@ import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
 import RiderMainPage from "../pages/rider/RiderMainPage";
 import Settings from "../pages/settings/Settings";
+import NewsMainPage from "../pages/news/NewsMainPage";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 export const AuthStack = () => (
@@ -87,7 +88,7 @@ export const ApplicationStack = () => (
     >
       <Tabs.Screen
         name="News"
-        component={Dummy}
+        component={NewsMainPage}
         options={{
           title: "News",
           headerRight: makeHeaderRight(),
