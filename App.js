@@ -3,11 +3,16 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
-import { AuthStack, ApplicationStack } from "./src/routes/Routes";
+import {
+  AuthStack,
+  ApplicationStack,
+  AppContainerStack,
+} from "./src/routes/Routes";
 
 export default function App() {
   return (
-    <ApplicationStack />
+    <AppContainerStack />
+    // <ApplicationStack />
     // <Register />
     // <Login />
     // <View style={styles.container}>

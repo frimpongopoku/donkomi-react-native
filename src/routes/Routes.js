@@ -10,8 +10,10 @@ import ShopMainPage from "../pages/shop/ShopMainPage";
 import RiderMainPage from "../pages/rider/RiderMainPage";
 import Settings from "../pages/settings/Settings";
 import NewsMainPage from "../pages/news/NewsMainPage";
+import Checkout from "../pages/checkout/Checkout";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const MainAppStack = createStackNavigator();
 export const AuthStack = () => (
   <NavigationContainer>
     <Stack.Navigator>
@@ -28,7 +30,6 @@ export const AuthStack = () => (
     </Stack.Navigator>
   </NavigationContainer>
 );
-const Dummy = ({ text, route }) => <Text>{route?.params?.title}</Text>;
 
 const getTabIcons = (params) => {
   const {
@@ -75,40 +76,72 @@ const makeHeaderRight = () => {
     </TouchableOpacity>
   );
 };
-// ------------------------------------------ MAIN APPLICATION BOTTOM TAB STACK ------------------
+// ----------------------------------------- APPLICATION BOTTOM TAB STACK ------------------
 export const ApplicationStack = () => (
-  <NavigationContainer>
-    <Tabs.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused }) =>
-          getTabIcons({ focused, tabName: route.name }),
-        tabBarActiveTintColor: "red",
-        tabBarInactiveTintColor: "black",
-      })}
-    >
-      <Tabs.Screen
-        name="News"
-        component={NewsMainPage}
-        options={{
-          title: "News",
-          headerRight: makeHeaderRight(),
-        }}
-      />
-      <Tabs.Screen
-        name="Shop"
-        component={ShopMainPage}
-        options={{ title: "Shop", headerRight: makeHeaderRight() }}
-      />
-      <Tabs.Screen
-        name="Rider"
-        component={RiderMainPage}
-        options={{ title: "Rider", headerRight: makeHeaderRight() }}
-      />
-      <Tabs.Screen
-        name="Settings"
-        component={Settings}
-        options={{ title: "Settings", headerRight: makeHeaderRight() }}
-      />
-    </Tabs.Navigator>
-  </NavigationContainer>
+  // <NavigationContainer>
+  <Tabs.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused }) =>
+        getTabIcons({ focused, tabName: route.name }),
+      tabBarActiveTintColor: "red",
+      tabBarInactiveTintColor: "black",
+    })}
+  >
+    <Tabs.Screen
+      name="News"
+      component={NewsMainPage}
+      options={{
+        title: "News",
+        headerRight: makeHeaderRight(),
+      }}
+    />
+    <Tabs.Screen
+      name="Shop"
+      component={ShopMainPage}
+      options={{ title: "Shop", headerRight: makeHeaderRight() }}
+    />
+    <Tabs.Screen
+      name="Rider"
+      component={RiderMainPage}
+      options={{ title: "Rider", headerRight: makeHeaderRight() }}
+    />
+    <Tabs.Screen
+      name="Settings"
+      component={Settings}
+      options={{ title: "Settings", headerRight: makeHeaderRight() }}
+    />
+  </Tabs.Navigator>
+  // </NavigationContainer>
 );
+
+// ----------- SINGLE PAGES STACK ------------------
+
+const SinglePageStack = () => {
+  return (
+    // <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Complete Your Order" component={Checkout} />
+    </Stack.Navigator>
+    // </NavigationContainer>
+  );
+};
+// ----------- MAIN APP CONTAINER STACK ----------------
+
+export const AppContainerStack = () => {
+  return (
+    <NavigationContainer>
+      <MainAppStack.Navigator>
+        <MainAppStack.Screen
+          name="Single"
+          component={SinglePageStack}
+          options={{ headerShown: false }}
+        />
+        <MainAppStack.Screen
+          name="dashboard"
+          component={ApplicationStack}
+          options={{ headerShown: false }}
+        />
+      </MainAppStack.Navigator>
+    </NavigationContainer>
+  );
+};
