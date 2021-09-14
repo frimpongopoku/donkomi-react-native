@@ -69,9 +69,12 @@ const getTabIcons = (params) => {
   return TABS_AND_ICONS[tabName];
 };
 
-const makeHeaderRight = () => {
+const makeHeaderRight = (navigation) => {
   return () => (
-    <TouchableOpacity style={{ marginRight: 20 }}>
+    <TouchableOpacity
+      style={{ marginRight: 20 }}
+      onPress={() => navigation.navigate("singles")}
+    >
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
   );
@@ -90,25 +93,34 @@ export const ApplicationStack = () => (
     <Tabs.Screen
       name="News"
       component={NewsMainPage}
-      options={{
+      options={({ navigation }) => ({
         title: "News",
-        headerRight: makeHeaderRight(),
-      }}
+        headerRight: makeHeaderRight(navigation),
+      })}
     />
     <Tabs.Screen
       name="Shop"
       component={ShopMainPage}
-      options={{ title: "Shop", headerRight: makeHeaderRight() }}
+      options={({ navigation }) => ({
+        title: "Shop",
+        headerRight: makeHeaderRight(navigation),
+      })}
     />
     <Tabs.Screen
       name="Rider"
       component={RiderMainPage}
-      options={{ title: "Rider", headerRight: makeHeaderRight() }}
+      options={({ navigation }) => ({
+        title: "Rider",
+        headerRight: makeHeaderRight(navigation),
+      })}
     />
     <Tabs.Screen
       name="Settings"
       component={Settings}
-      options={{ title: "Settings", headerRight: makeHeaderRight() }}
+      options={({ navigation }) => ({
+        title: "Settings",
+        headerRight: makeHeaderRight(navigation),
+      })}
     />
   </Tabs.Navigator>
   // </NavigationContainer>
@@ -116,11 +128,30 @@ export const ApplicationStack = () => (
 
 // ----------- SINGLE PAGES STACK ------------------
 
+const makeHeaderLeft = (navigation) => {
+  return () => (
+    <TouchableOpacity onPress={() => navigation.navigate("dashboard")}>
+      <Ionicons
+        name="arrow-back-outline"
+        style={{ marginLeft: 8 }}
+        size={24}
+        color="black"
+      />
+    </TouchableOpacity>
+  );
+};
 const SinglePageStack = () => {
   return (
     // <NavigationContainer>
     <Stack.Navigator>
-      <Stack.Screen name="Complete Your Order" component={Checkout} />
+      <Stack.Screen
+        name="checkout"
+        component={Checkout}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          title: "Complete Your Order",
+        })}
+      />
     </Stack.Navigator>
     // </NavigationContainer>
   );
@@ -132,7 +163,7 @@ export const AppContainerStack = () => {
     <NavigationContainer>
       <MainAppStack.Navigator>
         <MainAppStack.Screen
-          name="Single"
+          name="singles"
           component={SinglePageStack}
           options={{ headerShown: false }}
         />
