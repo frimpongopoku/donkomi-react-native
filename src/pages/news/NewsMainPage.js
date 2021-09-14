@@ -10,13 +10,56 @@ export default class NewsMainPage extends Component {
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
-        <NewsTweet image={burger} />
-        {/* <RoutineNewsCard />
-        <RoutineNewsCard /> */}
+        <RoutineNewsCard />
+        <ShopNewsCard />
+        <RoutineNewsCard />
       </View>
     );
   }
 }
+
+// ---------------- WIDGETS AREA ----------------------------
+
+export const ShopNewsCard = (props) => {
+  return (
+    <View>
+      <TouchableOpacity>
+        <Image source={burger} style={{ width: "100%", height: 250 }} />
+      </TouchableOpacity>
+      <View
+        style={{
+          padding: 15,
+          borderWidth: 2,
+          borderColor: STYLES.theme.lightGrey,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <View>
+          <Text style={{ fontWeight: "bold", color: "red", fontSize: 16 }}>
+            Rs 4,532
+          </Text>
+          <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+            Abinchin Burgers
+          </Text>
+          <Text style={{ color: "grey", fontSize: 13 }}>2 hours ago</Text>
+        </View>
+        <TouchableOpacity
+          style={{
+            padding: 15,
+            backgroundColor: "white",
+            borderRadius: 3,
+            elevation: 8,
+            marginLeft: "auto",
+            height: 50,
+          }}
+        >
+          <FontAwesome5 name="plus" size={21} color="green" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
 export const NewsTweet = (props) => {
   return (
