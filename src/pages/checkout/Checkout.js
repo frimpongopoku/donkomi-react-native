@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import CustomTabView from "../../shared/components/CustomTabView";
 import { STYLES } from "../../shared/ui";
+import DeliveryCheckout from "./DeliveryCheckout";
 import ShopCheckout from "./ShopCheckout";
 
 export default class Checkout extends Component {
@@ -15,7 +16,7 @@ export default class Checkout extends Component {
       case "shop":
         return <ShopCheckout />;
       case "delivery":
-        return <Text>This is the delivery bag</Text>;
+        return <DeliveryCheckout />;
       default:
         return <Text>No page available</Text>;
     }

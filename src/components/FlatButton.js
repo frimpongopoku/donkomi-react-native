@@ -6,6 +6,7 @@ export default function FlatButton({
   color,
   children = "FLAT BUTTON",
   containerStyle = {},
+  
 }) {
   return (
     <TouchableOpacity

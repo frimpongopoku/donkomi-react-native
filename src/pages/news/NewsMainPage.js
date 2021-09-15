@@ -18,7 +18,7 @@ export default class NewsMainPage extends Component {
   }
 }
 
-// ---------------- WIDGETS AREA ----------------------------
+// ------------------------- WIDGETS AREA ----------------------------
 
 export const ShopNewsCard = (props) => {
   return (
@@ -129,7 +129,6 @@ export const NewsTweet = (props) => {
               flexDirection: "row",
               alignItems: "center",
               padding: 10,
-              // borderLeftWidth: 2,
               borderRightWidth: 2,
               borderColor: STYLES.theme.maroon,
             }}
