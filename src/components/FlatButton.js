@@ -6,10 +6,15 @@ export default function FlatButton({
   color,
   children = "FLAT BUTTON",
   containerStyle = {},
-  
+  onPress,
+  props = {},
 }) {
   return (
     <TouchableOpacity
+      onPress={() => {
+        if (onPress) onPress();
+      }}
+      {...props}
       style={{
         backgroundColor: color || STYLES.theme.maroon,
         padding: 15,

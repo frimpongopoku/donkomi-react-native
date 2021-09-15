@@ -11,6 +11,7 @@ import RiderMainPage from "../pages/rider/RiderMainPage";
 import Settings from "../pages/settings/Settings";
 import NewsMainPage from "../pages/news/NewsMainPage";
 import Checkout from "../pages/checkout/Checkout";
+import PlaceOrder from "../pages/order placement/PlaceOrder";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
@@ -69,11 +70,11 @@ const getTabIcons = (params) => {
   return TABS_AND_ICONS[tabName];
 };
 
-const makeHeaderRight = (navigation) => {
+const makeHeaderRight = (navigation, destination = "singles") => {
   return () => (
     <TouchableOpacity
       style={{ marginRight: 20 }}
-      onPress={() => navigation.navigate("singles")}
+      onPress={() => navigation.navigate(destination)}
     >
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
@@ -81,7 +82,6 @@ const makeHeaderRight = (navigation) => {
 };
 // ----------------------------------------- APPLICATION BOTTOM TAB STACK ------------------
 export const ApplicationStack = () => (
-  // <NavigationContainer>
   <Tabs.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused }) =>
@@ -123,14 +123,15 @@ export const ApplicationStack = () => (
       })}
     />
   </Tabs.Navigator>
-  // </NavigationContainer>
 );
 
 // ----------- SINGLE PAGES STACK ------------------
 
 const makeHeaderLeft = (navigation) => {
   return () => (
-    <TouchableOpacity onPress={() => navigation.navigate("dashboard")}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("place-routine-order")}
+    >
       <Ionicons
         name="arrow-back-outline"
         style={{ marginLeft: 8 }}
@@ -142,7 +143,6 @@ const makeHeaderLeft = (navigation) => {
 };
 const SinglePageStack = () => {
   return (
-    // <NavigationContainer>
     <Stack.Navigator>
       <Stack.Screen
         name="checkout"
@@ -152,8 +152,16 @@ const SinglePageStack = () => {
           title: "Complete Your Order",
         })}
       />
+      <Stack.Screen
+        name="place-routine-order"
+        component={PlaceOrder}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          headerRight: makeHeaderRight(navigation, "checkout"),
+          title: "Place Your Order",
+        })}
+      />
     </Stack.Navigator>
-    // </NavigationContainer>
   );
 };
 // ----------- MAIN APP CONTAINER STACK ----------------
