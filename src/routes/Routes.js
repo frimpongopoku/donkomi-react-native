@@ -12,6 +12,7 @@ import Settings from "../pages/settings/Settings";
 import NewsMainPage from "../pages/news/NewsMainPage";
 import Checkout from "../pages/checkout/Checkout";
 import PlaceOrder from "../pages/order placement/PlaceOrder";
+import FormPlaceholder from "../pages/forms/FormPlaceholder";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
@@ -144,6 +145,15 @@ const makeHeaderLeft = (navigation) => {
 const SinglePageStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="universal-form"
+        component={FormPlaceholder}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          headerRight: makeHeaderRight(navigation, "place-routine-order"),
+          title: "Test Form Genrator",
+        })}
+      />
       <Stack.Screen
         name="checkout"
         component={Checkout}
