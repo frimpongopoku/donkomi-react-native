@@ -16,7 +16,6 @@ export default class FormPlaceholder extends Component {
         <FormGenerator
           fields={[
             {
-              // label: "Company Name:",
               fieldType: FormGenerator.FIELDS.TEXTBOX,
               placeholder: "Enter the name of you company...",
             },

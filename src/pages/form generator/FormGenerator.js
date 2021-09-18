@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Switch,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
@@ -20,6 +21,9 @@ const FIELDS = {
 };
 export default class FormGenerator extends Component {
   static FIELDS = FIELDS;
+  state = {
+    formData: {},
+  };
 
   renderLabel(field) {
     if (field.label)
@@ -34,6 +38,14 @@ export default class FormGenerator extends Component {
     );
   }
 
+  setContent({ field, content }) {
+    console.log("I am teh thing", content);
+    this.setState({ [field.name]: content });
+  }
+
+  getFieldValue(field) {
+    return this.state[field.name];
+  }
   renderDropdownComponent(field) {
     const data = field.data || [];
     return (
@@ -44,10 +56,6 @@ export default class FormGenerator extends Component {
             width: "100%",
             padding: 20,
           }}
-          // selectedValue={this.state.selectedShop}
-          // onValueChange={(itemValue, itemIndex) =>
-          //   this.setState({ selectedShop: itemValue })
-          // }
           mode="dropdown"
         >
           {data.map((item, index) => (
@@ -78,34 +86,38 @@ export default class FormGenerator extends Component {
   }
 
   renderImageComponent(field) {
+    const value = this.getFieldValue(field);
     return (
       <>
         {this.renderLabel(field)}
- 
+
         <TouchableOpacity
           onPress={() =>
             ImageCropPicker.openPicker({
               width: 300,
               height: 400,
-              copping: true,
-            }).then((image) =>
-              console.log("-------- I am the image banna-------", image)
-            )
+            }).then((image) => this.setContent({ field, content: image }))
           }
           style={{
             width: "100%",
-            padding: 10,
             minHeight: 200,
             alignItems: "center",
             justifyContent: "center",
             elevation: 4,
-            borderWidth: 2,
             borderRadius: 5,
             borderColor: STYLES.theme.blue,
             backgroundColor: "white",
           }}
         >
-          <Entypo name="images" size={60} color={STYLES.theme.blue} />
+          {!value && (
+            <Entypo name="images" size={60} color={STYLES.theme.blue} />
+          )}
+          {value && (
+            <Image
+              source={{ uri: value.path }}
+              style={{ height: 300, width: "100%" }}
+            />
+          )}
         </TouchableOpacity>
       </>
     );

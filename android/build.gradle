@@ -6,6 +6,7 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 30
         targetSdkVersion = 30
+        vectorDrawables.useSupportLibrary = true
     }
     repositories {
         google()
@@ -30,6 +31,9 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+         // ADD THIS
+      maven { url 'https://maven.google.com' }
+
 
         google()
         jcenter()
