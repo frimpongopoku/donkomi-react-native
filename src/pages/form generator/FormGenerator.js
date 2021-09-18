@@ -1,17 +1,9 @@
 import React, { Component } from "react";
-import {
-  Text,
-  TextInput,
-  View,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { Text, TextInput, View, StyleSheet, Switch, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
-import { Entypo } from "@expo/vector-icons";
-import ImageCropPicker from "react-native-image-crop-picker";
+import ImagePicker from "../../shared/components/ImagePicker";
+import FlatButton from "./../../components/FlatButton";
 const FIELDS = {
   TEXTBOX: "textbox",
   DROPDOWN: "dropdown",
@@ -21,8 +13,13 @@ const FIELDS = {
 };
 export default class FormGenerator extends Component {
   static FIELDS = FIELDS;
+  constructor(props) {
+    super(props);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
   state = {
     formData: {},
+    error: null,
   };
 
   renderLabel(field) {
@@ -39,7 +36,6 @@ export default class FormGenerator extends Component {
   }
 
   setContent({ field, content }) {
-    console.log("I am teh thing", content);
     this.setState({ [field.name]: content });
   }
 
@@ -90,38 +86,16 @@ export default class FormGenerator extends Component {
     return (
       <>
         {this.renderLabel(field)}
-
-        <TouchableOpacity
-          onPress={() =>
-            ImageCropPicker.openPicker({
-              width: 300,
-              height: 400,
-            }).then((image) => this.setContent({ field, content: image }))
+        <ImagePicker
+          value={value}
+          onFileSelected={(file, error) =>
+            this.setContent({ field, content: file })
           }
-          style={{
-            width: "100%",
-            minHeight: 200,
-            alignItems: "center",
-            justifyContent: "center",
-            elevation: 4,
-            borderRadius: 5,
-            borderColor: STYLES.theme.blue,
-            backgroundColor: "white",
-          }}
-        >
-          {!value && (
-            <Entypo name="images" size={60} color={STYLES.theme.blue} />
-          )}
-          {value && (
-            <Image
-              source={{ uri: value.path }}
-              style={{ height: 300, width: "100%" }}
-            />
-          )}
-        </TouchableOpacity>
+        />
       </>
     );
   }
+
   getComponentWithType(field) {
     switch (field.fieldType) {
       case FIELDS.TEXTBOX:
@@ -148,10 +122,70 @@ export default class FormGenerator extends Component {
       );
     });
   }
+
+  renderSubmitButton() {
+    const { customButton } = this.props;
+    if (customButton) return customButton;
+    return (
+      <FlatButton
+        onPress={this.onSubmit}
+        color="green"
+        containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
+        style={{ fontWeight: "bold", fontSize: 17 }}
+      >
+        Submit
+      </FlatButton>
+    );
+  }
+
+  setDefaults() {
+    const { fields } = this.props;
+    const state = {};
+    fields?.forEach((f) => {
+      const value = f.value || f.defaultValue;
+      state[f.name] = value;
+    });
+    this.setState({ formData: state });
+  }
+
+  componentDidMount() {
+    this.setDefaults();
+  }
+
+  requiredFieldIsEmpty() {
+    const { fields } = this.props;
+    var error;
+    for (let i = 0; i < fields.length; i++) {
+      const f = fields[i];
+      const value = this.getFieldValue(f);
+      if ((f.isRequired || f.required) && !value) {
+        error = `' The ${f.name}' is required, but you have not provided any content...`;
+        this.setState({
+          error,
+        });
+        return [true, error, f.name];
+      }
+    }
+    return [false, error];
+  }
+
+  onSubmit() {
+    const { formData, onSubmit } = this.state;
+    const requiredFieldIsEmpty = this.requiredFieldIsEmpty();
+    if (requiredFieldIsEmpty[0]) {
+      Alert.alert(requiredFieldIsEmpty[2], requiredFieldIsEmpty[1], [], {
+        cancelable: true,
+      });
+      return;
+    }
+    if (onSubmit) onSubmit(formData);
+  }
+
   render() {
+    console.log("CURRENT ERROR", this.state.error);
     const { title = "Create something with this form..." } = this.props;
     return (
-      <View>
+      <View style={{ height: "100%" }}>
         <Text
           style={{
             marginBottom: 10,
@@ -163,6 +197,7 @@ export default class FormGenerator extends Component {
           {title}
         </Text>
         {this.renderComponents()}
+        {this.renderSubmitButton()}
       </View>
     );
   }

@@ -14,10 +14,13 @@ export default class FormPlaceholder extends Component {
         }}
       >
         <FormGenerator
+          onSubmit={(content) => console.log("HERE WE GO", content)}
           fields={[
             {
+              name: "company",
               fieldType: FormGenerator.FIELDS.TEXTBOX,
               placeholder: "Enter the name of you company...",
+              required: true,
             },
             {
               label: "Choose continent",

@@ -1,14 +1,34 @@
+import { Entypo } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 import ImageCropPicker from "react-native-image-crop-picker";
 import { STYLES } from "../../shared/ui";
+
 export default class ImagePicker extends Component {
   onFileSelected(file, error) {
     const { onFileSelected } = this.props;
     if (onFileSelected) onFileSelected(file, error);
   }
+
+  renderSelector() {
+    const { children } = this.props;
+    var { value, defaultValue } = this.props;
+    if (children) return children;
+    value = defaultValue || value;
+    return (
+      <>
+        {!value && <Entypo name="images" size={60} color={STYLES.theme.blue} />}
+        {value && (
+          <Image
+            source={{ uri: value.path }}
+            style={{ height: 300, width: "100%", borderRadius: 10 }}
+          />
+        )}
+      </>
+    );
+  }
   render() {
-    const { pickerProps, defaultValue } = this.props;
+    const { pickerProps } = this.props;
     return (
       <TouchableOpacity
         onPress={() =>
@@ -31,13 +51,7 @@ export default class ImagePicker extends Component {
           backgroundColor: "white",
         }}
       >
-        {!value && <Entypo name="images" size={60} color={STYLES.theme.blue} />}
-        {value && (
-          <Image
-            source={{ uri: value.path }}
-            style={{ height: 300, width: "100%" }}
-          />
-        )}
+        {this.renderSelector()}
       </TouchableOpacity>
     );
   }
