@@ -3,57 +3,82 @@ import { Text, TextInput, View, StyleSheet, Switch, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
 import ImagePicker from "../../shared/components/ImagePicker";
+
 import FlatButton from "./../../components/FlatButton";
+import DateTimePicker from "../../components/DateTimePicker";
 const FIELDS = {
   TEXTBOX: "textbox",
   DROPDOWN: "dropdown",
   TEXTAREA: "textarea",
   TOGGLE: "toggle",
   IMAGE: "image",
+  DATE: "date",
+  TIME: "time",
+  DATETIME: "datetime",
 };
 export default class FormGenerator extends Component {
   static FIELDS = FIELDS;
   constructor(props) {
     super(props);
+    this.state = {
+      formData: {},
+      error: null,
+      mounted: false,
+    };
     this.onSubmit = this.onSubmit.bind(this);
   }
-  state = {
-    formData: {},
-    error: null,
-  };
 
   renderLabel(field) {
     if (field.label)
       return <Text style={{ marginBottom: 6 }}>{field.label}</Text>;
   }
   renderTextbox(field) {
+    const value = this.getFieldValue(field);
     return (
       <>
         {this.renderLabel(field)}
-        <TextInput style={styles.textbox} {...field} />
+        <TextInput
+          style={styles.textbox}
+          {...field}
+          value={value}
+          onChangeText={(text) => this.setContent({ field, content: text })}
+        />
       </>
     );
   }
 
   setContent({ field, content }) {
-    this.setState({ [field.name]: content });
+    this.setState((prev) => ({
+      formData: { ...prev.formData, [field.name]: content },
+    }));
   }
 
   getFieldValue(field) {
-    return this.state[field.name];
+    return this.state["formData"][field.name];
+  }
+
+  defaultValueDisplay(field) {
+    const value = this.getFieldValue(field);
+    if (value)
+      return (
+        <Text style={{ marginBottom: 6, color: "grey" }}>Current: {value}</Text>
+      );
   }
   renderDropdownComponent(field) {
     const data = field.data || [];
     return (
       <>
         {this.renderLabel(field)}
+        {this.defaultValueDisplay(field)}
         <Picker
           style={{
             width: "100%",
             padding: 20,
           }}
           mode="dropdown"
+          onValueChange={(item) => this.setContent({ field, content: item })}
         >
+          <Picker.Item label="---------" value={null} style={{ padding: 20 }} />
           {data.map((item, index) => (
             <Picker.Item
               key={index.toString()}
@@ -100,16 +125,41 @@ export default class FormGenerator extends Component {
     switch (field.fieldType) {
       case FIELDS.TEXTBOX:
         return this.renderTextbox(field);
+      case FIELDS.TEXTAREA:
+        return this.renderTextbox({
+          numberOfLines: 5,
+          ...field,
+          multiline: true,
+        });
       case FIELDS.DROPDOWN:
         return this.renderDropdownComponent(field);
       case FIELDS.TOGGLE:
         return this.renderSwitchComponent(field);
       case FIELDS.IMAGE:
         return this.renderImageComponent(field);
-
+      case FIELDS.DATE:
+        return this.renderDateAndTimeComponent({ ...field, mode: "date" });
+      case FIELDS.TIME:
+        return this.renderDateAndTimeComponent({ ...field, mode: "time" });
+      case FIELDS.DATETIME:
+        return this.renderDateAndTimeComponent({ ...field, mode: "datetime" });
       default:
         return <Text>There is no component with name {field.name}</Text>;
     }
+  }
+
+  renderDateAndTimeComponent(field) {
+    const value = this.getFieldValue(field);
+    return (
+      <>
+        {this.renderLabel(field)}
+        <DateTimePicker
+          {...field}
+          value={value || new Date(1998, 2, 22)}
+          onChange={(data) => this.setContent({ field, content: data })}
+        />
+      </>
+    );
   }
 
   renderComponents() {
@@ -138,18 +188,23 @@ export default class FormGenerator extends Component {
     );
   }
 
-  setDefaults() {
-    const { fields } = this.props;
+  static setDefaults(fields) {
     const state = {};
     fields?.forEach((f) => {
       const value = f.value || f.defaultValue;
       state[f.name] = value;
     });
-    this.setState({ formData: state });
+    return state;
   }
 
-  componentDidMount() {
-    this.setDefaults();
+  static getDerivedStateFromProps(props, state) {
+    if (!state.mounted) {
+      return {
+        formData: FormGenerator.setDefaults(props.fields),
+        mounted: true,
+      };
+    }
+    return null;
   }
 
   requiredFieldIsEmpty() {
@@ -170,7 +225,8 @@ export default class FormGenerator extends Component {
   }
 
   onSubmit() {
-    const { formData, onSubmit } = this.state;
+    const { formData } = this.state;
+    const { onSubmit } = this.props;
     const requiredFieldIsEmpty = this.requiredFieldIsEmpty();
     if (requiredFieldIsEmpty[0]) {
       Alert.alert(requiredFieldIsEmpty[2], requiredFieldIsEmpty[1], [], {
@@ -182,8 +238,8 @@ export default class FormGenerator extends Component {
   }
 
   render() {
-    console.log("CURRENT ERROR", this.state.error);
     const { title = "Create something with this form..." } = this.props;
+    console.log(this.state.formData["company"]);
     return (
       <View style={{ height: "100%" }}>
         <Text
