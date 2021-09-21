@@ -157,16 +157,7 @@ export default class FormGenerator extends Component {
         onChange={(data) => this.setContent({ field, content: data })}
       />
     );
-    // if (field.mode === FormGenerator.FIELDS.TIME)
-    //   jsx = (
-    //     <TextInput
-    //       style={styles.textbox}
-    //       {...field}
-    //       placeholder="Time like this hh:mm::ss"
-    //       value={value}
-    //       onChangeText={(text) => this.setContent({ field, content: text })}
-    //     />
-    //   );
+
     return (
       <>
         {this.renderLabel(field)}
@@ -255,17 +246,19 @@ export default class FormGenerator extends Component {
     console.log(this.state.formData["company"]);
     return (
       <View style={{ height: "100%" }}>
-        <Text
-          style={{
-            marginBottom: 10,
-            fontSize: 16,
-            fontWeight: "bold",
-            color: STYLES.theme.blue,
-          }}
-        >
-          {title}
-        </Text>
-        {this.renderComponents()}
+        <View style={{ padding: 20 }}>
+          <Text
+            style={{
+              marginBottom: 10,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: STYLES.theme.blue,
+            }}
+          >
+            {title}
+          </Text>
+          {this.renderComponents()}
+        </View>
         {this.renderSubmitButton()}
       </View>
     );

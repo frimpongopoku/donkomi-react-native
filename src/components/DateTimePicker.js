@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import ModalDateTimePicker from "@react-native-community/datetimepicker";
 import { STYLES } from "./../shared/ui";
-import { format, formatRelative } from "date-fns";
+import { format } from "date-fns";
 export default class DateTimePicker extends Component {
   // https://www.section.io/engineering-education/javascript-dates-manipulation-with-date-fns/
   static TIME_FORMAT = "hh:mm a";
@@ -17,8 +17,7 @@ export default class DateTimePicker extends Component {
 
   getContentString(value) {
     const { mode } = this.props;
-    if (mode === "time")
-      return formatRelative(value, DateTimePicker.TIME_FORMAT);
+    if (mode === "time") return format(value, DateTimePicker.TIME_FORMAT);
     return format(value, "do  MMMM, yyyy");
   }
   render() {
@@ -30,7 +29,6 @@ export default class DateTimePicker extends Component {
     } = this.props;
     const { show } = this.state;
     value = value || defaultValue || new Date();
-    console.log("I AM THE TIME-------- ", value);
     return (
       <View>
         <TouchableOpacity

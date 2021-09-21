@@ -7,7 +7,6 @@ export default class FormPlaceholder extends Component {
     return (
       <View
         style={{
-          padding: 20,
           flex: 1,
           height: "100%",
           backgroundColor: "white",
@@ -30,7 +29,7 @@ export default class FormPlaceholder extends Component {
               fieldType: FormGenerator.FIELDS.TIME,
               placeholder: "Enter the name of you company...",
               label: "Enter end time ...",
-              value: 3445,
+              defaultValue: Date.now(),
             },
             {
               name: "continent",
