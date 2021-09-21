@@ -26,10 +26,11 @@ export default class FormPlaceholder extends Component {
               value: "McDonalds",
             },
             {
-              name: "pussy",
-              fieldType: FormGenerator.FIELDS.DATETIME,
+              name: "juicy",
+              fieldType: FormGenerator.FIELDS.TIME,
               placeholder: "Enter the name of you company...",
               label: "Enter end time ...",
+              value: 3445,
             },
             {
               name: "continent",

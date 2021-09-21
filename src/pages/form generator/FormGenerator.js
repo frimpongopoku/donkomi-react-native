@@ -150,14 +150,27 @@ export default class FormGenerator extends Component {
 
   renderDateAndTimeComponent(field) {
     const value = this.getFieldValue(field);
+    var jsx = (
+      <DateTimePicker
+        {...field}
+        value={value}
+        onChange={(data) => this.setContent({ field, content: data })}
+      />
+    );
+    // if (field.mode === FormGenerator.FIELDS.TIME)
+    //   jsx = (
+    //     <TextInput
+    //       style={styles.textbox}
+    //       {...field}
+    //       placeholder="Time like this hh:mm::ss"
+    //       value={value}
+    //       onChangeText={(text) => this.setContent({ field, content: text })}
+    //     />
+    //   );
     return (
       <>
         {this.renderLabel(field)}
-        <DateTimePicker
-          {...field}
-          value={value || new Date(1998, 2, 22)}
-          onChange={(data) => this.setContent({ field, content: data })}
-        />
+        {jsx}
       </>
     );
   }
