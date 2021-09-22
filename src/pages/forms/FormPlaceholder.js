@@ -7,6 +7,7 @@ const FORM_PAGES = {
   ROUTINE: "routine",
   VENDOR: "vendor",
   SHOP: "shop",
+  SHOPITEM: "shop-item",
 };
 export default class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
@@ -14,13 +15,14 @@ export default class FormPlaceholder extends Component {
 
   componentDidMount() {
     const { navigation } = this.props;
-    navigation.setOptions({ title: "Create Routine" });
-    this.setState({ pageJson: this.getPageJson() });
+    const pageJson = this.getPageJson();
+    navigation.setOptions({ title: pageJson.title });
+    this.setState({ pageJson });
   }
 
   getPageJson() {
     var { page, data } = this.props;
-    page = page || FORM_PAGES.ROUTINE;
+    page = page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
       case FORM_PAGES.ROUTINE:
@@ -29,19 +31,31 @@ export default class FormPlaceholder extends Component {
           title: "Create New Routine",
           formTitle:
             "Make routines here and recycle them each time you are ready to move..",
-          formFields: FORM_JSONS["routines"],
+          formFields: FORM_JSONS["routine"],
         };
       case FORM_PAGES.STOCK:
         return {
           ...json,
           title: "Create New Stock",
           formTitle: "Add available stock from vendors you buy from",
-          formFields: FORM_JSONS["stock"]
+          formFields: FORM_JSONS["stock"],
         };
       case FORM_PAGES.VENDOR:
         return { ...json, title: "Create New Vendor" };
       case FORM_PAGES.SHOP:
-        return { ...json, title: "Create New Shop" };
+        return {
+          ...json,
+          title: "Create New Shop",
+          formTitle: "Create your personal shoppping house here...",
+          formFields: FORM_JSONS["shop"],
+        };
+      case FORM_PAGES.SHOPITEM:
+        return {
+          ...json,
+          title: "Create New Shop Item",
+          formTitle: "Add items that you sell with this form...",
+          formFields: FORM_JSONS["shop-item"],
+        };
       default:
         return json;
     }
