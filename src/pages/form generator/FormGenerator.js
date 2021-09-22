@@ -1,5 +1,13 @@
 import React, { Component } from "react";
-import { Text, TextInput, View, StyleSheet, Switch, Alert } from "react-native";
+import {
+  Text,
+  TextInput,
+  View,
+  StyleSheet,
+  Switch,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
 import ImagePicker from "../../shared/components/ImagePicker";
@@ -26,6 +34,7 @@ export default class FormGenerator extends Component {
       mounted: false,
     };
     this.onSubmit = this.onSubmit.bind(this);
+    this.handleDropdownSelection = this.handleDropdownSelection.bind(this);
   }
 
   renderLabel(field) {
@@ -49,34 +58,78 @@ export default class FormGenerator extends Component {
 
   setContent({ field, content }) {
     this.setState((prev) => ({
-      formData: { ...prev.formData, [field.name]: content },
+      formData: { ...prev.formData, [field.dbName || field.name]: content },
     }));
   }
 
   getFieldValue(field) {
-    return this.state["formData"][field.name];
+    return this.state["formData"][field.dbName || field.name];
   }
 
   defaultValueDisplay(field) {
     const value = this.getFieldValue(field);
-    if (value)
+    if (value && !field.multiple)
       return (
         <Text style={{ marginBottom: 6, color: "grey" }}>Current: {value}</Text>
       );
+
+    return this.renderDropdownChips(field);
   }
+
+  handleDropdownSelection(field, item) {
+    let values = this.getFieldValue(field);
+    if (field.multiple) {
+      values = values || [];
+      const exists = values.find((itm) => itm === item); // see if selected item exists
+      if (exists) values = values.filter((itm) => itm !== item);
+      // if it exists, user probably wants to remove it, that is why they tapped it again
+      else values = [...values, item]; // if it doesnt exist already, just add it on to the list
+      return this.setContent({ field, content: values });
+    }
+    this.setContent({ field, content: item });
+  }
+
+  renderDropdownChips(field) {
+    if (!field.multiple) return;
+    let values = this.getFieldValue(field) || [];
+    return (
+      <View style={{ flexDirection: "row", padding: 10 }}>
+        {values.map((item, key) => (
+          <TouchableOpacity
+            onPress={() => this.handleDropdownSelection(field, item)}
+            key={key}
+            style={{
+              paddingLeft: 15,
+              paddingRight: 15,
+              borderRadius: 55,
+              paddingTop: 5,
+              paddingBottom: 5,
+              marginLeft: 3,
+              marginRight: 3,
+              backgroundColor: STYLES.theme.lightGrey,
+            }}
+          >
+            <Text>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }
+
   renderDropdownComponent(field) {
     const data = field.data || [];
     return (
       <>
         {this.renderLabel(field)}
         {this.defaultValueDisplay(field)}
+        {/* {this.renderDropdownChips(field)} */}
         <Picker
           style={{
             width: "100%",
             padding: 20,
           }}
           mode="dropdown"
-          onValueChange={(item) => this.setContent({ field, content: item })}
+          onValueChange={(item) => this.handleDropdownSelection(field, item)}
         >
           <Picker.Item label="---------" value={null} style={{ padding: 20 }} />
           {data.map((item, index) => (
@@ -110,7 +163,7 @@ export default class FormGenerator extends Component {
     const value = this.getFieldValue(field);
     return (
       <>
-        {this.renderLabel(field)}
+        <View style={{ marginBottom: 10 }}>{this.renderLabel(field)}</View>
         <ImagePicker
           value={value}
           onFileSelected={(file, error) =>
