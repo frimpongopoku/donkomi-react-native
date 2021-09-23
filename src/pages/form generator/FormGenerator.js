@@ -302,7 +302,6 @@ export default class FormGenerator extends Component {
 
   render() {
     const { title = "Create something with this form..." } = this.props;
-    console.log(this.state.formData["company"]);
     return (
       <View style={{ height: "100%" }}>
         <ScrollView>
