@@ -10,18 +10,18 @@ export default function Register() {
         style={{
           paddingLeft: 14,
           paddingRight: 15,
-          paddingTop: 30,
+          // paddingTop: 10,
           paddingBottom: 30,
         }}
       >
         <Text
           style={{
             fontWeight: "bold",
-            color: STYLES.theme.maroon,
+            color: STYLES.theme.blue,
             marginBottom: 10,
           }}
         >
-          Create An Account
+          Provide the following details to get started...
         </Text>
         <TextBox placeholder="Email" />
         <TextBox placeholder="Preferred Name" />
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   container: {
     height: "100%",
     width: "100%",
+    backgroundColor: "white",
     // ...STYLES.flex,
     // justifyContent: "flex-start",
     paddingTop: StatusBar.currentHeight,

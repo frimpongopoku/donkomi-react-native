@@ -71,11 +71,15 @@ const getTabIcons = (params) => {
   return TABS_AND_ICONS[tabName];
 };
 
-const makeHeaderRight = (navigation, destination = "singles") => {
+const makeHeaderRight = (
+  navigation,
+  destination = "singles",
+  routeParams = { screen: "checkout" }
+) => {
   return () => (
     <TouchableOpacity
       style={{ marginRight: 20 }}
-      onPress={() => navigation.navigate(destination)}
+      onPress={() => navigation.navigate(destination, routeParams || {})}
     >
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>

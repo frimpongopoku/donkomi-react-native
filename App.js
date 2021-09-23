@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Provider } from "react-redux";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
@@ -10,18 +10,33 @@ import {
   ApplicationStack,
   AppContainerStack,
 } from "./src/routes/Routes";
+import { STYLES } from "./src/shared/ui";
 
-export default function App() {
-  return (
-    <Provider store={store}>
-      <AppContainerStack />
-    </Provider>
-    // <ApplicationStack />
-    // <Register />
-    // <Login />
-    // <View style={styles.container}>
-    //   <Text>Open up App.js to start working on your app!</Text>
-    //   <StatusBar style="auto" />
-    // </View>
-  );
+export default class App extends React.Component {
+  state = {
+    loading: false,
+  };
+  render() {
+    const { loading } = this.state;
+    if (loading)
+      return (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#e5dcfc",
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={STYLES.theme.purple} />
+        </View>
+      );
+    return (
+      <Provider store={store}>
+        {/* <AppContainerStack /> */}
+        <AuthStack />
+      </Provider>
+    );
+  }
 }

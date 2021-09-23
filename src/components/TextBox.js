@@ -3,7 +3,14 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import { STYLES } from "./../shared/ui";
 export default function TextBox(props = {}) {
   const { textbox } = styles;
-  return <TextInput placeholder="Email" style={textbox} {...props} />;
+  return (
+    <TextInput
+      placeholder="Email"
+      style={textbox}
+      placeholderTextColor={STYLES.theme.blue}
+      {...props}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

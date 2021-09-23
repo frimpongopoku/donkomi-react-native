@@ -27,8 +27,11 @@ export default function Login({ navigation }) {
         >
           Sign In To Your Account
         </Text>
-        <TextBox />
-        <TextBox placeholder="password" />
+        <TextBox placeholderTextColor={STYLES.theme.blue} />
+        <TextBox
+          placeholder="Password"
+          placeholderTextColor={STYLES.theme.blue}
+        />
         <View
           style={{
             ...STYLES.flex,
@@ -38,7 +41,7 @@ export default function Login({ navigation }) {
           }}
         >
           <TouchableOpacity onPress={() => navigation.push("Register")}>
-            <Text style={{ fontWeight: "bold", color: STYLES.theme.maroon }}>
+            <Text style={{ fontWeight: "bold", color: "green" }}>
               Create New Account
             </Text>
           </TouchableOpacity>
@@ -66,6 +69,7 @@ const styles = StyleSheet.create({
   container: {
     height: "100%",
     width: "100%",
+    backgroundColor: "white",
     ...STYLES.flex,
   },
   content: {
