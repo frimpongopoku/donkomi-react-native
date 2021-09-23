@@ -17,7 +17,7 @@ export default class Orders extends Component {
             position: "relative",
             borderWidth: 2,
             borderColor: STYLES.theme.blue,
-            height: 45,
+            height: 55,
             borderRadius: 5,
             marginTop: 10,
             marginBottom: 20,

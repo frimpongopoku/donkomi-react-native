@@ -7,6 +7,7 @@ import {
   Switch,
   Alert,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
@@ -237,7 +238,12 @@ export default class FormGenerator extends Component {
       <FlatButton
         onPress={this.onSubmit}
         color="green"
-        containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
+        containerStyle={{
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+          zIndex: 100,
+        }}
         style={{ fontWeight: "bold", fontSize: 17 }}
       >
         Submit
@@ -299,19 +305,21 @@ export default class FormGenerator extends Component {
     console.log(this.state.formData["company"]);
     return (
       <View style={{ height: "100%" }}>
-        <View style={{ padding: 20 }}>
-          <Text
-            style={{
-              marginBottom: 10,
-              fontSize: 16,
-              fontWeight: "bold",
-              color: STYLES.theme.blue,
-            }}
-          >
-            {title}
-          </Text>
-          {this.renderComponents()}
-        </View>
+        <ScrollView>
+          <View style={{ padding: 20, marginBottom: 50 }}>
+            <Text
+              style={{
+                marginBottom: 10,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: STYLES.theme.blue,
+              }}
+            >
+              {title}
+            </Text>
+            {this.renderComponents()}
+          </View>
+        </ScrollView>
         {this.renderSubmitButton()}
       </View>
     );

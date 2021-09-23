@@ -130,9 +130,7 @@ export const ApplicationStack = () => (
 
 const makeHeaderLeft = (navigation) => {
   return () => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("place-routine-order")}
-    >
+    <TouchableOpacity onPress={() => navigation.goBack()}>
       <Ionicons
         name="arrow-back-outline"
         style={{ marginLeft: 8 }}
@@ -181,13 +179,13 @@ export const AppContainerStack = () => {
     <NavigationContainer>
       <MainAppStack.Navigator>
         <MainAppStack.Screen
-          name="singles"
-          component={SinglePageStack}
+          name="dashboard"
+          component={ApplicationStack}
           options={{ headerShown: false }}
         />
         <MainAppStack.Screen
-          name="dashboard"
-          component={ApplicationStack}
+          name="singles"
+          component={SinglePageStack}
           options={{ headerShown: false }}
         />
       </MainAppStack.Navigator>

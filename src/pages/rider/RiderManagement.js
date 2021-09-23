@@ -3,23 +3,36 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import ListContentDisplay from "./ListContentDisplay";
+import FormPlaceholder from "../forms/FormPlaceholder";
 
-export default function RiderManagement() {
+export default function RiderManagement({ navigation }) {
   const buttons = [
-    { name: "Vendor", icon: "plus" },
-    { name: "Stock", icon: "plus" },
-    { name: "Routine", icon: "plus" },
+    {
+      name: "Vendor",
+      icon: "plus",
+      params: { page: FormPlaceholder.PAGES.VENDOR },
+    },
+    {
+      name: "Stock",
+      icon: "plus",
+      params: { page: FormPlaceholder.PAGES.STOCK },
+    },
+    {
+      name: "Routine",
+      icon: "plus",
+      params: { page: FormPlaceholder.PAGES.ROUTINE },
+    },
   ];
 
   return (
     <View style={{ width: "100%", height: "100%", backgroundColor: "white" }}>
-      <BigPlusButtons buttons={buttons} />
+      <BigPlusButtons buttons={buttons} navigation={navigation} />
       <ListContentDisplay />
     </View>
   );
 }
 
-const BigPlusButtons = ({ buttons }) => (
+const BigPlusButtons = ({ buttons, navigation }) => (
   <View
     style={{
       width: "100%",
@@ -30,6 +43,12 @@ const BigPlusButtons = ({ buttons }) => (
   >
     {buttons.map((btn, index) => (
       <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("singles", {
+            screen: "universal-form",
+            params: btn.params,
+          })
+        }
         key={index}
         style={{
           flexDirection: "column",

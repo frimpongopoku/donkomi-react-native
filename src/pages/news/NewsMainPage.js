@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, Image } from "react-native";
+import { Text, View, TouchableOpacity, Image, ScrollView } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import { FontAwesome } from "@expo/vector-icons";
@@ -9,11 +9,13 @@ import burger from "./../../shared/images/burger.jpg";
 export default class NewsMainPage extends Component {
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: "white" }}>
-        <RoutineNewsCard />
-        <ShopNewsCard />
-        <RoutineNewsCard />
-      </View>
+      <ScrollView>
+        <View style={{ flex: 1, backgroundColor: "white" }}>
+          <RoutineNewsCard navigation={this.props.navigation} />
+          <ShopNewsCard />
+          <RoutineNewsCard navigation={this.props.navigation} />
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -142,7 +144,7 @@ export const NewsTweet = (props) => {
   );
 };
 
-export const RoutineNewsCard = (props) => {
+export const RoutineNewsCard = ({ navigation }) => {
   return (
     <View style={{ width: "100%" }}>
       <View style={{ padding: 15 }}>
@@ -213,11 +215,14 @@ export const RoutineNewsCard = (props) => {
       {/* ---------- PLACE YOUR ORDER BOTTOM TILE ------- */}
 
       <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("singles", { screen: "place-routine-order" })
+        }
         style={{
           padding: 15,
           backgroundColor: STYLES.theme.blue,
           flexDirection: "row",
-          // justifyContent: "center",
+
           alignItems: "center",
         }}
       >

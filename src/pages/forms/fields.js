@@ -52,7 +52,7 @@ export const FORM_JSONS = {
       label: "Price",
       name: "stock name",
       dbName: "stock_name",
-      keyboardType: "number",
+      keyboardType: "numeric",
       required: true,
     },
 
@@ -153,7 +153,7 @@ export const FORM_JSONS = {
       label: "Price",
       name: "Item Price",
       dbName: "item_price",
-      keyboardType: "number",
+      keyboardType: "numeric",
       required: true,
     },
     {

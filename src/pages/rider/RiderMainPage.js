@@ -16,9 +16,9 @@ export default class RiderMainPage extends Component {
   renderScene = ({ route }) => {
     switch (route.key) {
       case "orders":
-        return <Orders />;
+        return <Orders navigation={this.props.navigation} />;
       case "manage":
-        return <RiderManagement />;
+        return <RiderManagement navigation={this.props.navigation} />;
       default:
         return <Text>No page available</Text>;
     }

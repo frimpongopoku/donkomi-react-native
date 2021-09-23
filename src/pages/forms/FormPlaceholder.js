@@ -1,5 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import FormGenerator from "../form generator/FormGenerator";
 import { FORM_JSONS } from "./fields";
 const FORM_PAGES = {
@@ -20,9 +22,19 @@ export default class FormPlaceholder extends Component {
     this.setState({ pageJson });
   }
 
+  makeRightContent(props) {
+    const { show = true, icon, onPress } = props;
+    if (!show) return null;
+    if (!icon && !onPress) return;
+    return (
+      <TouchableOpacity style={{ marginRight: 20 }} onPress={() => onPress()}>
+        <Ionicons name={icon} size={24} color={"red"} />
+      </TouchableOpacity>
+    );
+  }
   getPageJson() {
-    var { page, data } = this.props;
-    page = page || FORM_PAGES.SHOPITEM;
+    var { data, route } = this.props;
+    const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
       case FORM_PAGES.ROUTINE:
@@ -41,7 +53,11 @@ export default class FormPlaceholder extends Component {
           formFields: FORM_JSONS["stock"],
         };
       case FORM_PAGES.VENDOR:
-        return { ...json, title: "Create New Vendor" };
+        return {
+          ...json,
+          title: "Create New Vendor",
+          formFields: FORM_JSONS["vendor"],
+        };
       case FORM_PAGES.SHOP:
         return {
           ...json,
