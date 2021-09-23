@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Provider } from "react-redux";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
+import auth from "@react-native-firebase/auth";
 import store from "./src/redux/store";
 import {
   AuthStack,
