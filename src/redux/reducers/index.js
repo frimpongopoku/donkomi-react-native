@@ -1,6 +1,7 @@
 import { combineReducers } from "redux";
-import { doNothingReducer } from "./reducers";
+import { doNothingReducer, firebaseAuthUserReducer } from "./reducers";
 
 export default combineReducers({
   nothing: doNothingReducer,
+  fireAuth: firebaseAuthUserReducer,
 });

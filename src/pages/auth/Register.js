@@ -12,6 +12,9 @@ import TextBox from "../../components/TextBox";
 import { STYLES } from "../../shared/ui";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
+import { connect } from "react-redux";
+import { setFirebaseAuthUserAction } from "../../redux/actions/actions";
+import { bindActionCreators } from "redux";
 // 0F:02:7F:A7:CC:E0:78:AF:BB:4A:56:B6:06:C7:28:34:F3:BE:D3:33
 // GoogleSignin.configure({
 //   webClientId:
@@ -30,7 +33,7 @@ import auth from "@react-native-firebase/auth";
 //     .catch((e) => console.log("THIS IS THE ERROR BRUH", e));
 // };
 
-export default function Register() {
+function Register({ setFirebaseAuthUser, fireAuth }) {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -70,13 +73,18 @@ export default function Register() {
     setLoading(true);
     auth()
       .createUserWithEmailAndPassword(formData.email, formData.password)
-      .then((user) => console.log("I am the signed in user bana------->", user))
+      .then((user) => {
+        console.log("I am the signed in user bana------->", user);
+        setFirebaseAuthUser(user);
+      })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
         console.log(err);
       });
   };
+
+  console.log("I am the auth content from redux --->", fireAuth);
   return (
     <View style={styles.container}>
       <ScrollView style={{ height: "100%", flex: 1 }}>
@@ -191,3 +199,19 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
   },
 });
+
+const mapStateToProps = (state) => {
+  return {
+    fireAuth: state.fireAuth,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      setFirebaseAuthUser: setFirebaseAuthUserAction,
+    },
+    dispatch
+  );
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

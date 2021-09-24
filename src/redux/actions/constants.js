@@ -1,1 +1,2 @@
 export const NOTHING = "NOTHING";
+export const SET_FIREBASE_AUTH_USER = "SET_FIREBASE_AUTH_USER";
