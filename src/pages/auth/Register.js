@@ -38,6 +38,8 @@ function Register({ setFirebaseAuthUser, fireAuth }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+
   const handleTyping = (name, text) => {
     setFormData({ ...formData, [name]: text });
   };
