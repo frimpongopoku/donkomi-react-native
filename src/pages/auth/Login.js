@@ -13,6 +13,8 @@ import TextBox from "../../components/TextBox";
 import { STYLES } from "../../shared/ui";
 import logo from "./../../shared/images/app_logo.png";
 import auth from "@react-native-firebase/auth";
+
+
 export default function Login({ navigation }) {
   const [formData, setFormData] = useState({});
   const [error, setErrorMessage] = useState(null);
@@ -20,6 +22,7 @@ export default function Login({ navigation }) {
   const handleTyping = (name, text) => {
     setFormData({ ...formData, [name]: text });
   };
+
   const loginWithEmailAndPassword = (email, password) => {
     if (!email || !password)
       return setErrorMessage(
