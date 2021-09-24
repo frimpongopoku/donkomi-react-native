@@ -14,7 +14,6 @@ import { STYLES } from "../../shared/ui";
 import logo from "./../../shared/images/app_logo.png";
 import auth from "@react-native-firebase/auth";
 
-
 export default function Login({ navigation }) {
   const [formData, setFormData] = useState({});
   const [error, setErrorMessage] = useState(null);
@@ -33,7 +32,10 @@ export default function Login({ navigation }) {
     setLoadingState(true);
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then((user) => console.log("I am the user boy", user))
+      .then((user) => {
+        console.log("I am the user boy", user);
+        setLoadingState(false);
+      })
       .catch((e) => {
         setLoadingState(false);
         if (e?.code === "auth/user-not-found")
@@ -118,7 +120,7 @@ export default function Login({ navigation }) {
       </View>
 
       <View style={bottomArea}>
-        <FlatButton>USE GOOGLE</FlatButton>
+        {/* <FlatButton>USE GOOGLE</FlatButton> */}
         <FlatButton
           onPress={() =>
             loginWithEmailAndPassword(formData.email, formData.password)
