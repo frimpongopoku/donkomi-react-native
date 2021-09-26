@@ -41,7 +41,8 @@ class App extends React.Component {
           </Text>
         </View>
       );
-    if (this.props.fireAuthUser) return <AppContainerStack />;
+    if (this.props.fireAuthUser && this.props.user)
+      return <AppContainerStack />;
     return <AuthStack />;
   }
 }
@@ -49,6 +50,7 @@ class App extends React.Component {
 const mapStateToProps = (state) => {
   return {
     fireAuthUser: state.fireAuth,
+    user: state.user,
   };
 };
 

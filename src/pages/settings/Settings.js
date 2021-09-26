@@ -5,9 +5,27 @@ import avatar from "./../../shared/images/cavatar.jpeg";
 import { AntDesign } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+import auth from "@react-native-firebase/auth";
+import { bindActionCreators } from "redux";
+import {
+  logoutAction,
+  removeFirebaseAuthAction,
+} from "../../redux/actions/actions";
+import { connect } from "react-redux";
 
-<FontAwesome5 name="handshake" size={24} color="black" />;
-export default class Settings extends Component {
+class Settings extends Component {
+  constructor(props) {
+    super(props);
+  }
+  logout() {
+    const _this = this;
+    auth()
+      .signOut()
+      .then(() => {
+        _this.props.reduxLogout();
+        _this.props.navigation.navigate("Login");
+      });
+  }
   render() {
     return (
       <View style={{ height: "100%", backgroundColor: "white", padding: 20 }}>
@@ -106,7 +124,7 @@ export default class Settings extends Component {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={{ marginBottom: 10 }}>
+        <TouchableOpacity style={{ marginBottom: 10 }} onPress={this.logout}>
           <View
             style={{
               flexDirection: "row",
@@ -135,3 +153,13 @@ export default class Settings extends Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      reduxLogout: logoutAction,
+    },
+    dispatch
+  );
+};
+export default connect(null, mapDispatchToProps)(Settings);

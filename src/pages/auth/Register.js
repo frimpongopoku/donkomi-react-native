@@ -13,8 +13,13 @@ import { STYLES } from "../../shared/ui";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
 import { connect } from "react-redux";
-import { setFirebaseAuthUserAction } from "../../redux/actions/actions";
+import {
+  setDonkomiUserAction,
+  setFirebaseAuthUserAction,
+} from "../../redux/actions/actions";
 import { bindActionCreators } from "redux";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { REGISTER_USER } from "../../shared/urls";
 // 0F:02:7F:A7:CC:E0:78:AF:BB:4A:56:B6:06:C7:28:34:F3:BE:D3:33
 // GoogleSignin.configure({
 //   webClientId:
@@ -33,12 +38,44 @@ import { bindActionCreators } from "redux";
 //     .catch((e) => console.log("THIS IS THE ERROR BRUH", e));
 // };
 
-function Register({ setFirebaseAuthUser, fireAuth }) {
+function Register({
+  setFirebaseAuthUser,
+  fireAuth,
+  setDonkomiUser,
+  navigation,
+  user,
+}) {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-
+  const createDonkomiUser = (uid) => {
+    const user = {
+      ...formData,
+      preferred_name: formData.name,
+      user_id: uid,
+    };
+    setError(false);
+    setLoading(true);
+    InternetExplorer.roamAndFind(REGISTER_USER, InternetExplorer.POST, user)
+      .then((response) => {
+        if (!response.success) {
+          setError(
+            response.error?.message ||
+              "Sorry something happened in the process..."
+          );
+          setLoading(false);
+          return;
+        }
+        setDonkomiUser(response.data); // set donkomi user object to redux
+      })
+      .catch((error) => {
+        console.log("DONKOMI_USER_CREATION_ERROR:", error);
+        setError(error?.message?.toString() || error?.toString() || error);
+        setLoading(false);
+        return;
+      });
+  };
 
   const handleTyping = (name, text) => {
     setFormData({ ...formData, [name]: text });
@@ -75,9 +112,10 @@ function Register({ setFirebaseAuthUser, fireAuth }) {
     setLoading(true);
     auth()
       .createUserWithEmailAndPassword(formData.email, formData.password)
-      .then((user) => {
-        console.log("I am the signed in user bana------->", user);
+      .then(() => {
+        user = auth().currentUser;
         setFirebaseAuthUser(user);
+        createDonkomiUser(user.uid);
       })
       .catch((err) => {
         setError(err.message);
@@ -85,8 +123,6 @@ function Register({ setFirebaseAuthUser, fireAuth }) {
         console.log(err);
       });
   };
-
-  console.log("I am the auth content from redux --->", fireAuth);
   return (
     <View style={styles.container}>
       <ScrollView style={{ height: "100%", flex: 1 }}>
@@ -205,6 +241,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     fireAuth: state.fireAuth,
+    user: state.user,
   };
 };
 
@@ -212,6 +249,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       setFirebaseAuthUser: setFirebaseAuthUserAction,
+      setDonkomiUser: setDonkomiUserAction,
     },
     dispatch
   );
