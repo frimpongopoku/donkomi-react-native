@@ -38,13 +38,7 @@ import { REGISTER_USER } from "../../shared/urls";
 //     .catch((e) => console.log("THIS IS THE ERROR BRUH", e));
 // };
 
-function Register({
-  setFirebaseAuthUser,
-  fireAuth,
-  setDonkomiUser,
-  navigation,
-  user,
-}) {
+function Register({ setFirebaseAuthUser, setDonkomiUser, user }) {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -101,7 +95,6 @@ function Register({
       return setError("Please provide a password, and confirm you password");
     if (password !== confirmPassword)
       return setError("Your passwords do not match!");
-
     setError(null);
     return true;
   };

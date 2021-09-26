@@ -6,17 +6,36 @@ import { AuthStack, AppContainerStack } from "./src/routes/Routes";
 import { STYLES } from "./src/shared/ui";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setFirebaseAuthUserAction } from "./src/redux/actions/actions";
+import {
+  setDonkomiUserAction,
+  setFirebaseAuthUserAction,
+} from "./src/redux/actions/actions";
+import InternetExplorer from "./src/shared/classes/InternetExplorer";
+import { GET_REGISTERED_USER } from "./src/shared/urls";
 
 class App extends React.Component {
   state = {
     loading: true,
   };
+
+  fetchDonkomiUser = (uid) => {
+    return (async () => {
+      const response = await InternetExplorer.roamAndFind(
+        GET_REGISTERED_USER,
+        InternetExplorer.POST,
+        {
+          user_id: uid,
+        }
+      );
+      this.setState({ loading: false });
+      this.props.setDonkomiUser(response.data);
+    })();
+  };
   componentDidMount() {
     auth().onAuthStateChanged((user) => {
       if (user) {
-        this.setState({ loading: false });
         this.props.setFirebaseAuthUser(user);
+        this.fetchDonkomiUser(user.uid);
         return;
       }
       this.setState({ loading: false });
@@ -58,6 +77,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       setFirebaseAuthUser: setFirebaseAuthUserAction,
+      setDonkomiUser: setDonkomiUserAction,
     },
     dispatch
   );
