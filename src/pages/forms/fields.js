@@ -173,4 +173,12 @@ export const FORM_JSONS = {
       dbName: "image",
     },
   ],
+
+  "applications": [ 
+    {
+      fieldType: FormGenerator.FIELDS.IMAGE,
+      name: "Profile Picture",
+      dbName: "profile_picture",
+    },
+  ]
 };

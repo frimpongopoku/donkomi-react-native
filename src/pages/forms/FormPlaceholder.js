@@ -10,6 +10,7 @@ const FORM_PAGES = {
   VENDOR: "vendor",
   SHOP: "shop",
   SHOPITEM: "shop-item",
+  APPLICATIONS: "applications",
 };
 export default class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
@@ -71,6 +72,13 @@ export default class FormPlaceholder extends Component {
           title: "Create New Shop Item",
           formTitle: "Add items that you sell with this form...",
           formFields: FORM_JSONS["shop-item"],
+        };
+      case FORM_PAGES.PROFILE_EDITS:
+        return {
+          ...json,
+          title: "Apply To Earn",
+          formTitle: "Apply to take on different roles on this platform",
+          formFields: FORM_JSONS["applications"],
         };
       default:
         return json;

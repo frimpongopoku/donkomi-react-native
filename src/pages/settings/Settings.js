@@ -29,6 +29,7 @@ class Settings extends Component {
       });
   }
   render() {
+    const { navigation } = this.props;
     return (
       <View style={{ height: "100%", backgroundColor: "white", padding: 20 }}>
         <View
@@ -75,7 +76,12 @@ class Settings extends Component {
 
         {/* ------------- SETTINGS ITEMS ----------------- */}
 
-        <TouchableOpacity style={{ marginBottom: 10 }}>
+        <TouchableOpacity
+          style={{ marginBottom: 10 }}
+          onPress={() =>
+            navigation.navigate("singles", { screen: "edit-your-profile" })
+          }
+        >
           <View
             style={{
               flexDirection: "row",

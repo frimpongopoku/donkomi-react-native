@@ -13,6 +13,7 @@ import NewsMainPage from "../pages/news/NewsMainPage";
 import Checkout from "../pages/checkout/Checkout";
 import PlaceOrder from "../pages/order placement/PlaceOrder";
 import FormPlaceholder from "../pages/forms/FormPlaceholder";
+import EditYourProfile from "../pages/profile/EditYourProfile";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
@@ -171,6 +172,15 @@ const SinglePageStack = () => {
           headerLeft: makeHeaderLeft(navigation),
           headerRight: makeHeaderRight(navigation, "checkout"),
           title: "Place Your Order",
+        })}
+      />
+      <Stack.Screen
+        name="edit-your-profile"
+        component={EditYourProfile}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          // headerRight: makeHeaderRight(navigation, "checkout"),
+          title: "Edit your profile",
         })}
       />
     </Stack.Navigator>
