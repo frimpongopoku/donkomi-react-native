@@ -1,4 +1,9 @@
-import { NOTHING, SET_DONKOMI_USER, SET_FIREBASE_AUTH_USER, SHOW_FLOATING_MODAL } from "../actions/constants";
+import {
+  NOTHING,
+  SET_DONKOMI_USER,
+  SET_FIREBASE_AUTH_USER,
+  SHOW_FLOATING_MODAL,
+} from "../actions/constants";
 
 export const doNothingReducer = (state = null, action) => {
   if (action.type === NOTHING) return action.payload;
@@ -16,10 +21,11 @@ export const setDonkomiUserReducer = (state = null, action) => {
 
   return state;
 };
-export const showFloatingModalReducer = (state = null, action) => {
+export const showFloatingModalReducer = (
+  state = { show: false, Jsx: null, close: true },
+  action
+) => {
   if (action.type === SHOW_FLOATING_MODAL) return action.payload;
 
   return state;
 };
-
-

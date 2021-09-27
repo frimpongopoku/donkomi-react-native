@@ -1,11 +1,12 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   ActivityIndicator,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  StatusBar,
 } from "react-native";
 import auth from "@react-native-firebase/auth";
 import { AuthStack, AppContainerStack } from "./src/routes/Routes";
@@ -15,9 +16,11 @@ import { bindActionCreators } from "redux";
 import {
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
+  showFloatingModalActions,
 } from "./src/redux/actions/actions";
 import InternetExplorer from "./src/shared/classes/InternetExplorer";
 import { GET_REGISTERED_USER } from "./src/shared/urls";
+import { AntDesign } from "@expo/vector-icons";
 
 class App extends React.Component {
   state = {
@@ -36,23 +39,53 @@ class App extends React.Component {
         this.setState({ loading: false });
         this.props.setDonkomiUser(InternetExplorer.BACKEND_FAILED);
       });
-
-    // return (async () => {
-    //   try {
-    //     const response = await InternetExplorer.roamAndFind(
-    //       GET_REGISTERED_USER,
-    //       InternetExplorer.POST,
-    //       {
-    //         user_id: uid,
-    //       }
-    //     );
-    //     this.setState({ loading: false });
-    //     this.props.setDonkomiUser(response.data);
-    //   } catch (e) {
-    //     this.props.setDonkomiUser(undefined);
-    //   }
-    // })();
   };
+  renderUniversalModal() {
+    const { modal } = this.props;
+
+    const { Jsx, close, closeColor } = modal;
+    if (modal.show)
+      return (
+        <SafeAreaView
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "100%",
+            flex: 1,
+            flexDirection: "column",
+            width: "100%",
+            zIndex: 200,
+            backgroundColor: "antiquewhite",
+            marginTop: StatusBar.currentHeight,
+          }}
+        >
+          {close && (
+            <View
+              style={{
+                flexDirection: "row",
+                position: "absolute",
+                width: "100%",
+                top: 0,
+                zIndex: 5,
+              }}
+            >
+              <TouchableOpacity
+                style={{ padding: 30, marginLeft: "auto" }}
+                onPress={() => this.props.toggleUniversalModal()}
+              >
+                <AntDesign
+                  name="close"
+                  size={30}
+                  color={closeColor || "black"}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+          {Jsx}
+        </SafeAreaView>
+      );
+  }
   componentDidMount() {
     auth().onAuthStateChanged((user) => {
       if (user) {
@@ -65,7 +98,6 @@ class App extends React.Component {
   }
   render() {
     const { loading } = this.state;
-    console.log("I am the user ", this.props.user);
     // ------ When user profile isnt retrieved from the backend -------------
     if (
       this.props.fireAuthUser &&
@@ -125,7 +157,12 @@ class App extends React.Component {
         </View>
       );
     if (this.props.fireAuthUser && this.props.user)
-      return <AppContainerStack />;
+      return (
+        <>
+          <AppContainerStack />
+          {this.renderUniversalModal()}
+        </>
+      );
     return <AuthStack />;
   }
 }
@@ -134,6 +171,7 @@ const mapStateToProps = (state) => {
   return {
     fireAuthUser: state.fireAuth,
     user: state.user,
+    modal: state.modal,
   };
 };
 
@@ -142,6 +180,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       setFirebaseAuthUser: setFirebaseAuthUserAction,
       setDonkomiUser: setDonkomiUserAction,
+      toggleUniversalModal: showFloatingModalActions,
     },
     dispatch
   );

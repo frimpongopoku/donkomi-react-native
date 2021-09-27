@@ -10,6 +10,7 @@ export const STYLES = {
     maroon: "#D13123", 
     lightGrey: "#EAEAEA",
     purple: "#261942",
+    lightPurple:"#e5dcfc"
   }
 };
 

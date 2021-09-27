@@ -37,10 +37,7 @@ export const logoutAction = () => {
 };
 
 export const showFloatingModalActions = (
-  props = { show: false, Jsx: null }
+  props = { show: false, Jsx: null, close: true }
 ) => {
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
-// export const fetchDonkomiUser = firebaseUID => {
-//   InternetExplorer.roamAndFind()
-// }

@@ -11,6 +11,7 @@ import { bindActionCreators } from "redux";
 import {
   logoutAction,
   removeFirebaseAuthAction,
+  showFloatingModalActions,
 } from "../../redux/actions/actions";
 import { connect } from "react-redux";
 
@@ -70,7 +71,16 @@ class Settings extends Component {
             padding: 30,
           }}
         >
-          <TouchableOpacity onPress={this.chooseProfilePhoto}>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.showFloatingModal({
+                show: true,
+                Jsx: <ProfileFullView image={photo} />,
+                close: true,
+                closeColor: "white",
+              })
+            }
+          >
             <Image
               source={photo}
               style={{
@@ -211,12 +221,34 @@ class Settings extends Component {
   }
 }
 
+const ProfileFullView = ({ image }) => {
+  return (
+    <View
+      style={{
+        height: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#282828",
+      }}
+    >
+      <Image source={image} style={{ height: 500, width: "100%" }} />
+    </View>
+  );
+};
+
+const mapStateToProps = (state) => {
+  return {
+    modal: state.modal,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       reduxLogout: logoutAction,
+      showFloatingModal: showFloatingModalActions,
     },
     dispatch
   );
 };
-export default connect(null, mapDispatchToProps)(Settings);
+export default connect(mapStateToProps, mapDispatchToProps)(Settings);
