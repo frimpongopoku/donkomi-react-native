@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import { STYLES } from "../../shared/ui";
 import avatar from "./../../shared/images/cavatar.jpeg";
 import { AntDesign } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
+import ImageCropPicker from "react-native-image-crop-picker";
 import { bindActionCreators } from "redux";
 import {
   logoutAction,
@@ -17,10 +18,11 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     this.logout = this.logout.bind(this);
+    this.state = { profilePhoto: null };
+    this.chooseProfilePhoto = this.chooseProfilePhoto.bind(this);
+    this.removeProfilePhoto = this.removeProfilePhoto.bind(this);
   }
   logout() {
-    const _this = this;
-
     auth()
       .signOut()
       .then(() => {
@@ -28,8 +30,37 @@ class Settings extends Component {
         this.props.navigation.navigate("Login");
       });
   }
+
+  chooseProfilePhoto() {
+    ImageCropPicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+      freeStyleCropEnabled: true,
+    })
+      .then((image) => this.setState({ profilePhoto: image }))
+      .catch((error) => console.log("PROFILE_SELECTION_ERROR", error));
+  }
+
+  removeProfilePhoto() {
+    Alert.alert(
+      "Delete",
+      "Your profile photo will be removed after this...",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ],
+      { cancelable: true }
+    );
+  }
   render() {
     const { navigation } = this.props;
+    const { profilePhoto } = this.state;
+    const photo = profilePhoto ? { uri: profilePhoto?.path } : avatar;
     return (
       <View style={{ height: "100%", backgroundColor: "white", padding: 20 }}>
         <View
@@ -39,9 +70,9 @@ class Settings extends Component {
             padding: 30,
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={this.chooseProfilePhoto}>
             <Image
-              source={avatar}
+              source={photo}
               style={{
                 height: 120,
                 width: 120,
@@ -50,15 +81,33 @@ class Settings extends Component {
               }}
             />
           </TouchableOpacity>
-          <Text
-            style={{
-              fontWeight: "bold",
-              color: STYLES.theme.blue,
-              marginBottom: 10,
-            }}
-          >
-            Change
-          </Text>
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity onPress={this.chooseProfilePhoto}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: STYLES.theme.blue,
+                  marginBottom: 10,
+                }}
+              >
+                Change
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ marginLeft: 10 }}
+              onPress={this.removeProfilePhoto}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "red",
+                  marginBottom: 10,
+                }}
+              >
+                Remove
+              </Text>
+            </TouchableOpacity>
+          </View>
           <Text style={{ fontWeight: "bold" }}>Mrfimpong@gmail.com</Text>
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Text

@@ -4,6 +4,7 @@ import { Image, TouchableOpacity } from "react-native";
 import ImageCropPicker from "react-native-image-crop-picker";
 import { STYLES } from "../../shared/ui";
 
+// https://github.com/ivpusic/react-native-image-crop-picker --- picker source
 export default class ImagePicker extends Component {
   onFileSelected(file, error) {
     const { onFileSelected } = this.props;

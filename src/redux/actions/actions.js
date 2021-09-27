@@ -4,6 +4,7 @@ import {
   REMOVE_FIREBASE_AUTH,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SHOW_FLOATING_MODAL,
 } from "./constants";
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
@@ -35,7 +36,11 @@ export const logoutAction = () => {
   };
 };
 
+export const showFloatingModalActions = (
+  props = { show: false, Jsx: null }
+) => {
+  return { type: SHOW_FLOATING_MODAL, payload: props };
+};
 // export const fetchDonkomiUser = firebaseUID => {
 //   InternetExplorer.roamAndFind()
 // }
-
