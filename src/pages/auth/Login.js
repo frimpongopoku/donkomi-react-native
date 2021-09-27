@@ -33,8 +33,7 @@ export default function Login({ navigation }) {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then((user) => {
-        console.log("I am the user boy", user);
-        setLoadingState(false);
+        // setLoadingState(false);
       })
       .catch((e) => {
         setLoadingState(false);

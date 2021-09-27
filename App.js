@@ -1,6 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import auth from "@react-native-firebase/auth";
 import { AuthStack, AppContainerStack } from "./src/routes/Routes";
 import { STYLES } from "./src/shared/ui";
@@ -19,17 +25,33 @@ class App extends React.Component {
   };
 
   fetchDonkomiUser = (uid) => {
-    return (async () => {
-      const response = await InternetExplorer.roamAndFind(
-        GET_REGISTERED_USER,
-        InternetExplorer.POST,
-        {
-          user_id: uid,
-        }
-      );
-      this.setState({ loading: false });
-      this.props.setDonkomiUser(response.data);
-    })();
+    InternetExplorer.roamAndFind(GET_REGISTERED_USER, InternetExplorer.POST, {
+      user_id: uid,
+    })
+      .then((response) => {
+        this.props.setDonkomiUser(response.data);
+        this.setState({ loading: false });
+      })
+      .catch((e) => {
+        this.setState({ loading: false });
+        this.props.setDonkomiUser(InternetExplorer.BACKEND_FAILED);
+      });
+
+    // return (async () => {
+    //   try {
+    //     const response = await InternetExplorer.roamAndFind(
+    //       GET_REGISTERED_USER,
+    //       InternetExplorer.POST,
+    //       {
+    //         user_id: uid,
+    //       }
+    //     );
+    //     this.setState({ loading: false });
+    //     this.props.setDonkomiUser(response.data);
+    //   } catch (e) {
+    //     this.props.setDonkomiUser(undefined);
+    //   }
+    // })();
   };
   componentDidMount() {
     auth().onAuthStateChanged((user) => {
@@ -43,6 +65,48 @@ class App extends React.Component {
   }
   render() {
     const { loading } = this.state;
+    console.log("I am the user ", this.props.user);
+    // ------ When user profile isnt retrieved from the backend -------------
+    if (
+      this.props.fireAuthUser &&
+      this.props.user === InternetExplorer.BACKEND_FAILED &&
+      !loading
+    ) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#e5dcfc",
+            alignItems: "center",
+            flexDirection: "column",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <Text>Sorry, we could not load your profile</Text>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ loading: true });
+              this.fetchDonkomiUser();
+            }}
+            style={{
+              backgroundColor: "green",
+              paddingLeft: 15,
+              paddingRight: 15,
+              paddingTop: 15,
+              paddingBottom: 15,
+              borderRadius: 55,
+              width: "40%",
+
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ textAlign: "center", color: "white" }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    // ------------ IN LOADING STATE , firebase is not available yet, and user is not available as well show loading state ---
     if (loading)
       return (
         <View

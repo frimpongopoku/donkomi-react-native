@@ -11,6 +11,7 @@ export const GET = "GET";
 class InternetExplorer {
   static POST = POST;
   static GET = GET;
+  static BACKEND_FAILED = "BACKEND_FAILED";
   /**
    * @async
    * Used when getting data from a url

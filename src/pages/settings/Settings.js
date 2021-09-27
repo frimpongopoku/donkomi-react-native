@@ -16,14 +16,16 @@ import { connect } from "react-redux";
 class Settings extends Component {
   constructor(props) {
     super(props);
+    this.logout = this.logout.bind(this);
   }
   logout() {
     const _this = this;
+
     auth()
       .signOut()
       .then(() => {
-        _this.props.reduxLogout();
-        _this.props.navigation.navigate("Login");
+        this.props.reduxLogout();
+        this.props.navigation.navigate("Login");
       });
   }
   render() {
