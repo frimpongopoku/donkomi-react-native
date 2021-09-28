@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { STYLES } from "../../shared/ui";
 import avatar from "./../../shared/images/cavatar.jpeg";
 import { AntDesign } from "@expo/vector-icons";
@@ -10,16 +17,17 @@ import ImageCropPicker from "react-native-image-crop-picker";
 import { bindActionCreators } from "redux";
 import {
   logoutAction,
-  removeFirebaseAuthAction,
   showFloatingModalActions,
 } from "../../redux/actions/actions";
 import { connect } from "react-redux";
+import ImageUploader from "../../shared/classes/ImageUploader";
+import { makeAlert } from "../../shared/utils";
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.logout = this.logout.bind(this);
-    this.state = { profilePhoto: null };
+    this.state = { profilePhoto: null, loading: false };
     this.chooseProfilePhoto = this.chooseProfilePhoto.bind(this);
     this.removeProfilePhoto = this.removeProfilePhoto.bind(this);
   }
@@ -32,6 +40,23 @@ class Settings extends Component {
       });
   }
 
+  startUploadingImage(image) {
+    ImageUploader.uploadProfilePhoto(
+      image,
+      (url) => {
+        this.setState({ loading: false });
+        console.log("I am the download URL", url);
+      },
+      (error) => {
+        this.setState({ loading: false });
+        console.log(error);
+        makeAlert(
+          "Profile picture update",
+          error || "Sorry, we could not upload your picture ,try again later"
+        );
+      }
+    );
+  }
   chooseProfilePhoto() {
     ImageCropPicker.openPicker({
       width: 300,
@@ -39,7 +64,10 @@ class Settings extends Component {
       cropping: true,
       freeStyleCropEnabled: true,
     })
-      .then((image) => this.setState({ profilePhoto: image }))
+      .then((image) => {
+        this.setState({ profilePhoto: image, loading: true });
+        this.startUploadingImage(image.path);
+      })
       .catch((error) => console.log("PROFILE_SELECTION_ERROR", error));
   }
 
@@ -60,7 +88,7 @@ class Settings extends Component {
   }
   render() {
     const { navigation } = this.props;
-    const { profilePhoto } = this.state;
+    const { profilePhoto, loading } = this.state;
     const photo = profilePhoto ? { uri: profilePhoto?.path } : avatar;
     return (
       <View style={{ height: "100%", backgroundColor: "white", padding: 20 }}>
@@ -72,14 +100,15 @@ class Settings extends Component {
           }}
         >
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              if (loading) return;
               this.props.showFloatingModal({
                 show: true,
                 Jsx: <ProfileFullView image={photo} />,
                 close: true,
                 closeColor: "white",
-              })
-            }
+              });
+            }}
           >
             <Image
               source={photo}
@@ -88,9 +117,18 @@ class Settings extends Component {
                 width: 120,
                 borderRadius: 155,
                 marginBottom: 10,
+                opacity: loading ? 0.4 : 1,
               }}
             />
           </TouchableOpacity>
+          {loading && (
+            <View style={{ flexDirection: "row" }}>
+              <ActivityIndicator color="green" size="small" />
+              <Text style={{ marginLeft: 10, color: "green" }}>
+                Changing...
+              </Text>
+            </View>
+          )}
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity onPress={this.chooseProfilePhoto}>
               <Text
