@@ -3,8 +3,10 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { STYLES } from "../../shared/ui";
 import TextBox from "./../../components/TextBox";
 import { Ionicons } from "@expo/vector-icons";
-
+import FlatButton from "./../../components/FlatButton";
 import { makeAlert } from "./../../shared/utils";
+import InternetExplorer from "./../../shared/classes/InternetExplorer";
+import { UPDATE_USER_PROFILE } from "../../shared/urls";
 const fields = [
   {
     dbName: "preferred_name",
@@ -16,6 +18,7 @@ const fields = [
     dbName: "room_number",
     placeholder: "Room Number",
     name: "Preferred Name",
+    maxLength: 4,
     label: "Add Your room number...",
   },
   {
@@ -27,16 +30,34 @@ const fields = [
 ];
 export default class EditYourProfile extends Component {
   state = {
-    // showAlert: false,
-    // message: null,
-    // title: null,
+    form: {},
   };
+
+  updateProfileInApi() {
+    return (async () => {
+      const response = await InternetExplorer.roamAndFind(
+        UPDATE_USER_PROFILE,
+        "POST",
+        this.state.form
+      );
+
+      console.log("I am the response", response);
+    })();
+  }
+  setFormContent(fieldName, value) {
+    this.setState({ form: { ...this.state.form, [fieldName]: value } });
+  }
+
   renderBoxes() {
     return fields.map((box, index) => {
       return (
         <View style={{ marginTop: 8 }} key={index.toString()}>
           <Text style={{ marginBottom: 6 }}>{box.label}</Text>
-          <TextBox placeholder={box.placeholder} />
+          <TextBox
+            placeholder={box.placeholder}
+            onChangeText={(text) => this.setFormContent(box.dbName, text)}
+            {...box}
+          />
         </View>
       );
     });
@@ -82,7 +103,12 @@ export default class EditYourProfile extends Component {
   render() {
     return (
       <ScrollView
-        style={{ height: "100%", backgroundColor: "white", padding: 15 }}
+        style={{
+          height: "100%",
+          backgroundColor: "white",
+          padding: 15,
+          flex: 1,
+        }}
       >
         <Text style={{ fontWeight: "bold", color: STYLES.theme.blue }}>
           {" "}
@@ -99,7 +125,7 @@ export default class EditYourProfile extends Component {
               borderBottomColor: STYLES.theme.lightGrey,
             }}
           >
-            ROLE MANAGMENT
+            ROLE MANAGEMENT
           </Text>
 
           <Text style={{ color: "grey", margin: 6 }}>
@@ -108,6 +134,19 @@ export default class EditYourProfile extends Component {
           </Text>
 
           {this.renderRoles()}
+          <FlatButton
+            onPress={() => console.log("I AM THE STATE", this.state.form)}
+            containerStyle={{
+              // position: "absolute",
+              marginTop: 20,
+              bottom: 0,
+              width: "100%",
+              backgroundColor: "green",
+            }}
+            style={{ fontWeight: "bold" }}
+          >
+            UPDATE
+          </FlatButton>
         </View>
       </ScrollView>
     );
