@@ -1,5 +1,13 @@
 import { Alert } from "react-native";
 
+/**
+ *
+ * @param {*} title
+ * @param {*} message
+ * @param {*} props
+ * @param {*} okFxn
+ * @param {*} cancelFxn
+ */
 export const makeAlert = (
   title,
   message,
@@ -20,5 +28,5 @@ export const makeAlert = (
       style: "cancel",
     });
 
-  Alert.aler(title, message, btns, props);
+  return Alert.alert(title, message, btns, props);
 };
