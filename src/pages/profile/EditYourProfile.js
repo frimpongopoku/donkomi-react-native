@@ -7,6 +7,8 @@ import FlatButton from "./../../components/FlatButton";
 import { makeAlert } from "./../../shared/utils";
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import { UPDATE_USER_PROFILE } from "../../shared/urls";
+import { connect } from "react-redux";
+import SuccessNotification from "../../components/SuccessNotification";
 const fields = [
   {
     dbName: "preferred_name",
@@ -28,20 +30,47 @@ const fields = [
     label: "Add your residence name...",
   },
 ];
-export default class EditYourProfile extends Component {
+class EditYourProfile extends Component {
   state = {
     form: {},
+    success: null,
   };
 
   updateProfileInApi() {
-    return (async () => {
-      const response = await InternetExplorer.roamAndFind(
-        UPDATE_USER_PROFILE,
-        "POST",
-        this.state.form
+    const { user } = this.props;
+    const { form } = this.state;
+    // only preferred Name cannot be set to null in the db, the rest can be anything
+
+    if (!form.preferred_name)
+      return makeAlert(
+        "Preferred Name",
+        "Please make sure you dont leave the preferred name field empty"
       );
 
-      console.log("I am the response", response);
+    return (async () => {
+      try {
+        const response = await InternetExplorer.roamAndFind(
+          UPDATE_USER_PROFILE,
+          "POST",
+          { data: form, user_id: user.user_id }
+        );
+
+        if (!response.success) {
+          console.log("ERROR UPDATING", response.error);
+          return makeAlert(
+            "Couldnt update",
+            `Sorry, something happened, we could not update. Try again in a few minutes`
+          );
+        }
+
+        this.setState({
+          success: "Your profile updated succesfully!",
+        });
+
+        // now set the user to redux
+      } catch (e) {
+        console.log("GOT AN ERROR", e);
+      }
     })();
   }
   setFormContent(fieldName, value) {
@@ -101,12 +130,16 @@ export default class EditYourProfile extends Component {
     });
   }
   render() {
+    const { success } = this.state;
     return (
       <ScrollView
         style={{
           height: "100%",
           backgroundColor: "white",
-          padding: 15,
+          paddingRight: 15,
+          paddingLeft: 15,
+          paddingTop: 15,
+          paddingBottom: 100,
           flex: 1,
         }}
       >
@@ -114,6 +147,8 @@ export default class EditYourProfile extends Component {
           {" "}
           Edit your profile information here
         </Text>
+
+        {success && <SuccessNotification text={text} />}
 
         <View style={{ marginTop: 20 }}>
           {this.renderBoxes()}
@@ -135,7 +170,7 @@ export default class EditYourProfile extends Component {
 
           {this.renderRoles()}
           <FlatButton
-            onPress={() => console.log("I AM THE STATE", this.state.form)}
+            onPress={() => this.updateProfileInApi()}
             containerStyle={{
               // position: "absolute",
               marginTop: 20,
@@ -152,3 +187,10 @@ export default class EditYourProfile extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
+};
+export default connect(mapStateToProps, null)(EditYourProfile);

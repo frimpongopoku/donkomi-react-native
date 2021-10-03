@@ -5,13 +5,12 @@ export const STYLES = {
     alignItems: "center",
     justifyContent: "center",
   },
-  theme: { 
-    blue: "#2E3C84", 
-    maroon: "#D13123", 
+  theme: {
+    blue: "#2E3C84",
+    maroon: "#D13123",
     lightGrey: "#EAEAEA",
     purple: "#261942",
-    lightPurple:"#e5dcfc"
-  }
+    lightPurple: "#e5dcfc",
+    success: "#D1FFCD",
+  },
 };
-
-
