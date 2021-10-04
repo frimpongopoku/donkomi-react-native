@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { STYLES } from "../../shared/ui";
 import TextBox from "./../../components/TextBox";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,6 +15,7 @@ import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import { UPDATE_USER_PROFILE } from "../../shared/urls";
 import { connect } from "react-redux";
 import SuccessNotification from "../../components/SuccessNotification";
+import { setDonkomiUserAction } from "../../redux/actions/actions";
 const fields = [
   {
     dbName: "preferred_name",
@@ -32,8 +39,10 @@ const fields = [
 ];
 class EditYourProfile extends Component {
   state = {
+    mounted: false,
     form: {},
     success: null,
+    loading: false,
   };
 
   updateProfileInApi() {
@@ -46,6 +55,8 @@ class EditYourProfile extends Component {
         "Preferred Name",
         "Please make sure you dont leave the preferred name field empty"
       );
+
+    this.setState({ loading: true });
 
     return (async () => {
       try {
@@ -68,21 +79,56 @@ class EditYourProfile extends Component {
         });
 
         // now set the user to redux
+        this.props.reduxSetUser(response.data);
       } catch (e) {
         console.log("GOT AN ERROR", e);
+        makeAlert(
+          "Coulnt update",
+          "Sorry, something happened, we could not update. Try again in a few minutes"
+        );
       }
+
+      this.setState({ loading: false });
     })();
   }
   setFormContent(fieldName, value) {
     this.setState({ form: { ...this.state.form, [fieldName]: value } });
   }
 
+  getDefaults(fieldName) {
+    const { user } = this.props;
+    const data = {
+      preferred_name: user?.preferred_name,
+      residence: user?.residence,
+      room_number: user?.room_number,
+    };
+
+    return data[fieldName];
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const { user } = props;
+    if (!state.mounted)
+      return {
+        form: {
+          preferred_name: user?.preferred_name,
+          residence: user?.residence,
+          room_number: user?.room_number,
+        },
+        mounted: true,
+      };
+
+    return null;
+  }
+
   renderBoxes() {
     return fields.map((box, index) => {
+      const value = this.state.form[box.dbName];
       return (
         <View style={{ marginTop: 8 }} key={index.toString()}>
           <Text style={{ marginBottom: 6 }}>{box.label}</Text>
           <TextBox
+            value={value}
             placeholder={box.placeholder}
             onChangeText={(text) => this.setFormContent(box.dbName, text)}
             {...box}
@@ -129,8 +175,10 @@ class EditYourProfile extends Component {
       );
     });
   }
+
   render() {
     const { success } = this.state;
+    const { user } = this.props;
     return (
       <ScrollView
         style={{
@@ -145,10 +193,15 @@ class EditYourProfile extends Component {
       >
         <Text style={{ fontWeight: "bold", color: STYLES.theme.blue }}>
           {" "}
-          Edit your profile information here
+          {user?.preferred_name}, edit your profile information here
         </Text>
 
-        {success && <SuccessNotification text={text} />}
+        {success && (
+          <SuccessNotification
+            text={success}
+            close={() => this.setState({ success: null })}
+          />
+        )}
 
         <View style={{ marginTop: 20 }}>
           {this.renderBoxes()}
@@ -172,15 +225,16 @@ class EditYourProfile extends Component {
           <FlatButton
             onPress={() => this.updateProfileInApi()}
             containerStyle={{
-              // position: "absolute",
               marginTop: 20,
               bottom: 0,
               width: "100%",
               backgroundColor: "green",
+              marginBottom: 100,
             }}
             style={{ fontWeight: "bold" }}
+            loading={this.state.loading}
           >
-            UPDATE
+            {this.state.loading ? "UPDATING..." : "UPDATE"}
           </FlatButton>
         </View>
       </ScrollView>
@@ -193,4 +247,7 @@ const mapStateToProps = (state) => {
     user: state.user,
   };
 };
-export default connect(mapStateToProps, null)(EditYourProfile);
+
+export default connect(mapStateToProps, { reduxSetUser: setDonkomiUserAction })(
+  EditYourProfile
+);
