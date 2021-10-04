@@ -5,6 +5,13 @@ export const STYLES = {
     alignItems: "center",
     justifyContent: "center",
   },
+  textbox: {
+    borderWidth: 0,
+    borderBottomWidth: 2,
+    fontSize: 15,
+    padding: 10,
+    borderBottomColor: "#EAEAEA",
+  },
   theme: {
     blue: "#2E3C84",
     maroon: "#D13123",

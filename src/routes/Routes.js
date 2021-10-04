@@ -14,6 +14,7 @@ import Checkout from "../pages/checkout/Checkout";
 import PlaceOrder from "../pages/order placement/PlaceOrder";
 import FormPlaceholder from "../pages/forms/FormPlaceholder";
 import EditYourProfile from "../pages/profile/EditYourProfile";
+import ShopCreationContainer from "../pages/shop/creation/ShopCreationContainer";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
@@ -181,6 +182,15 @@ const SinglePageStack = () => {
           headerLeft: makeHeaderLeft(navigation),
           // headerRight: makeHeaderRight(navigation, "checkout"),
           title: "Edit your profile",
+        })}
+      />
+      <Stack.Screen
+        name="create-shop"
+        component={ShopCreationContainer}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          // headerRight: makeHeaderRight(navigation, "place-routine-order"),
+          title: "Create New Shop",
         })}
       />
     </Stack.Navigator>

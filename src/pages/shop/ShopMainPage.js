@@ -5,6 +5,8 @@ import TabBarHeader from "../../shared/components/TabBarHeader";
 import ShopManagement from "./ShopManagement";
 import ShopOrders from "./ShopOrders";
 import Stock from "./Stock";
+import { Entypo } from "@expo/vector-icons";
+import FormPlaceholder from "../forms/FormPlaceholder";
 
 export default class ShopMainPage extends Component {
   constructor(props) {
@@ -47,14 +49,48 @@ export default class ShopMainPage extends Component {
   }
 
   handleIndexChange = (index) => this.setState({ index });
+
+  addShopItem() {
+    const { shops, navigation } = this.props;
+    // const params = {
+    //   page: FormPlaceholder.PAGES.SHOPITEM,
+    //   notificationMessage: !shops
+    //     ? "You have not created a shop yet, you need to create one, and add items"
+    //     : null,
+    // };
+    navigation.navigate("singles", {
+      screen: "create-shop",
+    });
+  }
   render() {
+    const { navigation } = this.props;
     return (
-      <TabView
-        navigationState={{ index: this.state.index, routes: this.routes }}
-        renderScene={this.renderScene}
-        renderTabBar={this.renderTabBar}
-        onIndexChange={this.handleIndexChange}
-      />
+      <>
+        <TabView
+          navigationState={{ index: this.state.index, routes: this.routes }}
+          renderScene={this.renderScene}
+          renderTabBar={this.renderTabBar}
+          onIndexChange={this.handleIndexChange}
+        />
+
+        <TouchableOpacity
+          onPress={() => this.addShopItem()}
+          style={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            borderRadius: 55,
+            width: 55,
+            height: 55,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "green",
+            elevation: 5,
+          }}
+        >
+          <Entypo name="plus" size={24} color="white" />
+        </TouchableOpacity>
+      </>
     );
   }
 }

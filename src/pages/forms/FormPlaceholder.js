@@ -84,24 +84,31 @@ export default class FormPlaceholder extends Component {
         return json;
     }
   }
+
+  getRouteNotification() {
+    const { route } = this.props;
+    return route?.params.notificationMessage;
+  }
   render() {
     const { pageJson } = this.state;
+
     return (
-      <View
+      <ScrollView
         style={{
           flex: 1,
           height: "100%",
-          backgroundColor: "white",
+          backgroundColor: "red",
         }}
       >
-        <FormGenerator
-          title={pageJson?.formTitle}
-          onSubmit={(content) =>
-            console.log("--------HERE WE GO--------", content)
-          }
-          fields={pageJson?.formFields}
-        />
-      </View>
+          <Text>{this.getRouteNotification()} </Text>
+          <FormGenerator
+            title={pageJson?.formTitle}
+            onSubmit={(content) =>
+              console.log("--------HERE WE GO--------", content)
+            }
+            fields={pageJson?.formFields}
+          />
+      </ScrollView>
     );
   }
 }

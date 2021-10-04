@@ -8,7 +8,7 @@ export default function FlatButton({
   containerStyle = {},
   onPress,
   props = {},
-  loading = true,
+  loading = false,
 }) {
   return (
     <TouchableOpacity
@@ -20,8 +20,8 @@ export default function FlatButton({
         backgroundColor: color || STYLES.theme.maroon,
         padding: 15,
         display: "flex",
-        flexDirection: "row",
         ...STYLES.flex,
+        flexDirection: "row",
         ...containerStyle,
       }}
     >

@@ -150,35 +150,26 @@ export const FORM_JSONS = {
     {
       fieldType: FormGenerator.FIELDS.TEXTBOX,
       placeholder: "Eg. 210",
-      label: "Price",
+      label: "Price in Rupees(Rs)",
       name: "Item Price",
       dbName: "item_price",
       keyboardType: "numeric",
       required: true,
     },
     {
-      fieldType: FormGenerator.FIELDS.TEXTAREA,
-      placeholder:
-        "Eg. Ama's Jollof House sells jollof rice made the ghanaian way",
-      label: "About your shop",
-      name: "shop description",
-      dbName: "about_shop",
-      numberOfLines: 6,
-      required: true,
-    },
-    {
       fieldType: FormGenerator.FIELDS.IMAGE,
-      label: "Your shop's cover photo",
+      label: "A Photo of item",
       name: "image",
       dbName: "image",
+      required: true,
     },
   ],
 
-  "applications": [ 
+  applications: [
     {
       fieldType: FormGenerator.FIELDS.IMAGE,
       name: "Profile Picture",
       dbName: "profile_picture",
     },
-  ]
+  ],
 };
