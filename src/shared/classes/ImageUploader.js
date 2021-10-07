@@ -5,21 +5,12 @@ const makeError = (message) => {
 };
 export default class ImageUploader {
   static PROFILE_PHOTOS = "Profile Photos";
-  // static uploadImageToFirebase(bucket, image) {
-  //   if (!bucket || !image)
-  //     return makeError("Provide a bucket name, and an image");
-  //   return async () => {
-  //     ref = storage().ref(bucket);
-  //     if (!ref) return makeError("Invalid firebase bucket reference...");
-  //     const url = await ref.putFile(image);
-  //     return url;
-  //   };
-  // }
+  static SHOP_PHOTO_BUCKET = "Shop Cover Photos"
+  static PRODUCT_BUCKET = "Product Photos"
   static uploadImageToFirebase(bucket, image, onComplete, onError, inProgress) {
     if (!bucket || !image)
       return onError("Provide a bucket name, and an image");
     const ref = storage().ref(`${bucket}/${Date.now()}`);
-    // if (!ref) return onError("Invalid firebase bucket reference...");
     const task = ref.putFile(image, { contentType: "image/jpg" });
     task.on(STATE_CHANGED, (snap) => inProgress && inProgress(snap));
     task.then(() => {

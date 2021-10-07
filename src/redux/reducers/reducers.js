@@ -2,6 +2,8 @@ import {
   NOTHING,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_USER_SHOPS,
+  SET_USER_SHOP_ITEMS,
   SHOW_FLOATING_MODAL,
 } from "../actions/constants";
 
@@ -26,6 +28,22 @@ export const showFloatingModalReducer = (
   action
 ) => {
   if (action.type === SHOW_FLOATING_MODAL) return action.payload;
+
+  return state;
+};
+export const setUserShopsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_USER_SHOPS) return action.payload;
+
+  return state;
+};
+export const setUserShopItemsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_USER_SHOP_ITEMS) return action.payload;
 
   return state;
 };

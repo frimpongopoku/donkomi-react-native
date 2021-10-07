@@ -3,6 +3,8 @@ import {
   doNothingReducer,
   firebaseAuthUserReducer,
   setDonkomiUserReducer,
+  setUserShopItemsReducer,
+  setUserShopsReducer,
   showFloatingModalReducer,
 } from "./reducers";
 
@@ -11,4 +13,6 @@ export default combineReducers({
   fireAuth: firebaseAuthUserReducer,
   user: setDonkomiUserReducer,
   modal: showFloatingModalReducer,
+  shops: setUserShopsReducer, 
+  products: setUserShopItemsReducer
 });
