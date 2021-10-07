@@ -21,16 +21,19 @@ class ShopCreationContainer extends Component {
     success: null,
   };
 
-  async sendShopToBackend(data) {
-    console.log("THIS IS THE DATA", data);
-    const response = await InternetExplorer.roamAndFind(
-      CREATE_A_SHOP,
-      "POST",
-      data
-    );
-    console.log("I am teh response brother", response);
-    this.setState({ loading: false });
+  sendShopToBackend(data) {
+    return (async () => {
+      console.log("THIS IS THE DATA", data);
+      const response = await InternetExplorer.roamAndFind(
+        CREATE_A_SHOP,
+        "POST",
+        data
+      );
+      console.log("I am teh response brother", response);
+      this.setState({ loading: false });
+    })();
   }
+
   startShopCreationProcess() {
     const { form } = this.state;
     const data = { description: form.description, name: form.name };
@@ -43,7 +46,7 @@ class ShopCreationContainer extends Component {
     ImageUploader.uploadImageToFirebase(
       ImageUploader.SHOP_PHOTO_BUCKET,
       form.image?.path,
-      (url) => this.sendShopToBackend({ ...data, image: url }),
+      (url) => this.sendShopToBackend({ ...data, image: url })
       // (error) => {
       //   makeAlert(
       //     "Sorry",

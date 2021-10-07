@@ -5,11 +5,11 @@ const makeError = (message) => {
 };
 export default class ImageUploader {
   static PROFILE_PHOTOS = "Profile Photos";
-  static SHOP_PHOTO_BUCKET = "Shop Cover Photos"
-  static PRODUCT_BUCKET = "Product Photos"
+  static SHOP_PHOTO_BUCKET = "Shop Cover Photos";
+  static PRODUCT_BUCKET = "Product Photos";
   static uploadImageToFirebase(bucket, image, onComplete, onError, inProgress) {
     if (!bucket || !image)
-      return onError("Provide a bucket name, and an image");
+      return onError ? onError("Provide a bucket name, and an image") : null;
     const ref = storage().ref(`${bucket}/${Date.now()}`);
     const task = ref.putFile(image, { contentType: "image/jpg" });
     task.on(STATE_CHANGED, (snap) => inProgress && inProgress(snap));
@@ -17,9 +17,13 @@ export default class ImageUploader {
       ref
         .getDownloadURL()
         .then((url) => onComplete(url))
-        .catch((e) => onError(e?.toString()));
+        .catch((e) => {
+          if (onError) onError(e?.toString());
+        });
     });
-    task.catch((e) => onError(e));
+    task.catch((e) => {
+      if (onError) onError(e);
+    });
   }
 
   static uploadProfilePhoto(image, onComplete, onError, inProgress) {
