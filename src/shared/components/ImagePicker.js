@@ -1,6 +1,6 @@
 import { Entypo } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Image, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import ImageCropPicker from "react-native-image-crop-picker";
 import { STYLES } from "../../shared/ui";
 
@@ -31,29 +31,32 @@ export default class ImagePicker extends Component {
   render() {
     const { pickerProps } = this.props;
     return (
-      <TouchableOpacity
-        onPress={() =>
-          ImageCropPicker.openPicker({
-            width: 300,
-            height: 400,
-            ...pickerProps,
-          })
-            .then((image) => this.onFileSelected(image, null))
-            .catch((error) => this.onFileSelected(null, error))
-        }
-        style={{
-          width: "100%",
-          minHeight: 200,
-          alignItems: "center",
-          justifyContent: "center",
-          elevation: 4,
-          borderRadius: 5,
-          borderColor: STYLES.theme.blue,
-          backgroundColor: "white",
-        }}
-      >
-        {this.renderSelector()}
-      </TouchableOpacity>
+      <View style={{ padding: 5 }}>
+        <TouchableOpacity
+          onPress={() =>
+            ImageCropPicker.openPicker({
+              width: 300,
+              height: 400,
+              ...pickerProps,
+            })
+              .then((image) => this.onFileSelected(image, null))
+              .catch((error) => this.onFileSelected(null, error))
+          }
+          style={{
+            width: "100%",
+            minHeight: 200,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 3,
+            borderRadius: 5,
+            borderColor: STYLES.theme.blue,
+            backgroundColor: "white",
+            // margin: 7,
+          }}
+        >
+          {this.renderSelector()}
+        </TouchableOpacity>
+      </View>
     );
   }
 }

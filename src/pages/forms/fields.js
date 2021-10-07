@@ -157,6 +157,15 @@ export const FORM_JSONS = {
       required: true,
     },
     {
+      fieldType: FormGenerator.FIELDS.DROPDOWN,
+      placeholder: "Choose shop the item should be in...",
+      label: "Which shop should this item be in?",
+      name: "Shop",
+      data: ["Akwesi's shops", "Biibi Kisok", "Bombo"],
+      dbName: "shop",
+      required: true,
+    },
+    {
       fieldType: FormGenerator.FIELDS.IMAGE,
       label: "A Photo of item",
       name: "image",
