@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import FlatButton from "../../../components/FlatButton";
+import Subtitle from "../../../components/Subtitle";
 import SuccessNotification from "../../../components/SuccessNotification";
 import TextBox from "../../../components/TextBox";
 import {
@@ -72,17 +73,16 @@ class ShopCreationContainer extends Component {
 
   startCreatingProduct() {
     const { form } = this.state;
-    if (!form?.name || !form?.image || !form.shop)
+    if (!form?.name || !form?.image || !form.shop_id)
       return makeAlert(
         "Required",
         "Please make sure you have provided a name, a cover photo, and a shop at least"
       );
-    const image = form.image;
-    delete form.image;
+
     this.setState({ loading: true });
     ImageUploader.uploadImageToFirebase(
       ImageUploader.PRODUCT_BUCKET,
-      image?.path,
+      form.image?.path,
       (url) => this.sendProductToBackend({ ...form, image: url }),
       (error) => {
         makeAlert(
@@ -101,7 +101,12 @@ class ShopCreationContainer extends Component {
       ...data,
       user_id: user?.user_id,
     });
-    console.log("I am the response from PRODUCTS----> ", response);
+    if (response.success) {
+      if (this.state.productFormReset) this.state.productFormReset();
+      addProductToRedux([...(products || []), response.data]);
+      this.setState({ success: `'${data.name}' was created successfully` });
+    } else makeAlert("Sorry", response?.error?.toString());
+    this.setState({ loading: false });
   }
 
   handleCreateButtonPress() {
@@ -124,25 +129,29 @@ class ShopCreationContainer extends Component {
     const { route } = this.props;
     if (route?.params?.page === "shop-item")
       return (
-        <CreateShopItem
-          shops={this.props.shops}
-          onFormChange={(formData, reset) =>
-            this.setState({ form: formData, productFormReset: reset })
-          }
-        />
+        <View style={{ marginBottom: 150 }}>
+          <CreateShopItem
+            shops={this.props.shops}
+            onFormChange={(formData, reset) =>
+              this.setState({ form: formData, productFormReset: reset })
+            }
+          />
+        </View>
       );
 
     return (
-      <CreateShopComponent
-        onFormChange={(formData, reset) =>
-          this.setState({ form: formData, shopFormReset: reset })
-        }
-      />
+      <View style={{ marginBottom: 150 }}>
+        <CreateShopComponent
+          onFormChange={(formData, reset) =>
+            this.setState({ form: formData, shopFormReset: reset })
+          }
+        />
+      </View>
     );
   }
 
   render() {
-    // console.log("I am the shop bro", this.props.shops);
+    console.log("I am the products bro", this.props.products);
     return (
       <View
         style={{
@@ -171,7 +180,7 @@ class ShopCreationContainer extends Component {
           color="green"
           loading={this.state.loading}
         >
-          Create
+          {this.state.loading ? "Creating" : "Create"}
         </FlatButton>
       </View>
     );
@@ -212,6 +221,7 @@ const CreateShopItem = ({ onFormChange, shops }) => {
   };
   return (
     <>
+      <Subtitle text="Add a new item to your shop" />
       {FORM_JSONS["shop-item"].map((item, index) => {
         if (item.fieldType === FormGenerator.FIELDS.TEXTBOX)
           return (
@@ -234,7 +244,7 @@ const CreateShopItem = ({ onFormChange, shops }) => {
                 Enter the name of your shop
               </Text>
               <ImagePicker
-                onFileSelected={(file, error) => handleChange("photo", file)}
+                onFileSelected={(file, error) => handleChange("image", file)}
                 value={formData["image"]}
                 pickerProps={{ cropping: true }}
               />
