@@ -1,12 +1,14 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { STYLES } from "../shared/ui";
 
 export default function SuccessNotification({ text, close }) {
   if (text)
     return (
-      <View
-        onPress={() => (close ? close() : null)}
+      <TouchableOpacity
+        onPress={() => {
+          if (close) close();
+        }}
         style={{
           backgroundColor: STYLES.theme.success,
           width: "100%",
@@ -17,7 +19,7 @@ export default function SuccessNotification({ text, close }) {
         }}
       >
         <Text style={{ color: "green" }}>{text}</Text>
-      </View>
+      </TouchableOpacity>
     );
 
   return <></>;

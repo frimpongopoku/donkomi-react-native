@@ -2,9 +2,11 @@ import { Picker } from "@react-native-picker/picker";
 import React, { Component, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import FlatButton from "../../../components/FlatButton";
 import SuccessNotification from "../../../components/SuccessNotification";
 import TextBox from "../../../components/TextBox";
+import { setUserShopsAction } from "../../../redux/actions/actions";
 import ImageUploader from "../../../shared/classes/ImageUploader";
 import InternetExplorer from "../../../shared/classes/InternetExplorer";
 import ImagePicker from "../../../shared/components/ImagePicker";
@@ -19,17 +21,24 @@ class ShopCreationContainer extends Component {
     loading: false,
     error: null,
     success: null,
+    shopFormReset: null,
+    productFormReset: null,
   };
 
   sendShopToBackend(data) {
+    const { user, shops, addShopToRedux } = this.props;
     return (async () => {
-      console.log("THIS IS THE DATA", data);
       const response = await InternetExplorer.roamAndFind(
         CREATE_A_SHOP,
         "POST",
-        data
+        { ...data, user_id: user?.user_id }
       );
-      console.log("I am teh response brother", response);
+      if (response?.success) {
+        addShopToRedux([...(shops || []), response.data]);
+        if (this.state.shopFormReset) this.state.shopFormReset();
+        this.setState({ success: `'${data?.name}' has been created` });
+      } else makeAlert("Sorry", response?.error?.toString());
+
       this.setState({ loading: false });
     })();
   }
@@ -46,21 +55,25 @@ class ShopCreationContainer extends Component {
     ImageUploader.uploadImageToFirebase(
       ImageUploader.SHOP_PHOTO_BUCKET,
       form.image?.path,
-      (url) => this.sendShopToBackend({ ...data, image: url })
-      // (error) => {
-      //   makeAlert(
-      //     "Sorry",
-      //     "Something happened, we could not create your shop. Please try again in a few minutes"
-      //   );
-      //   this.setState({ loading: false });
-      //   console.log("Error_SHOP_CREATION", error);
-      // }
+      (url) => this.sendShopToBackend({ ...data, image: url }),
+      (error) => {
+        makeAlert(
+          "Sorry",
+          "Something happened, we could not create your shop. Please try again in a few minutes"
+        );
+        this.setState({ loading: false });
+        console.log("Error_SHOP_CREATION", error);
+      }
     );
+  }
+
+  startCreatingProduct() {
+    const { formData } = this.state;
   }
 
   handleCreateButtonPress() {
     const page = this.getCurrentPage();
-    if (page === "shop-item") return;
+    if (page === "shop-item") return this.startCreatingProduct();
     this.startShopCreationProcess();
   }
 
@@ -79,19 +92,24 @@ class ShopCreationContainer extends Component {
     if (route?.params?.page === "shop-item")
       return (
         <CreateShopItem
-          onFormChange={(formData) => this.setState({ form: formData })}
+          shops={this.props.shops}
+          onFormChange={(formData, reset) =>
+            this.setState({ form: formData, productFormReset: reset })
+          }
         />
       );
 
     return (
       <CreateShopComponent
-        onFormChange={(formData) => this.setState({ form: formData })}
+        onFormChange={(formData, reset) =>
+          this.setState({ form: formData, shopFormReset: reset })
+        }
       />
     );
   }
 
   render() {
-    console.log("I am the form data bro", this.state.form);
+    console.log("I am the shop bro", this.props.shops);
     return (
       <View
         style={{
@@ -133,16 +151,30 @@ const mapStateToProps = (state) => {
     products: state.products,
   };
 };
-export default connect(mapStateToProps, null)(ShopCreationContainer);
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      addShopToRedux: setUserShopsAction,
+    },
+    dispatch
+  );
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ShopCreationContainer);
 
 // ----------------------------------------------------------------------------------------------------
-const CreateShopItem = ({ onFormChange }) => {
+const CreateShopItem = ({ onFormChange, shops }) => {
   const [formData, setFormData] = useState({});
-
+  const reset = () => {
+    setFormData({});
+  };
   const handleChange = (name, value) => {
     const data = { ...formData, [name]: value };
-    if (onFormChange) onFormChange(data);
-    setFormData({ ...formData, [name]: value });
+    if (onFormChange) onFormChange(data, reset);
+    setFormData(data);
   };
   return (
     <>
@@ -174,7 +206,6 @@ const CreateShopItem = ({ onFormChange }) => {
               />
             </View>
           );
-
         if (item.fieldType === FormGenerator.FIELDS.DROPDOWN)
           return (
             <View key={index.toString()}>
@@ -187,18 +218,18 @@ const CreateShopItem = ({ onFormChange }) => {
                   padding: 20,
                 }}
                 mode="dropdown"
-                onValueChange={(item) => handleChange(item.dbName, item)}
+                onValueChange={(value) => handleChange(item.dbName, value)}
               >
                 <Picker.Item
                   label="---------"
                   value={null}
                   style={{ padding: 20 }}
                 />
-                {item.data.map((child, index) => (
+                {(shops || []).map((child, index) => (
                   <Picker.Item
                     key={index.toString()}
-                    label={child}
-                    value={child}
+                    label={child.name}
+                    value={child.id}
                     style={{ padding: 20 }}
                   />
                 ))}
@@ -213,14 +244,26 @@ const CreateShopItem = ({ onFormChange }) => {
 // ----------------------------------------------------------------------------------------
 const CreateShopComponent = ({ onFormChange }) => {
   const [formData, setFormData] = useState({});
+  const reset = () => {
+    setFormData({});
+  };
   const handleChange = (name, value) => {
     const data = { ...formData, [name]: value };
-    if (onFormChange) onFormChange(data);
-    setFormData({ ...formData, [name]: value });
+    if (onFormChange) onFormChange(data, reset);
+    setFormData(data);
   };
   return (
     <>
-      {/* <Space /> */}
+      <Text
+        style={{
+          marginBottom: 10,
+          fontSize: 16,
+          fontWeight: "bold",
+          color: STYLES.theme.blue,
+        }}
+      >
+        Add another shop to sell different content
+      </Text>
       <Text>Enter the name of your shop</Text>
       <TextBox
         placeholder="Name of you shop..."

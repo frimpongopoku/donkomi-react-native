@@ -51,15 +51,10 @@ export default class ShopMainPage extends Component {
   handleIndexChange = (index) => this.setState({ index });
 
   addShopItem() {
-    const { shops, navigation } = this.props;
-    // const params = {
-    //   page: FormPlaceholder.PAGES.SHOPITEM,
-    //   notificationMessage: !shops
-    //     ? "You have not created a shop yet, you need to create one, and add items"
-    //     : null,
-    // };
+    const { navigation } = this.props;
     navigation.navigate("singles", {
       screen: "create-shop",
+      params: { page: "shop-item" },
     });
   }
   render() {
