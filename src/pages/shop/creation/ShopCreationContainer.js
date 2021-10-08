@@ -6,12 +6,15 @@ import { bindActionCreators } from "redux";
 import FlatButton from "../../../components/FlatButton";
 import SuccessNotification from "../../../components/SuccessNotification";
 import TextBox from "../../../components/TextBox";
-import { setUserShopsAction } from "../../../redux/actions/actions";
+import {
+  setUserShopItemsAction,
+  setUserShopsAction,
+} from "../../../redux/actions/actions";
 import ImageUploader from "../../../shared/classes/ImageUploader";
 import InternetExplorer from "../../../shared/classes/InternetExplorer";
 import ImagePicker from "../../../shared/components/ImagePicker";
 import { STYLES } from "../../../shared/ui";
-import { CREATE_A_SHOP } from "../../../shared/urls";
+import { CREATE_A_PRODUCT, CREATE_A_SHOP } from "../../../shared/urls";
 import FormGenerator from "../../form generator/FormGenerator";
 import { FORM_JSONS } from "../../forms/fields";
 import { makeAlert } from "./../../../shared/utils";
@@ -46,7 +49,7 @@ class ShopCreationContainer extends Component {
   startShopCreationProcess() {
     const { form } = this.state;
     const data = { description: form.description, name: form.name };
-    if (!form.description || !form.name)
+    if (!form.description || !form.name || !form.image)
       return makeAlert(
         "Required",
         "Please make sure you provide a name, a description, and a cover photo"
@@ -68,7 +71,37 @@ class ShopCreationContainer extends Component {
   }
 
   startCreatingProduct() {
-    const { formData } = this.state;
+    const { form } = this.state;
+    if (!form?.name || !form?.image || !form.shop)
+      return makeAlert(
+        "Required",
+        "Please make sure you have provided a name, a cover photo, and a shop at least"
+      );
+    const image = form.image;
+    delete form.image;
+    this.setState({ loading: true });
+    ImageUploader.uploadImageToFirebase(
+      ImageUploader.PRODUCT_BUCKET,
+      image?.path,
+      (url) => this.sendProductToBackend({ ...form, image: url }),
+      (error) => {
+        makeAlert(
+          "Sorry",
+          "Something happened, we could not create your shop. Please try again in a few minutes"
+        );
+        this.setState({ loading: false });
+        console.log("ERROR_PRODUCT_CREATION", error);
+      }
+    );
+  }
+
+  async sendProductToBackend(data) {
+    const { products, user, addProductToRedux } = this.props;
+    const response = await InternetExplorer.send(CREATE_A_PRODUCT, "POST", {
+      ...data,
+      user_id: user?.user_id,
+    });
+    console.log("I am the response from PRODUCTS----> ", response);
   }
 
   handleCreateButtonPress() {
@@ -109,7 +142,7 @@ class ShopCreationContainer extends Component {
   }
 
   render() {
-    console.log("I am the shop bro", this.props.shops);
+    // console.log("I am the shop bro", this.props.shops);
     return (
       <View
         style={{
@@ -156,6 +189,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addShopToRedux: setUserShopsAction,
+      addProductToRedux: setUserShopItemsAction,
     },
     dispatch
   );

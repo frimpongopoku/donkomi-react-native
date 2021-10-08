@@ -1,4 +1,5 @@
 import {
+  GET_AVAILABLE_ROLES,
   NOTHING,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
@@ -44,6 +45,14 @@ export const setUserShopItemsReducer = (
   action
 ) => {
   if (action.type === SET_USER_SHOP_ITEMS) return action.payload;
+
+  return state;
+};
+export const setAvailableRolesReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === GET_AVAILABLE_ROLES) return action.payload;
 
   return state;
 };

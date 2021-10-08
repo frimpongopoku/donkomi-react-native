@@ -14,12 +14,15 @@ import { STYLES } from "./src/shared/ui";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
+  setAvailableRolesAction,
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
+  setUserShopItemsAction,
+  setUserShopsAction,
   showFloatingModalActions,
 } from "./src/redux/actions/actions";
 import InternetExplorer from "./src/shared/classes/InternetExplorer";
-import { GET_REGISTERED_USER } from "./src/shared/urls";
+import { GET_REGISTERED_USER, WHO_AM_I } from "./src/shared/urls";
 import { AntDesign } from "@expo/vector-icons";
 
 class App extends React.Component {
@@ -28,11 +31,15 @@ class App extends React.Component {
   };
 
   fetchDonkomiUser = (uid) => {
-    InternetExplorer.roamAndFind(GET_REGISTERED_USER, InternetExplorer.POST, {
+    InternetExplorer.roamAndFind(WHO_AM_I, InternetExplorer.POST, {
       user_id: uid,
     })
       .then((response) => {
-        this.props.setDonkomiUser(response.data);
+        const data = response.data;
+        this.props.setDonkomiUser(data.user);
+        this.props.setShops(data.shops);
+        this.props.setProducts(data.products);
+        this.props.setRoles(data.roles);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -181,6 +188,9 @@ const mapDispatchToProps = (dispatch) => {
       setFirebaseAuthUser: setFirebaseAuthUserAction,
       setDonkomiUser: setDonkomiUserAction,
       toggleUniversalModal: showFloatingModalActions,
+      setShops: setUserShopsAction,
+      setProducts: setUserShopItemsAction,
+      setRoles: setAvailableRolesAction,
     },
     dispatch
   );

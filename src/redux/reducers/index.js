@@ -6,6 +6,7 @@ import {
   setUserShopItemsReducer,
   setUserShopsReducer,
   showFloatingModalReducer,
+  setAvailableRolesReducer
 } from "./reducers";
 
 export default combineReducers({
@@ -14,5 +15,6 @@ export default combineReducers({
   user: setDonkomiUserReducer,
   modal: showFloatingModalReducer,
   shops: setUserShopsReducer, 
-  products: setUserShopItemsReducer
+  products: setUserShopItemsReducer,
+  roles: setAvailableRolesReducer
 });

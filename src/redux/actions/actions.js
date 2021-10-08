@@ -1,4 +1,5 @@
 import {
+  GET_AVAILABLE_ROLES,
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
@@ -44,10 +45,13 @@ export const showFloatingModalActions = (
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
 
+export const setUserShopsAction = (shops = null) => {
+  return { type: SET_USER_SHOPS, payload: shops };
+};
+export const setUserShopItemsAction = (items = null) => {
+  return { type: SET_USER_SHOP_ITEMS, payload: items };
+};
 
-export const setUserShopsAction = (shops= null) => { 
-  return {type: SET_USER_SHOPS,payload:shops}
-}
-export const setUserShopItemsAction = (items = null) => { 
-  return {type: SET_USER_SHOP_ITEMS,payload:items}
-}
+export const setAvailableRolesAction = (roles = []) => {
+  return { type: GET_AVAILABLE_ROLES, payload: roles };
+};
