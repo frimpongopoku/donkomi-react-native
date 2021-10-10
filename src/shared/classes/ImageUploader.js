@@ -1,4 +1,5 @@
 import storage from "@react-native-firebase/storage";
+import firebase from "@react-native-firebase/app";
 const STATE_CHANGED = "state_changed";
 const makeError = (message) => {
   return { pass: false, error: message };
@@ -37,7 +38,8 @@ export default class ImageUploader {
   }
 
   static deleteImageFromStorage(imageURL) {
-    const refFromURL = stoarge.refFromURL(imageURL);
-    refFromURL?.delete();
+    const ref = storage().ref(imageURL);
+    console.log("I AMTEH REF------->", ref);
+    ref.delete();
   }
 }

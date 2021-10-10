@@ -87,20 +87,19 @@ class ShopCreationContainer extends Component {
       UpdateFields.PRODUCTS,
       data
     );
-    console.log("Update the fields ------------>", update_data);
     const response = await InternetExplorer.roamAndFind(
       UPDATE_A_PRODUCT,
       "POST",
       { data: update_data, user_id: user?.user_id, product_id: data?.id }
     );
     if (response.success) {
-      if (this.state.productFormReset) this.state.productFormReset();
+      // if (this.state.productFormReset) this.state.productFormReset();
       products = products.filter((prod) => prod.id !== editedItemID);
       addProductToRedux([...products, response.data]);
 
       this.setState({
         success: `'${data.name}' was updated successfully`,
-        form: {},
+        // form: {},
       });
     } else {
       console.log("UPDATE_ERROR", response?.error);
@@ -121,7 +120,7 @@ class ShopCreationContainer extends Component {
 
     const userHasChangedImage = old.image !== form.image;
     if (userHasChangedImage) {
-      console.log("USER HAS CHANGED IAMGE---------->");
+      console.log("USER HAS CHANGED IAMGE---------->", old?.image);
       ImageUploader.deleteImageFromStorage(old.image);
       ImageUploader.uploadImageToFirebase(
         ImageUploader.PRODUCT_BUCKET,
