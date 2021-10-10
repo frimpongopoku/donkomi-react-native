@@ -54,7 +54,7 @@ export default class ShopMainPage extends Component {
     const { navigation } = this.props;
     navigation.navigate("singles", {
       screen: "create-shop",
-      params: { page: "shop-item", edit_id: 8 },
+      params: { edit_id: 7 },
     });
   }
   render() {

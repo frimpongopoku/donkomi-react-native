@@ -21,6 +21,7 @@ import {
   CREATE_A_PRODUCT,
   CREATE_A_SHOP,
   UPDATE_A_PRODUCT,
+  UPDATE_A_SHOP,
 } from "../../../shared/urls";
 import FormGenerator from "../../form generator/FormGenerator";
 import { FORM_JSONS } from "../../forms/fields";
@@ -36,6 +37,54 @@ class ShopCreationContainer extends Component {
     shopFormReset: null,
     productFormReset: null,
   };
+
+  async updateShopInBackend(data) {
+    var { user, shops, addShopToRedux } = this.props;
+    const editedItemID = this.getIdOfItemToEdit();
+    shops = shops || [];
+    const update_data = UpdateFields.getOnlyModelFields(
+      UpdateFields.SHOP,
+      data
+    );
+
+    const response = await InternetExplorer.roamAndFind(UPDATE_A_SHOP, "POST", {
+      data: update_data,
+      user_id: user?.user_id,
+      shop_id: editedItemID,
+    });
+
+    if (response?.success) {
+      shops = shops.filter((shop) => shop.id !== editedItemID);
+      addShopToRedux([...(shops || []), response.data]);
+      this.setState({ success: `'${data?.name}' has been updated!` });
+    } else makeAlert("Sorry", response?.error?.message?.toString());
+    this.setState({ loading: false });
+  }
+
+  startUpdatingShop() {
+    const { form } = this.state;
+    const { shops } = this.props;
+    const old = (shops || []).find(
+      (item) => item.id === this.getIdOfItemToEdit()
+    );
+    const userHasChangedImage = old.image !== form.image;
+    if (userHasChangedImage) {
+      // delete image here first, @TODO
+      ImageUploader.uploadImageToFirebase(
+        ImageUploader.SHOP_PHOTO_BUCKET,
+        form.image?.path,
+        (url) => this.updateShopInBackend({ ...form, image: url }),
+        (error) => {
+          makeAlert(
+            "Sorry",
+            "Something happened, we could not update your shop. Please try again in a few minutes"
+          );
+          this.setState({ loading: false });
+          console.log("Error_SHOP_UPDATE", error);
+        }
+      );
+    } else this.updateShopInBackend(form);
+  }
 
   sendShopToBackend(data) {
     const { user, shops, addShopToRedux } = this.props;
@@ -64,6 +113,9 @@ class ShopCreationContainer extends Component {
         "Please make sure you provide a name, a description, and a cover photo"
       );
     this.setState({ loading: true });
+
+    if (this.isInEditMode()) return this.startUpdatingShop();
+
     ImageUploader.uploadImageToFirebase(
       ImageUploader.SHOP_PHOTO_BUCKET,
       form.image?.path,
@@ -120,7 +172,6 @@ class ShopCreationContainer extends Component {
 
     const userHasChangedImage = old.image !== form.image;
     if (userHasChangedImage) {
-      console.log("USER HAS CHANGED IAMGE---------->", old?.image);
       ImageUploader.deleteImageFromStorage(old.image);
       ImageUploader.uploadImageToFirebase(
         ImageUploader.PRODUCT_BUCKET,
@@ -181,7 +232,7 @@ class ShopCreationContainer extends Component {
 
   handleCreateButtonPress() {
     const page = this.getCurrentPage();
-    if (page === "shop-item") return this.startCreatingProduct();
+    if (page === PRODUCT_PAGE) return this.startCreatingProduct();
     this.startShopCreationProcess();
   }
 
@@ -196,6 +247,8 @@ class ShopCreationContainer extends Component {
     }
     navigation.setOptions({ title });
   }
+
+  isShop = () => this.getCurrentPage() !== PRODUCT_PAGE;
 
   getCurrentPage = () => this.props.route?.params?.page;
   getIdOfItemToEdit = () => this.props.route?.params?.edit_id;
@@ -234,13 +287,14 @@ class ShopCreationContainer extends Component {
             this.setState({ form: formData, shopFormReset: reset })
           }
           form={this.state.form}
+          isInEditMode={this.getIdOfItemToEdit()}
         />
       </View>
     );
   }
 
   render() {
-    // console.log("I amt the producst bebe", this.props.products);
+    // console.log("I amt the producst bebe", this.props.shops);
     // console.log("Also, I am the from", this.state.form);
     return (
       <View
@@ -405,11 +459,12 @@ const CreateShopItem = ({ onFormChange, shops, form, isInEditMode }) => {
 };
 
 // ----------------------------------------------------------------------------------------
-const CreateShopComponent = ({ onFormChange }) => {
+const CreateShopComponent = ({ onFormChange, form, isInEditMode }) => {
   const [formData, setFormData] = useState({});
   const reset = () => {
     setFormData({});
   };
+  useEffect(() => setFormData(form), [form]);
   const handleChange = (name, value) => {
     const data = { ...formData, [name]: value };
     if (onFormChange) onFormChange(data, reset);
@@ -425,7 +480,9 @@ const CreateShopComponent = ({ onFormChange }) => {
           color: STYLES.theme.blue,
         }}
       >
-        Add another shop to sell different content
+        {isInEditMode
+          ? "Make changes to your shop..."
+          : "Add another shop to sell different content"}
       </Text>
       <Text>Enter the name of your shop</Text>
       <TextBox

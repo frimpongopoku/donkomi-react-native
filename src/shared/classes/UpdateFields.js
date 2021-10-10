@@ -1,6 +1,6 @@
 export default class UpdateFields {
   static PRODUCTS = ["name", "size", "variation", "price", "shop_id", "image"];
-
+  static SHOP = ["name", "description", "image"]
   static getOnlyModelFields(modelFields = [], data) {
     if (!modelFields || !data) return {};
     const form = {};
