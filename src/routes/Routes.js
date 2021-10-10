@@ -109,7 +109,7 @@ export const ApplicationStack = () => (
       name="Shop"
       component={ShopMainPage}
       options={({ navigation }) => ({
-        title: "Shop",
+        title: "Market Place",
         headerRight: makeHeaderRight(navigation),
       })}
     />

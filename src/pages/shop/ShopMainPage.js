@@ -7,6 +7,7 @@ import ShopOrders from "./ShopOrders";
 import Stock from "./Stock";
 import { Entypo } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
+import YourShops from "./YourShops";
 
 export default class ShopMainPage extends Component {
   constructor(props) {
@@ -18,19 +19,22 @@ export default class ShopMainPage extends Component {
   }
 
   routes = [
-    { key: "stock", title: "Stock" },
-    { key: "shop-management", title: "Manage Your Shop" },
+    { key: "market", title: "Market" },
+    { key: "your-products", title: " Products" },
+    { key: "your-shops", title: " Shops" },
     { key: "orders", title: "Orders" },
   ];
 
   renderScene = ({ route }) => {
     switch (route.key) {
-      case "stock":
+      case "market":
         return <Stock text={route.key} />;
-      case "shop-management":
+      case "your-products":
         return <ShopManagement />;
       case "orders":
         return <ShopOrders />;
+        case "your-shops":
+          return <YourShops />;
       default:
         return <Text>These are the orders from my shop</Text>;
     }
