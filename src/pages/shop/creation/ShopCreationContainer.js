@@ -1,8 +1,9 @@
 import { Picker } from "@react-native-picker/picker";
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import Chip from "../../../components/Chip";
 import FlatButton from "../../../components/FlatButton";
 import Subtitle from "../../../components/Subtitle";
 import SuccessNotification from "../../../components/SuccessNotification";
@@ -13,12 +14,19 @@ import {
 } from "../../../redux/actions/actions";
 import ImageUploader from "../../../shared/classes/ImageUploader";
 import InternetExplorer from "../../../shared/classes/InternetExplorer";
+import UpdateFields from "../../../shared/classes/UpdateFields";
 import ImagePicker from "../../../shared/components/ImagePicker";
 import { STYLES } from "../../../shared/ui";
-import { CREATE_A_PRODUCT, CREATE_A_SHOP } from "../../../shared/urls";
+import {
+  CREATE_A_PRODUCT,
+  CREATE_A_SHOP,
+  UPDATE_A_PRODUCT,
+} from "../../../shared/urls";
 import FormGenerator from "../../form generator/FormGenerator";
 import { FORM_JSONS } from "../../forms/fields";
 import { makeAlert } from "./../../../shared/utils";
+
+const PRODUCT_PAGE = "shop-item";
 class ShopCreationContainer extends Component {
   state = {
     form: {},
@@ -41,7 +49,7 @@ class ShopCreationContainer extends Component {
         addShopToRedux([...(shops || []), response.data]);
         if (this.state.shopFormReset) this.state.shopFormReset();
         this.setState({ success: `'${data?.name}' has been created` });
-      } else makeAlert("Sorry", response?.error?.toString());
+      } else makeAlert("Sorry", response?.error?.message?.toString());
 
       this.setState({ loading: false });
     })();
@@ -71,15 +79,75 @@ class ShopCreationContainer extends Component {
     );
   }
 
+  async updateProductInBackend(data) {
+    var { user, addProductToRedux, products } = this.props;
+    const editedItemID = this.getIdOfItemToEdit();
+    products = products || [];
+    const update_data = UpdateFields.getOnlyModelFields(
+      UpdateFields.PRODUCTS,
+      data
+    );
+    console.log("Update the fields ------------>", update_data);
+    const response = await InternetExplorer.roamAndFind(
+      UPDATE_A_PRODUCT,
+      "POST",
+      { data: update_data, user_id: user?.user_id, product_id: data?.id }
+    );
+    if (response.success) {
+      if (this.state.productFormReset) this.state.productFormReset();
+      products = products.filter((prod) => prod.id !== editedItemID);
+      addProductToRedux([...products, response.data]);
+
+      this.setState({
+        success: `'${data.name}' was updated successfully`,
+        form: {},
+      });
+    } else {
+      console.log("UPDATE_ERROR", response?.error);
+      makeAlert("Sorry", response?.error?.message?.toString());
+    }
+    this.setState({ loading: false });
+  }
+
+  //check if image has changed.
+  //delete old one, upload new one, get url, replace the url in the form object,
+  //send form object to backend to update
+  startUpdatingProduct() {
+    const { form } = this.state;
+    const { products } = this.props;
+    const old = (products || []).find(
+      (item) => item.id === this.getIdOfItemToEdit()
+    );
+
+    const userHasChangedImage = old.image !== form.image;
+    if (userHasChangedImage) {
+      console.log("USER HAS CHANGED IAMGE---------->");
+      ImageUploader.deleteImageFromStorage(old.image);
+      ImageUploader.uploadImageToFirebase(
+        ImageUploader.PRODUCT_BUCKET,
+        form.image?.path,
+        (url) => this.updateProductInBackend({ ...form, image: url }),
+        (error) => {
+          makeAlert(
+            "Sorry",
+            "Something happened, we could not update your product. Please try again in a few minutes"
+          );
+          this.setState({ loading: false });
+          console.log("ERROR_PRODUCT_UPDATE", error);
+        }
+      );
+    } else this.updateProductInBackend(form);
+  }
+
   startCreatingProduct() {
     const { form } = this.state;
-    if (!form?.name || !form?.image || !form.shop_id)
+    if (!form?.name || !form?.image || (!form.shop_id && !this.isInEditMode()))
       return makeAlert(
         "Required",
         "Please make sure you have provided a name, a cover photo, and a shop at least"
       );
-
     this.setState({ loading: true });
+    if (this.isInEditMode()) return this.startUpdatingProduct();
     ImageUploader.uploadImageToFirebase(
       ImageUploader.PRODUCT_BUCKET,
       form.image?.path,
@@ -87,7 +155,7 @@ class ShopCreationContainer extends Component {
       (error) => {
         makeAlert(
           "Sorry",
-          "Something happened, we could not create your shop. Please try again in a few minutes"
+          "Something happened, we could not create your product. Please try again in a few minutes"
         );
         this.setState({ loading: false });
         console.log("ERROR_PRODUCT_CREATION", error);
@@ -104,8 +172,11 @@ class ShopCreationContainer extends Component {
     if (response.success) {
       if (this.state.productFormReset) this.state.productFormReset();
       addProductToRedux([...(products || []), response.data]);
-      this.setState({ success: `'${data.name}' was created successfully` });
-    } else makeAlert("Sorry", response?.error?.toString());
+      this.setState({
+        success: `'${data.name}' was created successfully`,
+        form: {},
+      });
+    } else makeAlert("Sorry", response?.error?.message?.toString());
     this.setState({ loading: false });
   }
 
@@ -120,11 +191,27 @@ class ShopCreationContainer extends Component {
     var title;
     if (this.getCurrentPage() === "shop-item") title = "Add New Shop Items";
     else title = "Create New Shop";
+    if (this.isInEditMode()) {
+      const item = this.findItemToEdit();
+      title = `Editing '${item?.name}'`;
+    }
     navigation.setOptions({ title });
   }
 
   getCurrentPage = () => this.props.route?.params?.page;
+  getIdOfItemToEdit = () => this.props.route?.params?.edit_id;
+  isInEditMode = () => this.getIdOfItemToEdit();
 
+  findItemToEdit() {
+    const { products, shops } = this.props;
+    const id = this.getIdOfItemToEdit();
+    var found;
+    if (this.getCurrentPage() === PRODUCT_PAGE) {
+      found = (products || []).find((item) => item.id === id);
+    } else found = (shops || []).find((item) => item.id === id);
+    this.setState({ form: found });
+    return found;
+  }
   renderPage() {
     const { route } = this.props;
     if (route?.params?.page === "shop-item")
@@ -135,6 +222,8 @@ class ShopCreationContainer extends Component {
             onFormChange={(formData, reset) =>
               this.setState({ form: formData, productFormReset: reset })
             }
+            form={this.state.form}
+            isInEditMode={this.getIdOfItemToEdit()}
           />
         </View>
       );
@@ -145,13 +234,15 @@ class ShopCreationContainer extends Component {
           onFormChange={(formData, reset) =>
             this.setState({ form: formData, shopFormReset: reset })
           }
+          form={this.state.form}
         />
       </View>
     );
   }
 
   render() {
-    console.log("I am the products bro", this.props.products);
+    // console.log("I amt the producst bebe", this.props.products);
+    // console.log("Also, I am the from", this.state.form);
     return (
       <View
         style={{
@@ -175,12 +266,18 @@ class ShopCreationContainer extends Component {
           {this.renderPage()}
         </ScrollView>
         <FlatButton
-          onPress={() => this.handleCreateButtonPress()}
+          onPress={() =>
+            !this.state.loading ? this.handleCreateButtonPress() : null
+          }
           containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
           color="green"
           loading={this.state.loading}
         >
-          {this.state.loading ? "Creating" : "Create"}
+          {this.state.loading
+            ? "Working..."
+            : this.isInEditMode()
+            ? "Update"
+            : "Create"}
         </FlatButton>
       </View>
     );
@@ -209,19 +306,33 @@ export default connect(
 )(ShopCreationContainer);
 
 // ----------------------------------------------------------------------------------------------------
-const CreateShopItem = ({ onFormChange, shops }) => {
-  const [formData, setFormData] = useState({});
+const CreateShopItem = ({ onFormChange, shops, form, isInEditMode }) => {
+  const [formData, setFormData] = useState(form || {});
   const reset = () => {
     setFormData({});
   };
+  useEffect(() => setFormData(form), [form]);
+
   const handleChange = (name, value) => {
-    const data = { ...formData, [name]: value };
+    let shop;
+    if (name === "shop_id") {
+      shop = shops.find((shop) => shop.id === value);
+    }
+    const data = {
+      ...formData,
+      [name]: value,
+      shopName: value === null ? null : shop?.name,
+    };
     if (onFormChange) onFormChange(data, reset);
     setFormData(data);
   };
   return (
     <>
-      <Subtitle text="Add a new item to your shop" />
+      <Subtitle
+        text={
+          isInEditMode ? "Make your changes..." : "Add a new item to your shop"
+        }
+      />
       {FORM_JSONS["shop-item"].map((item, index) => {
         if (item.fieldType === FormGenerator.FIELDS.TEXTBOX)
           return (
@@ -250,12 +361,20 @@ const CreateShopItem = ({ onFormChange, shops }) => {
               />
             </View>
           );
-        if (item.fieldType === FormGenerator.FIELDS.DROPDOWN)
+        // --- User should not be able to change shops in edit mode. This is not the place.
+        if (item.fieldType === FormGenerator.FIELDS.DROPDOWN && !isInEditMode) {
+          const selectedShop = formData["shopName"];
           return (
             <View key={index.toString()}>
               <Text style={{ marginBottom: 10 }}>
                 Which shop should this item be in?
               </Text>
+
+              {selectedShop && (
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <Chip text={selectedShop} />
+                </View>
+              )}
               <Picker
                 style={{
                   width: "100%",
@@ -280,6 +399,7 @@ const CreateShopItem = ({ onFormChange, shops }) => {
               </Picker>
             </View>
           );
+        }
       })}
     </>
   );

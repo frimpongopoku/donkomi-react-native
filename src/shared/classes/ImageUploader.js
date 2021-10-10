@@ -35,4 +35,9 @@ export default class ImageUploader {
       inProgress
     );
   }
+
+  static deleteImageFromStorage(imageURL) {
+    const refFromURL = stoarge.refFromURL(imageURL);
+    refFromURL?.delete();
+  }
 }

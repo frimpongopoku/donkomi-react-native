@@ -21,7 +21,7 @@ export default class ImagePicker extends Component {
         {!value && <Entypo name="images" size={60} color={STYLES.theme.blue} />}
         {value && (
           <Image
-            source={{ uri: value.path }}
+            source={{ uri: value.path || value }}
             style={{ height: 300, width: "100%", borderRadius: 10 }}
           />
         )}
