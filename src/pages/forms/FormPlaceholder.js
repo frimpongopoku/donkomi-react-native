@@ -56,10 +56,10 @@ class FormPlaceholder extends Component {
         ? pageJson.editTitle || editTitle
         : pageJson.title || title,
     });
-    pageJson.formFields = this.inflateFormFieldsWithValues(
-      pageJson.formFields,
-      itemToEdit
-    );
+    // pageJson.formFields = this.inflateFormFieldsWithValues(
+    //   pageJson.formFields,
+    //   itemToEdit
+    // );
     this.setState({ pageJson: { ...pageJson, editObject: itemToEdit } });
   }
 
@@ -84,7 +84,6 @@ class FormPlaceholder extends Component {
   }
 
   putItemInReduxStore(item, reduxFxn, oldData = []) {
-    console.log("It actually runs me bro!-------");
     if (this.isInEditMode()) {
       const filtered = oldData.filter((old) => old.id !== item.id);
       return reduxFxn([...filtered, item]);
@@ -184,6 +183,7 @@ class FormPlaceholder extends Component {
           fields={pageJson?.formFields}
           isInEditMode={this.isInEditMode()}
           editObject={pageJson?.editObject}
+          defaultObject={pageJson?.editObject}
           updateParams={this.isInEditMode() ? pageJson.updateParams : {}}
           onSuccess={pageJson?.onSuccess}
         />
