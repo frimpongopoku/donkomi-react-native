@@ -282,9 +282,9 @@ export default class FormGenerator extends Component {
     return null;
   }
 
-  componentDidMount() {
-    this.setState({ formData: FormGenerator.setDefaults(this.props.fields) });
-  }
+  // componentDidMount() {
+  //   this.setState({ formData: FormGenerator.setDefaults(this.props.fields) });
+  // }
 
   requiredFieldIsEmpty() {
     const { fields } = this.props;
@@ -304,7 +304,8 @@ export default class FormGenerator extends Component {
   }
 
   onSubmit() {
-    const { formData } = this.state;
+    const { formData, loading } = this.state;
+    if (loading) return;
     const { onSubmit } = this.props;
     const requiredFieldIsEmpty = this.requiredFieldIsEmpty();
     if (requiredFieldIsEmpty[0]) {
@@ -329,11 +330,11 @@ export default class FormGenerator extends Component {
     if (!image?.path) return this.sendDataToBackend(form);
     ImageUploader.uploadImageToFirebase(
       storageBucket,
-      form.image?.path,
+      image?.path,
       (url) =>
         this.sendDataToBackend({
           ...form,
-          image: url,
+          ...(isInEditMode ? { data: { ...form?.data, image: url } } : form),
         }),
       (error) => {
         makeAlert(

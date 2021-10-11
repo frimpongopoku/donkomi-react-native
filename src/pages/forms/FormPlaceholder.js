@@ -157,7 +157,6 @@ class FormPlaceholder extends Component {
   }
   render() {
     const { pageJson } = this.state;
-    console.log("LE VENDORS", this.props.vendors);
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;
     return (
