@@ -282,10 +282,6 @@ export default class FormGenerator extends Component {
     return null;
   }
 
-  // componentDidMount() {
-  //   this.setState({ formData: FormGenerator.setDefaults(this.props.fields) });
-  // }
-
   requiredFieldIsEmpty() {
     const { fields } = this.props;
     var error;
