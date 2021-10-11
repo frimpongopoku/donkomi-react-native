@@ -73,7 +73,8 @@ export default class FormGenerator extends Component {
   getFieldValue(field) {
     const { defaultObject = {} } = this.props;
     const key = field.dbName || field.name;
-    return this.state.formData[key] || defaultObject[key] || null;
+    const fromState = this.state.formData[key];
+    return fromState === undefined ? defaultObject[key] || null : fromState;
   }
 
   defaultValueDisplay(field) {
