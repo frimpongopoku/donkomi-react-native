@@ -10,7 +10,7 @@ export default function RiderManagement({ navigation }) {
     {
       name: "Vendor",
       icon: "plus",
-      params: { page: FormPlaceholder.PAGES.VENDOR },
+      params: { page: FormPlaceholder.PAGES.VENDOR, edit_id: 24 },
     },
     {
       name: "Stock",

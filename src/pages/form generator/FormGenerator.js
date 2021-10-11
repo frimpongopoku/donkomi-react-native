@@ -264,19 +264,23 @@ export default class FormGenerator extends Component {
     const state = {};
     fields?.forEach((f) => {
       const value = f.value || f.defaultValue;
-      state[f.name] = value;
+      state[f.dbName || f.name] = value;
     });
     return state;
   }
 
-  static getDerivedStateFromProps(props, state) {
-    if (!state.mounted) {
-      return {
-        formData: FormGenerator.setDefaults(props.fields),
-        mounted: true,
-      };
-    }
-    return null;
+  // static getDerivedStateFromProps(props, state) {
+  //   // if (!state.mounted) {
+  //   return {
+  //     formData: FormGenerator.setDefaults(props.fields),
+  //     mounted: true,
+  //   };
+  //   // }
+  //   return null;
+  // }
+
+  componentDidMount() {
+    this.setState({ formData: FormGenerator.setDefaults(this.props.fields) });
   }
 
   requiredFieldIsEmpty() {
@@ -311,9 +315,15 @@ export default class FormGenerator extends Component {
   }
 
   submitForm(form) {
-    const { storageBucket, user } = this.props;
+    const { storageBucket, user, updateParams, isInEditMode } = this.props;
     this.setState({ loading: true });
-    if (!form.image) return this.sendDataToBackend(form);
+    const image = form.image;
+    form = {
+      ...(isInEditMode ? { data: form } : form),
+      user_id: user?.user_id,
+      ...updateParams,
+    };
+    if (!image?.path) return this.sendDataToBackend(form);
     ImageUploader.uploadImageToFirebase(
       storageBucket,
       form.image?.path,
@@ -321,7 +331,6 @@ export default class FormGenerator extends Component {
         this.sendDataToBackend({
           ...form,
           image: url,
-          user_id: user?.user_id,
         }),
       (error) => {
         makeAlert(
@@ -333,28 +342,37 @@ export default class FormGenerator extends Component {
       }
     );
   }
+
   async sendDataToBackend(data) {
-    const { onSuccess, URL, modifyData } = this.props;
+    var { onSuccess, URL, modifyData, isInEditMode, updateURL } = this.props;
+    URL = isInEditMode ? updateURL : URL;
+    data = modifyData ? modifyData(data) : data;
     try {
-      const response = await InternetExplorer.roamAndFind(URL, "POST", {
-        ...(modifyData ? modifyData(data) : data),
-      });
+      const response = await InternetExplorer.roamAndFind(URL, "POST", data);
       if (response.success) {
-        this.setState({ loading: false, success: "Creation was succesful!" });
+        const obj = {
+          loading: false,
+          success: isInEditMode
+            ? "Update was successful!" 
+            : "Creation was succesful!",
+        }; 
+        this.setState(isInEditMode ? obj : { ...obj, formData: {} }); // basically, dont clear form when in edit mode
         if (onSuccess) return onSuccess(response.data);
       } else {
         this.setState({ loading: false });
-        console.log("I AM THE RESPONSE ERROR ", response.error);
+        console.log(" RESPONSE ERROR ", response.error);
         makeAlert("Sorry", response?.error?.message?.toString());
       }
     } catch (error) {
       this.setState({ loading: false });
       console.log("Internet Explorer Error", error?.toString());
     }
-  }
+  } 
+
   render() {
     const { title = "Create something with this form..." } = this.props;
     const { success } = this.state;
+    // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
       <View style={{ height: "100%", flex: 1 }}>
         {/* <ScrollView> */}

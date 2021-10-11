@@ -5,8 +5,10 @@ import {
   REMOVE_FIREBASE_AUTH,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_ROUTINES,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
+  SET_VENDORS,
   SHOW_FLOATING_MODAL,
 } from "./constants";
 
@@ -54,4 +56,10 @@ export const setUserShopItemsAction = (items = null) => {
 
 export const setAvailableRolesAction = (roles = []) => {
   return { type: GET_AVAILABLE_ROLES, payload: roles };
+};
+export const setVendorsAction = (data = []) => {
+  return { type: SET_VENDORS, payload: data };
+};
+export const setRoutinesAction = (data = []) => {
+  return { type: SET_ROUTINES, payload: data };
 };

@@ -3,8 +3,10 @@ import {
   NOTHING,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_ROUTINES,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
+  SET_VENDORS,
   SHOW_FLOATING_MODAL,
 } from "../actions/constants";
 
@@ -53,6 +55,22 @@ export const setAvailableRolesReducer = (
   action
 ) => {
   if (action.type === GET_AVAILABLE_ROLES) return action.payload;
+
+  return state;
+};
+export const setVendorsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_VENDORS) return action.payload;
+
+  return state;
+};
+export const setRoutinesReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_ROUTINES) return action.payload;
 
   return state;
 };

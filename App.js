@@ -19,6 +19,7 @@ import {
   setFirebaseAuthUserAction,
   setUserShopItemsAction,
   setUserShopsAction,
+  setVendorsAction,
   showFloatingModalActions,
 } from "./src/redux/actions/actions";
 import InternetExplorer from "./src/shared/classes/InternetExplorer";
@@ -40,6 +41,7 @@ class App extends React.Component {
         this.props.setShops(data.shops);
         this.props.setProducts(data.products);
         this.props.setRoles(data.roles);
+        this.props.setVendors(data.vendors);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -191,6 +193,7 @@ const mapDispatchToProps = (dispatch) => {
       setShops: setUserShopsAction,
       setProducts: setUserShopItemsAction,
       setRoles: setAvailableRolesAction,
+      setVendors: setVendorsAction,
     },
     dispatch
   );

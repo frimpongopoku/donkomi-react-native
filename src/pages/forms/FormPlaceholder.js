@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { setVendorsAction } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import { CREATE_A_VENDOR, UPDATE_A_VENDOR } from "../../shared/urls";
 import FormGenerator from "../form generator/FormGenerator";
@@ -19,11 +21,55 @@ class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
   state = { pageJson: {} };
 
+  getItemToEdit() {
+    const { vendors, routines, campaigns } = this.props;
+    if (!this.isInEditMode()) return {};
+    const id = this.getIdOfItemToEdit();
+    const currentPage = this.getCurrentPage();
+    switch (currentPage) {
+      case FORM_PAGES.VENDOR:
+        return vendors.find((v) => v.id === id);
+
+      default:
+        return {};
+    }
+  }
+
+  getCurrentPage() {
+    const { route } = this.props;
+    return route?.params?.page;
+  }
+  inflateFormFieldsWithValues(fields, valueObj) {
+    return fields.map((field) => {
+      field.value = valueObj[field.dbName];
+      return field;
+    });
+  }
   componentDidMount() {
     const { navigation } = this.props;
     const pageJson = this.getPageJson();
-    navigation.setOptions({ title: pageJson.title });
-    this.setState({ pageJson });
+    const itemToEdit = this.getItemToEdit();
+    const title = "Create New " + pageJson.pageName;
+    const editTitle = "Edit a " + pageJson.pageName;
+    navigation.setOptions({
+      title: this.isInEditMode()
+        ? pageJson.editTitle || editTitle
+        : pageJson.title || title,
+    });
+    pageJson.formFields = this.inflateFormFieldsWithValues(
+      pageJson.formFields,
+      itemToEdit
+    );
+    this.setState({ pageJson: { ...pageJson, editObject: itemToEdit } });
+  }
+
+  isInEditMode() {
+    const { route } = this.props;
+    return route?.params?.edit_id;
+  }
+
+  getIdOfItemToEdit() {
+    return this.isInEditMode();
   }
 
   makeRightContent(props) {
@@ -36,8 +82,17 @@ class FormPlaceholder extends Component {
       </TouchableOpacity>
     );
   }
+
+  putItemInReduxStore(item, reduxFxn, oldData = []) {
+    console.log("It actually runs me bro!-------");
+    if (this.isInEditMode()) {
+      const filtered = oldData.filter((old) => old.id !== item.id);
+      return reduxFxn([...filtered, item]);
+    }
+    reduxFxn([...oldData, item]);
+  }
   getPageJson() {
-    var { data, route } = this.props;
+    var { data, route, addVendorToRedux, vendors } = this.props;
     const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
@@ -59,12 +114,17 @@ class FormPlaceholder extends Component {
       case FORM_PAGES.VENDOR:
         return {
           ...json,
-          title: "Create New Vendor",
           formFields: FORM_JSONS["vendor"],
           formTitle: "Add a new vendor",
+          formEditTitle: "Edit vendor information...",
           bucket: ImageUploader.VENDOR_BUCKET,
           url: CREATE_A_VENDOR,
           updateURL: UPDATE_A_VENDOR,
+          pageName: "vendor",
+          pagePluralName: "vendors",
+          onSuccess: (data) =>
+            this.putItemInReduxStore(data, addVendorToRedux, vendors),
+          updateParams: { vendor_id: this.getIdOfItemToEdit() }, // just extra params for the update request to the backend that is unique to each field
         };
       case FORM_PAGES.SHOP:
         return {
@@ -98,7 +158,9 @@ class FormPlaceholder extends Component {
   }
   render() {
     const { pageJson } = this.state;
-
+    console.log("LE VENDORS", this.props.vendors);
+    const formTitle = "Add a new " + pageJson?.pageName;
+    const editFormTitle = "Edit your " + pageJson?.pageName;
     return (
       <View
         style={{
@@ -112,9 +174,18 @@ class FormPlaceholder extends Component {
         <FormGenerator
           user={this.props.user}
           URL={pageJson?.url}
+          updateURL={pageJson?.updateURL}
           storageBucket={pageJson?.bucket}
-          title={pageJson?.formTitle}
+          title={
+            !this.isInEditMode()
+              ? pageJson?.formTitle || formTitle
+              : pageJson.formEditTitle || editFormTitle
+          }
           fields={pageJson?.formFields}
+          isInEditMode={this.isInEditMode()}
+          editObject={pageJson?.editObject}
+          updateParams={this.isInEditMode() ? pageJson.updateParams : {}}
+          onSuccess={pageJson?.onSuccess}
         />
         {/* </ScrollView> */}
       </View>
@@ -125,7 +196,19 @@ class FormPlaceholder extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
+    vendors: state.vendors,
+    routines: state.routines,
+    // campaigns: state.campaigns
   };
 };
 
-export default connect(mapStateToProps, null)(FormPlaceholder);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      addVendorToRedux: setVendorsAction,
+    },
+    dispatch
+  );
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormPlaceholder);
