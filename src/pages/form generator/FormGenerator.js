@@ -71,7 +71,9 @@ export default class FormGenerator extends Component {
   }
 
   getFieldValue(field) {
-    return this.state["formData"][field.dbName || field.name];
+    const { defaultObject = {} } = this.props;
+    const key = field.dbName || field.name;
+    return this.state.formData[key] || defaultObject[key] || null;
   }
 
   defaultValueDisplay(field) {
@@ -269,15 +271,15 @@ export default class FormGenerator extends Component {
     return state;
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   // if (!state.mounted) {
-  //   return {
-  //     formData: FormGenerator.setDefaults(props.fields),
-  //     mounted: true,
-  //   };
-  //   // }
-  //   return null;
-  // }
+  static getDerivedStateFromProps(props, state) {
+    if (!state.formData || state.formData === {}) {
+      return {
+        formData: FormGenerator.setDefaults(props.fields),
+        mounted: true,
+      };
+    }
+    return null;
+  }
 
   componentDidMount() {
     this.setState({ formData: FormGenerator.setDefaults(this.props.fields) });
@@ -353,9 +355,9 @@ export default class FormGenerator extends Component {
         const obj = {
           loading: false,
           success: isInEditMode
-            ? "Update was successful!" 
+            ? "Update was successful!"
             : "Creation was succesful!",
-        }; 
+        };
         this.setState(isInEditMode ? obj : { ...obj, formData: {} }); // basically, dont clear form when in edit mode
         if (onSuccess) return onSuccess(response.data);
       } else {
@@ -367,7 +369,7 @@ export default class FormGenerator extends Component {
       this.setState({ loading: false });
       console.log("Internet Explorer Error", error?.toString());
     }
-  } 
+  }
 
   render() {
     const { title = "Create something with this form..." } = this.props;
