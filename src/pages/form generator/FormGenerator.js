@@ -25,6 +25,11 @@ const FIELDS = {
   TIME: "time",
   DATETIME: "datetime",
 };
+
+import InternetExplorer from "./../../shared/classes/InternetExplorer";
+import ImageUploader from "./../../shared/classes/ImageUploader";
+import { makeAlert } from "../../shared/utils";
+import SuccessNotification from "../../components/SuccessNotification";
 export default class FormGenerator extends Component {
   static FIELDS = FIELDS;
   constructor(props) {
@@ -33,6 +38,8 @@ export default class FormGenerator extends Component {
       formData: {},
       error: null,
       mounted: false,
+      loading: false,
+      success: false,
     };
     this.onSubmit = this.onSubmit.bind(this);
     this.handleDropdownSelection = this.handleDropdownSelection.bind(this);
@@ -233,6 +240,7 @@ export default class FormGenerator extends Component {
 
   renderSubmitButton() {
     const { customButton } = this.props;
+    const { loading } = this.state;
     if (customButton) return customButton;
     return (
       <FlatButton
@@ -245,8 +253,9 @@ export default class FormGenerator extends Component {
           zIndex: 100,
         }}
         style={{ fontWeight: "bold", fontSize: 17 }}
+        loading={this.state.loading}
       >
-        Submit
+        {loading ? "Submitting..." : "Submit"}
       </FlatButton>
     );
   }
@@ -277,7 +286,7 @@ export default class FormGenerator extends Component {
       const f = fields[i];
       const value = this.getFieldValue(f);
       if ((f.isRequired || f.required) && !value) {
-        error = `' The ${f.name}' is required, but you have not provided any content...`;
+        error = `'${f.name}' is required, but you have not provided any content...`;
         this.setState({
           error,
         });
@@ -297,28 +306,85 @@ export default class FormGenerator extends Component {
       });
       return;
     }
-    if (onSubmit) onSubmit(formData);
+    if (onSubmit) return onSubmit(formData);
+    this.submitForm(formData);
   }
 
+  submitForm(form) {
+    const { storageBucket, user } = this.props;
+    this.setState({ loading: true });
+    if (!form.image) return this.sendDataToBackend(form);
+    ImageUploader.uploadImageToFirebase(
+      storageBucket,
+      form.image?.path,
+      (url) =>
+        this.sendDataToBackend({
+          ...form,
+          image: url,
+          user_id: user?.user_id,
+        }),
+      (error) => {
+        makeAlert(
+          "Sorry",
+          "Something happened, we could not run your request. Please try again in a few minutes"
+        );
+        this.setState({ loading: false });
+        console.log("FORM_GENERATOR_IMAGE_UPLOAD_ERROR", error);
+      }
+    );
+  }
+  async sendDataToBackend(data) {
+    const { onSuccess, URL, modifyData } = this.props;
+    try {
+      const response = await InternetExplorer.roamAndFind(URL, "POST", {
+        ...(modifyData ? modifyData(data) : data),
+      });
+      if (response.success) {
+        this.setState({ loading: false, success: "Creation was succesful!" });
+        if (onSuccess) return onSuccess(response.data);
+      } else {
+        this.setState({ loading: false });
+        console.log("I AM THE RESPONSE ERROR ", response.error);
+        makeAlert("Sorry", response?.error?.message?.toString());
+      }
+    } catch (error) {
+      this.setState({ loading: false });
+      console.log("Internet Explorer Error", error?.toString());
+    }
+  }
   render() {
     const { title = "Create something with this form..." } = this.props;
+    const { success } = this.state;
     return (
-      <View style={{ height: "100%" }}>
-        <ScrollView>
-          <View style={{ padding: 20, marginBottom: 50 }}>
-            <Text
-              style={{
-                marginBottom: 10,
-                fontSize: 16,
-                fontWeight: "bold",
-                color: STYLES.theme.blue,
-              }}
-            >
-              {title}
-            </Text>
-            {this.renderComponents()}
-          </View>
-        </ScrollView>
+      <View style={{ height: "100%", flex: 1 }}>
+        {/* <ScrollView> */}
+        <View
+          style={{
+            paddingLeft: 15,
+            paddingRight: 15,
+            paddingTop: 10,
+            marginBottom: 50,
+          }}
+        >
+          {success && (
+            <SuccessNotification
+              text={success}
+              close={() => this.setState({ success: false })}
+            />
+          )}
+          <Text
+            style={{
+              marginBottom: 10,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: STYLES.theme.blue,
+            }}
+          >
+            {title}
+          </Text>
+          {this.renderComponents()}
+        </View>
+        {/* </ScrollView> */}
         {this.renderSubmitButton()}
       </View>
     );

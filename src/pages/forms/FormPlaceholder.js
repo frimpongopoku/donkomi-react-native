@@ -2,6 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { Component } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { connect } from "react-redux";
+import ImageUploader from "../../shared/classes/ImageUploader";
+import { CREATE_A_VENDOR, UPDATE_A_VENDOR } from "../../shared/urls";
 import FormGenerator from "../form generator/FormGenerator";
 import { FORM_JSONS } from "./fields";
 const FORM_PAGES = {
@@ -12,7 +15,7 @@ const FORM_PAGES = {
   SHOPITEM: "shop-item",
   APPLICATIONS: "applications",
 };
-export default class FormPlaceholder extends Component {
+class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
   state = { pageJson: {} };
 
@@ -58,6 +61,10 @@ export default class FormPlaceholder extends Component {
           ...json,
           title: "Create New Vendor",
           formFields: FORM_JSONS["vendor"],
+          formTitle: "Add a new vendor",
+          bucket: ImageUploader.VENDOR_BUCKET,
+          url: CREATE_A_VENDOR,
+          updateURL: UPDATE_A_VENDOR,
         };
       case FORM_PAGES.SHOP:
         return {
@@ -93,22 +100,32 @@ export default class FormPlaceholder extends Component {
     const { pageJson } = this.state;
 
     return (
-      <ScrollView
+      <View
         style={{
           flex: 1,
           height: "100%",
-          backgroundColor: "red",
+          backgroundColor: "white",
         }}
       >
-          <Text>{this.getRouteNotification()} </Text>
-          <FormGenerator
-            title={pageJson?.formTitle}
-            onSubmit={(content) =>
-              console.log("--------HERE WE GO--------", content)
-            }
-            fields={pageJson?.formFields}
-          />
-      </ScrollView>
+        {/* <ScrollView> */}
+        <Text>{this.getRouteNotification()} </Text>
+        <FormGenerator
+          user={this.props.user}
+          URL={pageJson?.url}
+          storageBucket={pageJson?.bucket}
+          title={pageJson?.formTitle}
+          fields={pageJson?.formFields}
+        />
+        {/* </ScrollView> */}
+      </View>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
+};
+
+export default connect(mapStateToProps, null)(FormPlaceholder);

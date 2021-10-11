@@ -8,6 +8,7 @@ export default class ImageUploader {
   static PROFILE_PHOTOS = "Profile Photos";
   static SHOP_PHOTO_BUCKET = "Shop Cover Photos";
   static PRODUCT_BUCKET = "Product Photos";
+  static VENDOR_BUCKET = "Vendor Photos"
   static uploadImageToFirebase(bucket, image, onComplete, onError, inProgress) {
     if (!bucket || !image)
       return onError ? onError("Provide a bucket name, and an image") : null;

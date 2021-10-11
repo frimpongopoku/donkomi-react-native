@@ -78,7 +78,7 @@ export const FORM_JSONS = {
       placeholder: "Eg. McDonalds",
       label: "Vendor Name",
       name: "Vendor Name",
-      dbName: "vendor_name",
+      dbName: "name",
       required: true,
     },
     {
@@ -87,7 +87,7 @@ export const FORM_JSONS = {
         "Briefly describe your vendor. Eg. 'McDonalds sells burgers and chicken",
       label: "Vendor description",
       name: "Vendor description",
-      dbName: "vendor_description",
+      dbName: "description",
       required: true,
     },
 
@@ -96,6 +96,7 @@ export const FORM_JSONS = {
       label: "Vendor cover photo",
       name: "image",
       dbName: "image",
+      required:true
     },
   ],
   shop: [
