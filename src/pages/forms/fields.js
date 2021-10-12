@@ -40,10 +40,10 @@ export const FORM_JSONS = {
   stock: [
     {
       fieldType: FormGenerator.FIELDS.TEXTBOX,
-      placeholder: "Eg. Athena's trip to Ricardos",
-      label: "Routine Name",
-      name: "Routine Name",
-      dbName: "routine_name",
+      placeholder: "Eg. Burger, Chips, Mango, Rounder",
+      label: "Name",
+      name: "Stock Name",
+      dbName: "name",
       required: true,
     },
     {
@@ -51,9 +51,34 @@ export const FORM_JSONS = {
       placeholder: "Eg. 210",
       label: "Price",
       name: "stock name",
-      dbName: "stock_name",
+      dbName: "price",
       keyboardType: "numeric",
       required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder: "Any description of the item?...",
+      label: "Description",
+      name: "Stock description",
+      dbName: "description",
+      numberOfLines: 6,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder: "Eg. Athena's trip to Ricardos",
+      label: "Size",
+      name: "Size",
+      dbName: "size",
+      maxLength: 20,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder:
+        "Are there different kinds of your item? What kind is this...",
+      label: "Variation",
+      name: "Variation",
+      dbName: "variation",
+      maxLength: 70,
     },
 
     {
@@ -70,6 +95,7 @@ export const FORM_JSONS = {
       label: "Image of stock",
       name: "image",
       dbName: "image",
+      required: true,
     },
   ],
   vendor: [
@@ -96,7 +122,7 @@ export const FORM_JSONS = {
       label: "Vendor cover photo",
       name: "image",
       dbName: "image",
-      required:true
+      required: true,
     },
   ],
   shop: [

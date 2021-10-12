@@ -47,7 +47,14 @@ export default class FormGenerator extends Component {
 
   renderLabel(field) {
     if (field.label)
-      return <Text style={{ marginBottom: 6 }}>{field.label}</Text>;
+      return (
+        <Text style={{ marginBottom: 6 }}>
+          {field.label}{" "}
+          {(field.required || field.isRequired) && (
+            <Text style={{ color: "red" }}>*</Text>
+          )}
+        </Text>
+      );
   }
   renderTextbox(field) {
     const value = this.getFieldValue(field);
@@ -369,40 +376,45 @@ export default class FormGenerator extends Component {
     }
   }
 
-  render() {
+  renderContent() {
     const { title = "Create something with this form..." } = this.props;
     const { success } = this.state;
+    return (
+      <View
+        style={{
+          paddingLeft: 15,
+          paddingRight: 15,
+          // paddingTop: 10,
+          marginBottom: 50,
+        }}
+      >
+        {success && (
+          <SuccessNotification
+            text={success}
+            close={() => this.setState({ success: false })}
+          />
+        )}
+        <Text
+          style={{
+            marginBottom: 10,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: STYLES.theme.blue,
+          }}
+        >
+          {title}
+        </Text>
+        {this.renderComponents()}
+      </View>
+    );
+  }
+  render() {
+    const { scroll } = this.props;
     // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
       <View style={{ height: "100%", flex: 1 }}>
-        {/* <ScrollView> */}
-        <View
-          style={{
-            paddingLeft: 15,
-            paddingRight: 15,
-            paddingTop: 10,
-            marginBottom: 50,
-          }}
-        >
-          {success && (
-            <SuccessNotification
-              text={success}
-              close={() => this.setState({ success: false })}
-            />
-          )}
-          <Text
-            style={{
-              marginBottom: 10,
-              fontSize: 16,
-              fontWeight: "bold",
-              color: STYLES.theme.blue,
-            }}
-          >
-            {title}
-          </Text>
-          {this.renderComponents()}
-        </View>
-        {/* </ScrollView> */}
+        {scroll && <ScrollView>{this.renderContent()}</ScrollView>}
+        {!scroll && this.renderContent()}
         {this.renderSubmitButton()}
       </View>
     );

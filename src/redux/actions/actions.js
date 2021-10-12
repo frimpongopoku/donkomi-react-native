@@ -6,6 +6,7 @@ import {
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_ROUTINES,
+  SET_STOCK,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
@@ -62,4 +63,8 @@ export const setVendorsAction = (data = []) => {
 };
 export const setRoutinesAction = (data = []) => {
   return { type: SET_ROUTINES, payload: data };
+};
+
+export const setStockAction = (data = []) => {
+  return { type: SET_STOCK, payload: data };
 };

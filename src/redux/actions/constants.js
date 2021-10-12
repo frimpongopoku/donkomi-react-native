@@ -10,3 +10,4 @@ export const GET_AVAILABLE_ROLES = "GET_ROLES";
 export const SET_VENDORS = "SET_VENDORS"; 
 export const SET_ROUTINES = "SET_ROUTINES"; 
 export const SET_CAMPAIGNS= "SET_CAMPAIGNS";
+export const SET_STOCK = "SET_STOCK";

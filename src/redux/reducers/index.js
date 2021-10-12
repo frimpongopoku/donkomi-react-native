@@ -8,7 +8,8 @@ import {
   showFloatingModalReducer,
   setAvailableRolesReducer,
   setVendorsReducer,
-  setRoutinesReducer
+  setRoutinesReducer,
+  setStockReducer
 } from "./reducers";
 
 export default combineReducers({
@@ -21,4 +22,5 @@ export default combineReducers({
   roles: setAvailableRolesReducer, 
   routines: setRoutinesReducer,
   vendors: setVendorsReducer,
+  stock: setStockReducer,
 });

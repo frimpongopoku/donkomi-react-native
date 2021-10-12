@@ -1,6 +1,6 @@
 // const HOST = "192.168.0.38:8000";
 // const HOST = "127.0.0.1:8000";
-const HOST = "http://ce46-102-115-231-239.ngrok.io" + "/api/donkomi";
+const HOST = "http://1e59-102-115-232-6.ngrok.io" + "/api/donkomi";
 
 export const TEST_URL =
   HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
@@ -18,3 +18,5 @@ export const DELETE_A_PRODUCT = HOST + "/product/delete";
 export const WHO_AM_I = HOST + "/user/whoami/";
 export const CREATE_A_VENDOR = HOST + "/vendor/create/";
 export const UPDATE_A_VENDOR = HOST + "/update/vendor/";
+export const CREATE_STOCK  = HOST + "/stock/create/";
+export const UPDATE_STOCK = HOST + "/update/stock/";

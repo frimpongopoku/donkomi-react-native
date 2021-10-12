@@ -4,6 +4,7 @@ import {
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_ROUTINES,
+  SET_STOCK,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
@@ -71,6 +72,15 @@ export const setRoutinesReducer = (
   action
 ) => {
   if (action.type === SET_ROUTINES) return action.payload;
+
+  return state;
+};
+
+export const setStockReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_STOCK) return action.payload;
 
   return state;
 };

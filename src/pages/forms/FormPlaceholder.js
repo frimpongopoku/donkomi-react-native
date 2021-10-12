@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { setVendorsAction } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
-import { CREATE_A_VENDOR, UPDATE_A_VENDOR } from "../../shared/urls";
+import { CREATE_A_VENDOR, CREATE_STOCK, UPDATE_A_VENDOR, UPDATE_STOCK } from "../../shared/urls";
 import FormGenerator from "../form generator/FormGenerator";
 import { FORM_JSONS } from "./fields";
 const FORM_PAGES = {
@@ -109,6 +109,12 @@ class FormPlaceholder extends Component {
           title: "Create New Stock",
           formTitle: "Add available stock from vendors you buy from",
           formFields: FORM_JSONS["stock"],
+          scroll: true,
+          url: CREATE_STOCK, 
+          updateURL: UPDATE_STOCK, 
+          pageName: "stock", 
+          pagePluralName: "stock",
+          bucket: ImageUploader.STOCK_BUCKET
         };
       case FORM_PAGES.VENDOR:
         return {
@@ -167,7 +173,6 @@ class FormPlaceholder extends Component {
           backgroundColor: "white",
         }}
       >
-        {/* <ScrollView> */}
         <Text>{this.getRouteNotification()} </Text>
         <FormGenerator
           user={this.props.user}
@@ -185,8 +190,8 @@ class FormPlaceholder extends Component {
           defaultObject={pageJson?.editObject}
           updateParams={this.isInEditMode() ? pageJson.updateParams : {}}
           onSuccess={pageJson?.onSuccess}
+          scroll={pageJson?.scroll}
         />
-        {/* </ScrollView> */}
       </View>
     );
   }
