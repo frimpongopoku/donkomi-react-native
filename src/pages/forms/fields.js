@@ -85,9 +85,10 @@ export const FORM_JSONS = {
       fieldType: FormGenerator.FIELDS.DROPDOWN,
       placeholder: "Which vendor sells this stock",
       label: "Vendors",
-      name: "vendor",
+      name: "vendor", // just a name that can be used to communicate errors on a particular field to a user
       data: ["McDonalds", "Ricardos", "KFC"],
-      dbName: "vendor_id",
+      dbName: "vendor_id", // a name that matches teh db field name in the backend
+      updateName: "vendor", // sometimes model fields and dbName do not match, so prefilling content back into fields for update wont work when we use dbName as key, so instead, an updateName is provided
       labelExtractor: (item) => item.name,
       valueExtractor: (item) => item.id,
       required: true,

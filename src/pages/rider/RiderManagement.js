@@ -15,7 +15,7 @@ export default function RiderManagement({ navigation }) {
     {
       name: "Stock",
       icon: "plus",
-      params: { page: FormPlaceholder.PAGES.STOCK },
+      params: { page: FormPlaceholder.PAGES.STOCK, edit_id: 20 },
     },
     {
       name: "Routine",

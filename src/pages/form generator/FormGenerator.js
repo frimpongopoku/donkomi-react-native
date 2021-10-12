@@ -64,7 +64,7 @@ export default class FormGenerator extends Component {
         <TextInput
           style={styles.textbox}
           {...field}
-          value={value}
+          value={value?.toString()}
           onChangeText={(text) => this.setContent({ field, content: text })}
         />
       </>
@@ -78,14 +78,21 @@ export default class FormGenerator extends Component {
   }
 
   getFieldValue(field) {
-    const { defaultObject = {} } = this.props;
-    const key = field.dbName || field.name;
+    const { defaultObject = {}, isInEditMode } = this.props;
+    const key =
+      isInEditMode && field.updateName
+        ? field.updateName
+        : field.dbName || field.name;
     const fromState = this.state.formData[key];
     return fromState === undefined ? defaultObject[key] || null : fromState;
   }
 
   defaultValueDisplay(field) {
-    const value = this.getFieldValue(field);
+    var value = this.getFieldValue(field);
+    var found = field.data?.find(
+      (item) => field.valueExtractor(item) === value
+    );
+    value = field.labelExtractor(found) || value;
     if (value && !field.multiple)
       return (
         <Text style={{ marginBottom: 6, color: "grey" }}>Current: {value}</Text>
@@ -344,7 +351,9 @@ export default class FormGenerator extends Component {
       (url) =>
         this.sendDataToBackend({
           ...form,
-          ...(isInEditMode ? { data: { ...form?.data, image: url } } : form),
+          ...(isInEditMode
+            ? { data: { ...form?.data, image: url } }
+            : { ...form, image: url }),
         }),
       (error) => {
         makeAlert(
@@ -417,7 +426,7 @@ export default class FormGenerator extends Component {
   }
   render() {
     const { scroll } = this.props;
-
+    console.log(" here is the edit object", this.props.editObject);
     // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
       <View style={{ height: "100%", flex: 1 }}>

@@ -142,6 +142,7 @@ class FormPlaceholder extends Component {
           bucket: ImageUploader.STOCK_BUCKET,
           onSuccess: (data) =>
             this.putItemInReduxStore(data, addStockToRedux, stock),
+          updateParams: { stock_id: this.getIdOfItemToEdit() },
         };
       case FORM_PAGES.VENDOR:
         return {
@@ -189,7 +190,7 @@ class FormPlaceholder extends Component {
     return route?.params.notificationMessage;
   }
   render() {
-    console.log("I aim the vendors bruH", this.props.vendors);
+    console.log("I aim the stock bruH", this.props.stock);
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;
@@ -230,6 +231,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     vendors: state.vendors,
     routines: state.routines,
+    stock: state.stock,
     // campaigns: state.campaigns
   };
 };
