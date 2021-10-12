@@ -190,7 +190,6 @@ class FormPlaceholder extends Component {
     return route?.params.notificationMessage;
   }
   render() {
-    console.log("I aim the stock bruH", this.props.stock);
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;

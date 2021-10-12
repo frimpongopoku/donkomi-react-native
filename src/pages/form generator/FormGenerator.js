@@ -426,7 +426,6 @@ export default class FormGenerator extends Component {
   }
   render() {
     const { scroll } = this.props;
-    console.log(" here is the edit object", this.props.editObject);
     // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
       <View style={{ height: "100%", flex: 1 }}>
