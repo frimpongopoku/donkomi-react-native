@@ -6,7 +6,12 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { setVendorsAction } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
-import { CREATE_A_VENDOR, CREATE_STOCK, UPDATE_A_VENDOR, UPDATE_STOCK } from "../../shared/urls";
+import {
+  CREATE_A_VENDOR,
+  CREATE_STOCK,
+  UPDATE_A_VENDOR,
+  UPDATE_STOCK,
+} from "../../shared/urls";
 import FormGenerator from "../form generator/FormGenerator";
 import { FORM_JSONS } from "./fields";
 const FORM_PAGES = {
@@ -22,14 +27,15 @@ class FormPlaceholder extends Component {
   state = { pageJson: {} };
 
   getItemToEdit() {
-    const { vendors, routines, campaigns } = this.props;
+    const { vendors, routines, campaigns, stock } = this.props;
     if (!this.isInEditMode()) return {};
     const id = this.getIdOfItemToEdit();
     const currentPage = this.getCurrentPage();
     switch (currentPage) {
       case FORM_PAGES.VENDOR:
         return vendors.find((v) => v.id === id);
-
+      case FORM_PAGES.STOCK:
+        return stock.find((v) => v.id === id);
       default:
         return {};
     }
@@ -45,6 +51,20 @@ class FormPlaceholder extends Component {
       return field;
     });
   }
+
+  modifyFormFields(page, fields = []) {
+    const { vendors } = this.props;
+    switch (page) {
+      case FORM_PAGES.STOCK:
+        const vendorDropdownField = fields.find((f) => f.dbName === "vendors");
+        vendorDropdownField.data = vendors;
+        const rest = fields.filter((f) => f.dbName !== "vendors");
+        return [...rest, vendorDropdownField];
+      default:
+        return fields;
+    }
+  }
+
   componentDidMount() {
     const { navigation } = this.props;
     const pageJson = this.getPageJson();
@@ -56,11 +76,16 @@ class FormPlaceholder extends Component {
         ? pageJson.editTitle || editTitle
         : pageJson.title || title,
     });
-    // pageJson.formFields = this.inflateFormFieldsWithValues(
-    //   pageJson.formFields,
-    //   itemToEdit
-    // );
-    this.setState({ pageJson: { ...pageJson, editObject: itemToEdit } });
+    this.setState({
+      pageJson: {
+        ...pageJson,
+        formFields: this.modifyFormFields(
+          this.getCurrentPage(),
+          pageJson.formFields
+        ),
+        editObject: itemToEdit,
+      },
+    });
   }
 
   isInEditMode() {
@@ -110,11 +135,11 @@ class FormPlaceholder extends Component {
           formTitle: "Add available stock from vendors you buy from",
           formFields: FORM_JSONS["stock"],
           scroll: true,
-          url: CREATE_STOCK, 
-          updateURL: UPDATE_STOCK, 
-          pageName: "stock", 
+          url: CREATE_STOCK,
+          updateURL: UPDATE_STOCK,
+          pageName: "stock",
           pagePluralName: "stock",
-          bucket: ImageUploader.STOCK_BUCKET
+          bucket: ImageUploader.STOCK_BUCKET,
         };
       case FORM_PAGES.VENDOR:
         return {
@@ -162,6 +187,7 @@ class FormPlaceholder extends Component {
     return route?.params.notificationMessage;
   }
   render() {
+    console.log("I aim the vendors bruH", this.props.vendors);
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;

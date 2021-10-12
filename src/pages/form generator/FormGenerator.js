@@ -136,6 +136,7 @@ export default class FormGenerator extends Component {
 
   renderDropdownComponent(field) {
     const data = field.data || [];
+    const { labelExtractor, valueExtractor } = field;
     return (
       <>
         {this.renderLabel(field)}
@@ -150,14 +151,20 @@ export default class FormGenerator extends Component {
           onValueChange={(item) => this.handleDropdownSelection(field, item)}
         >
           <Picker.Item label="---------" value={null} style={{ padding: 20 }} />
-          {data.map((item, index) => (
-            <Picker.Item
-              key={index.toString()}
-              label={item}
-              value={item}
-              style={{ padding: 20 }}
-            />
-          ))}
+          {data.map((item, index) => {
+            const label = labelExtractor
+              ? labelExtractor(item)
+              : item?.toString();
+            const value = valueExtractor ? valueExtractor(item) : label;
+            return (
+              <Picker.Item
+                key={index.toString()}
+                label={label}
+                value={value}
+                style={{ padding: 20 }}
+              />
+            );
+          })}
         </Picker>
       </>
     );
@@ -410,6 +417,7 @@ export default class FormGenerator extends Component {
   }
   render() {
     const { scroll } = this.props;
+
     // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
       <View style={{ height: "100%", flex: 1 }}>

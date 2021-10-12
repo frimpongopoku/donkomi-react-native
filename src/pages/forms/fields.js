@@ -88,6 +88,8 @@ export const FORM_JSONS = {
       name: "vendors",
       data: ["McDonalds", "Ricardos", "KFC"],
       dbName: "vendors",
+      labelExtractor: (item) => item.name,
+      valueExtractor: (item) => item.id,
       required: true,
     },
     {
