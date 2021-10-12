@@ -368,7 +368,7 @@ export default class FormGenerator extends Component {
           loading: false,
           success: isInEditMode
             ? "Update was successful!"
-            : "Creation was succesful!",
+            : "Creation was successful!",
         };
         this.setState(isInEditMode ? obj : { ...obj, formData: {} }); // basically, dont clear form when in edit mode
         if (onSuccess) return onSuccess(response.data);

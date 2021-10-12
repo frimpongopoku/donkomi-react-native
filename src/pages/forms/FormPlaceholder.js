@@ -4,7 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setVendorsAction } from "../../redux/actions/actions";
+import { setStockAction, setVendorsAction } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import {
   CREATE_A_VENDOR,
@@ -56,9 +56,9 @@ class FormPlaceholder extends Component {
     const { vendors } = this.props;
     switch (page) {
       case FORM_PAGES.STOCK:
-        const vendorDropdownField = fields.find((f) => f.dbName === "vendors");
+        const vendorDropdownField = fields.find((f) => f.name === "vendor");
         vendorDropdownField.data = vendors;
-        const rest = fields.filter((f) => f.dbName !== "vendors");
+        const rest = fields.filter((f) => f.name !== "vendor");
         return [...rest, vendorDropdownField];
       default:
         return fields;
@@ -116,7 +116,7 @@ class FormPlaceholder extends Component {
     reduxFxn([...oldData, item]);
   }
   getPageJson() {
-    var { data, route, addVendorToRedux, vendors } = this.props;
+    var { data, route, addVendorToRedux, vendors, stock } = this.props;
     const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
@@ -140,6 +140,8 @@ class FormPlaceholder extends Component {
           pageName: "stock",
           pagePluralName: "stock",
           bucket: ImageUploader.STOCK_BUCKET,
+          onSuccess: (data) =>
+            this.putItemInReduxStore(data, addStockToRedux, stock),
         };
       case FORM_PAGES.VENDOR:
         return {
@@ -236,6 +238,7 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       addVendorToRedux: setVendorsAction,
+      addStockToRedux: setStockAction,
     },
     dispatch
   );
