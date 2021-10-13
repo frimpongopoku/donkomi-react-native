@@ -89,10 +89,10 @@ export default class FormGenerator extends Component {
 
   defaultValueDisplay(field) {
     var value = this.getFieldValue(field);
-    var found = field.data?.find(
-      (item) => field.valueExtractor(item) === value
-    );
-    value = field.labelExtractor(found) || value;
+    var found;
+    if (field.valueExtractor)
+      found = field.data?.find((item) => field.valueExtractor(item) === value);
+    value = (field.labelExtractor && field.labelExtractor(found)) || value;
     if (value && !field.multiple)
       return (
         <Text style={{ marginBottom: 6, color: "grey" }}>Current: {value}</Text>

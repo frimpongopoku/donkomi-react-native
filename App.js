@@ -47,6 +47,7 @@ class App extends React.Component {
         this.setState({ loading: false });
       })
       .catch((e) => {
+        console.log("I DONT GET SHIT BUDA", e);
         this.setState({ loading: false });
         this.props.setDonkomiUser(InternetExplorer.BACKEND_FAILED);
       });

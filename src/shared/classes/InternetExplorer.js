@@ -1,5 +1,6 @@
 const DEFAULT_HEADER = {
   // Accept: "application/json",
+  Accept: "application/json, text/plain, */*",
   "Content-Type": "application/json",
 };
 export const POST = "POST";
