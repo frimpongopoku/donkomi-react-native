@@ -4,12 +4,14 @@ import { ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setStockAction, setVendorsAction } from "../../redux/actions/actions";
+import { setRoutinesAction, setStockAction, setVendorsAction } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import {
   CREATE_A_VENDOR,
+  CREATE_ROUTINE,
   CREATE_STOCK,
   UPDATE_A_VENDOR,
+  UPDATE_ROUTINE,
   UPDATE_STOCK,
 } from "../../shared/urls";
 import FormGenerator from "../form generator/FormGenerator";
@@ -60,6 +62,11 @@ class FormPlaceholder extends Component {
         vendorDropdownField.data = vendors;
         const rest = fields.filter((f) => f.name !== "vendor");
         return [...rest, vendorDropdownField];
+      case FORM_PAGES.ROUTINE:
+        const vendorDropField = fields.find((f) => f.name === "vendors");
+        vendorDropField.data = vendors;
+        const rem = fields.filter((f) => f.name !== "vendors");
+        return [...rem, vendorDropField];
       default:
         return fields;
     }
@@ -116,7 +123,7 @@ class FormPlaceholder extends Component {
     reduxFxn([...oldData, item]);
   }
   getPageJson() {
-    var { data, route, addVendorToRedux, vendors, stock } = this.props;
+    var { data, route, addVendorToRedux, vendors, stock, routines } = this.props;
     const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
@@ -127,6 +134,14 @@ class FormPlaceholder extends Component {
           formTitle:
             "Make routines here and recycle them each time you are ready to move..",
           formFields: FORM_JSONS["routine"],
+          url: CREATE_ROUTINE,
+          updateURL: UPDATE_ROUTINE,
+          pageName: "routine",
+          pagePluralName: "routines",
+          bucket: null,
+          onSuccess: (data) =>
+            this.putItemInReduxStore(data, addRoutineToRedux, routines),
+          updateParams: { routine_id: this.getIdOfItemToEdit() },
         };
       case FORM_PAGES.STOCK:
         return {
@@ -240,6 +255,7 @@ const mapDispatchToProps = (dispatch) => {
     {
       addVendorToRedux: setVendorsAction,
       addStockToRedux: setStockAction,
+      addRoutineToRedux: setRoutinesAction,
     },
     dispatch
   );

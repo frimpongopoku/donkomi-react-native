@@ -87,12 +87,16 @@ export default class FormGenerator extends Component {
     return fromState === undefined ? defaultObject[key] || null : fromState;
   }
 
-  defaultValueDisplay(field) {
-    var value = this.getFieldValue(field);
+  useValueToFindName(value, field) {
     var found;
     if (field.valueExtractor)
       found = field.data?.find((item) => field.valueExtractor(item) === value);
     value = (field.labelExtractor && field.labelExtractor(found)) || value;
+    return value;
+  }
+  defaultValueDisplay(field) {
+    var value = this.getFieldValue(field);
+    value = this.useValueToFindName(value, field);
     if (value && !field.multiple)
       return (
         <Text style={{ marginBottom: 6, color: "grey" }}>Current: {value}</Text>
@@ -119,24 +123,27 @@ export default class FormGenerator extends Component {
     let values = this.getFieldValue(field) || [];
     return (
       <View style={{ flexDirection: "row", padding: 10 }}>
-        {values.map((item, key) => (
-          <TouchableOpacity
-            onPress={() => this.handleDropdownSelection(field, item)}
-            key={key}
-            style={{
-              paddingLeft: 15,
-              paddingRight: 15,
-              borderRadius: 55,
-              paddingTop: 5,
-              paddingBottom: 5,
-              marginLeft: 3,
-              marginRight: 3,
-              backgroundColor: STYLES.theme.lightGrey,
-            }}
-          >
-            <Text>{item}</Text>
-          </TouchableOpacity>
-        ))}
+        {values.map((item, key) => {
+          const label = this.useValueToFindName(item, field);
+          return (
+            <TouchableOpacity
+              onPress={() => this.handleDropdownSelection(field, item)}
+              key={key}
+              style={{
+                paddingLeft: 15,
+                paddingRight: 15,
+                borderRadius: 55,
+                paddingTop: 5,
+                paddingBottom: 5,
+                marginLeft: 3,
+                marginRight: 3,
+                backgroundColor: STYLES.theme.lightGrey,
+              }}
+            >
+              <Text>{label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     );
   }
@@ -369,7 +376,7 @@ export default class FormGenerator extends Component {
   async sendDataToBackend(data) {
     var { onSuccess, URL, modifyData, isInEditMode, updateURL } = this.props;
     URL = isInEditMode ? updateURL : URL;
-    data = modifyData ? modifyData(data) : data;
+    if (!isInEditMode) data = modifyData ? modifyData(data) : data; // the modify data function should only be used when not in edit mode
     try {
       const response = await InternetExplorer.roamAndFind(URL, "POST", data);
       if (response.success) {
@@ -404,12 +411,6 @@ export default class FormGenerator extends Component {
           marginBottom: 50,
         }}
       >
-        {success && (
-          <SuccessNotification
-            text={success}
-            close={() => this.setState({ success: false })}
-          />
-        )}
         <Text
           style={{
             marginBottom: 10,
@@ -421,6 +422,12 @@ export default class FormGenerator extends Component {
           {title}
         </Text>
         {this.renderComponents()}
+        {success && (
+          <SuccessNotification
+            text={success}
+            close={() => this.setState({ success: false })}
+          />
+        )}
       </View>
     );
   }
