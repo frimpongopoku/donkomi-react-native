@@ -4,7 +4,11 @@ import { ScrollView, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setRoutinesAction, setStockAction, setVendorsAction } from "../../redux/actions/actions";
+import {
+  setRoutinesAction,
+  setStockAction,
+  setVendorsAction,
+} from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import {
   CREATE_A_VENDOR,
@@ -123,7 +127,8 @@ class FormPlaceholder extends Component {
     reduxFxn([...oldData, item]);
   }
   getPageJson() {
-    var { data, route, addVendorToRedux, vendors, stock, routines } = this.props;
+    var { data, route, addVendorToRedux, vendors, stock, routines } =
+      this.props;
     const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
@@ -142,6 +147,12 @@ class FormPlaceholder extends Component {
           onSuccess: (data) =>
             this.putItemInReduxStore(data, addRoutineToRedux, routines),
           updateParams: { routine_id: this.getIdOfItemToEdit() },
+          modifyData: (data) => {
+            return {
+              user_id: data.user_id,
+              data,
+            };
+          },
         };
       case FORM_PAGES.STOCK:
         return {
@@ -234,6 +245,7 @@ class FormPlaceholder extends Component {
           updateParams={this.isInEditMode() ? pageJson.updateParams : {}}
           onSuccess={pageJson?.onSuccess}
           scroll={pageJson?.scroll}
+          modifyData={pageJson?.modifyData}
         />
       </View>
     );

@@ -5,7 +5,7 @@ export const FORM_JSONS = {
     {
       fieldType: FormGenerator.FIELDS.TEXTBOX,
       placeholder: "Eg. Kweku's trip to Ricardos",
-      label: "Trip Name",
+      label: "Trip Title",
       name: "Trip title",
       dbName: "title",
       required: true,

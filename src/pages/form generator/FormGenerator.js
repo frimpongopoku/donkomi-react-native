@@ -28,7 +28,7 @@ const FIELDS = {
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import ImageUploader from "./../../shared/classes/ImageUploader";
-import { makeAlert } from "../../shared/utils";
+import { getRandomIntegerInRange, makeAlert } from "../../shared/utils";
 import SuccessNotification from "../../components/SuccessNotification";
 export default class FormGenerator extends Component {
   static FIELDS = FIELDS;
@@ -40,6 +40,7 @@ export default class FormGenerator extends Component {
       mounted: false,
       loading: false,
       success: false,
+      remountKey: "normal-mount",
     };
     this.onSubmit = this.onSubmit.bind(this);
     this.handleDropdownSelection = this.handleDropdownSelection.bind(this);
@@ -107,23 +108,27 @@ export default class FormGenerator extends Component {
 
   handleDropdownSelection(field, item) {
     let values = this.getFieldValue(field);
+    if (!item) return;
     if (field.multiple) {
       values = values || [];
       const exists = values.find((itm) => itm === item); // see if selected item exists
       if (exists) values = values.filter((itm) => itm !== item);
       // if it exists, user probably wants to remove it, that is why they tapped it again
       else values = [...values, item]; // if it doesnt exist already, just add it on to the list
-      return this.setContent({ field, content: values });
+      return this.setContent({
+        field,
+        content: values && values?.length > 0 ? values : null,
+      });
     }
     this.setContent({ field, content: item });
   }
 
   renderDropdownChips(field) {
     if (!field.multiple) return;
-    let values = this.getFieldValue(field) || [];
+    let values = this.getFieldValue(field);
     return (
       <View style={{ flexDirection: "row", padding: 10 }}>
-        {values.map((item, key) => {
+        {values?.map((item, key) => {
           const label = this.useValueToFindName(item, field);
           return (
             <TouchableOpacity
@@ -162,7 +167,9 @@ export default class FormGenerator extends Component {
             padding: 20,
           }}
           mode="dropdown"
-          onValueChange={(item) => this.handleDropdownSelection(field, item)}
+          onValueChange={(item) => {
+            this.handleDropdownSelection(field, item);
+          }}
         >
           <Picker.Item label="---------" value={null} style={{ padding: 20 }} />
           {data.map((item, index) => {
@@ -386,7 +393,15 @@ export default class FormGenerator extends Component {
             ? "Update was successful!"
             : "Creation was successful!",
         };
-        this.setState(isInEditMode ? obj : { ...obj, formData: {} }); // basically, dont clear form when in edit mode
+        this.setState(
+          isInEditMode
+            ? obj
+            : {
+                ...obj,
+                formData: {},
+                remountKey: `remountKey-${getRandomIntegerInRange(99)}`, // remounting here only because dropdown picker has a weird behaviour of not resetting after formdata has been set empty. So it keeps user selection, meanwhile selection isnt recorded. To fix this, we gotta remount
+              }
+        ); // basically, dont clear form when in edit mode
         if (onSuccess) return onSuccess(response.data);
       } else {
         this.setState({ loading: false });
@@ -435,7 +450,7 @@ export default class FormGenerator extends Component {
     const { scroll } = this.props;
     // console.log("THIS IS THE FORM DATA BURDA", this.state.formData);
     return (
-      <View style={{ height: "100%", flex: 1 }}>
+      <View style={{ height: "100%", flex: 1 }} key={this.state.remountKey}>
         {scroll && <ScrollView>{this.renderContent()}</ScrollView>}
         {!scroll && this.renderContent()}
         {this.renderSubmitButton()}

@@ -30,3 +30,7 @@ export const makeAlert = (
 
   return Alert.alert(title, message, btns, props);
 };
+
+export const getRandomIntegerInRange = (range = 99999999) => {
+  return Math.floor(Math.random() * Math.floor(range));
+};
