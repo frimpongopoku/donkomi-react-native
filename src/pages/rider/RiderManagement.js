@@ -4,8 +4,9 @@ import { Entypo } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import ListContentDisplay from "./ListContentDisplay";
 import FormPlaceholder from "../forms/FormPlaceholder";
+import { connect } from "react-redux";
 
-export default function RiderManagement({ navigation }) {
+function RiderManagement({ navigation, routines, stock, vendors }) {
   const buttons = [
     {
       name: "Vendor",
@@ -27,7 +28,7 @@ export default function RiderManagement({ navigation }) {
   return (
     <View style={{ width: "100%", height: "100%", backgroundColor: "white" }}>
       <BigPlusButtons buttons={buttons} navigation={navigation} />
-      <ListContentDisplay />
+      <ListContentDisplay routines={routines} stock={stock} vendors={vendors} />
     </View>
   );
 }
@@ -75,3 +76,13 @@ const BigPlusButtons = ({ buttons, navigation }) => (
     ))}
   </View>
 );
+
+export const mapStateToProps = (state) => {
+  return {
+    stock: state.stock,
+    routines: state.routines,
+    vendors: state.vendors,
+  };
+};
+
+export default connect(mapStateToProps, null)(RiderManagement);

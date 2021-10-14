@@ -7,6 +7,8 @@ import { STYLES } from "../../shared/ui";
 import { Feather } from "@expo/vector-icons";
 import burger from "./../../shared/images/burger.jpg";
 import { MaterialIcons } from "@expo/vector-icons";
+import NotFound from "../../components/NotFound";
+import { Defaults } from "../../shared/classes/Defaults";
 export default class ListContentDisplay extends Component {
   tabs = [
     { key: "vendors", title: "Vendors" },
@@ -15,11 +17,12 @@ export default class ListContentDisplay extends Component {
   ];
 
   renderScene = ({ route }) => {
+    const { vendors, stock, routines } = this.props;
     switch (route.key) {
       case "vendors":
-        return <VendorsList />;
+        return <VendorsList vendors={vendors} />;
       case "stock":
-        return <StockList />;
+        return <StockList stock={stock} />;
       default:
         return <Text style={{ padding: 2 }}>I am the {route.key} page</Text>;
     }
@@ -42,7 +45,8 @@ export default class ListContentDisplay extends Component {
   }
 }
 
-const VendorsList = ({ data = [1, 2, 3, 4] }) => {
+const VendorsList = ({ vendors }) => {
+  if (!vendors) return <NotFound text="No vendors yet, create some" />;
   return (
     <View
       style={{
@@ -51,48 +55,55 @@ const VendorsList = ({ data = [1, 2, 3, 4] }) => {
         paddingTop: 20,
       }}
     >
-      {data.map((item, index) => (
-        <View
-          key={index}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            borderBottomWidth: 1,
-            borderBottomColor: "#EAEAEA",
-            marginBottom: 10,
-          }}
-        >
-          <Image
+      {vendors?.map((vendor, index) => {
+        return (
+          <View
+            key={index.toString()}
             style={{
-              height: 65,
-              width: 65,
-              marginRight: 10,
-              borderRadius: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
               marginBottom: 10,
             }}
-            source={burger}
-          />
-          <Text style={{ fontSize: 15 }}>McDondalds</Text>
-          <View style={{ marginLeft: "auto" }}>
-            <TouchableOpacity
-              style={{ marginLeft: "auto", flexDirection: "row" }}
-            >
-              <Feather
-                name="edit"
-                size={24}
-                color="green"
-                style={{ marginRight: 15 }}
-              />
-              <MaterialIcons name="delete-outline" size={24} color="red" />
-            </TouchableOpacity>
+          >
+            <Image
+              style={{
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+              source={
+                vendor?.image
+                  ? { uri: vendor?.image }
+                  : Defaults.getDefaultImage()
+              }
+            />
+            <Text style={{ fontSize: 15 }}>{vendor?.name}</Text>
+            <View style={{ marginLeft: "auto" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto", flexDirection: "row" }}
+              >
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
-const StockList = ({ data = [1, 2, 3, 4] }) => {
+const StockList = ({ stock }) => {
+  console.log("I am teh stock list", stock);
   return (
     <View
       style={{
@@ -101,58 +112,60 @@ const StockList = ({ data = [1, 2, 3, 4] }) => {
         paddingTop: 20,
       }}
     >
-      {data.map((item, index) => (
-        <View
-          key={index}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            borderBottomWidth: 1,
-            borderBottomColor: "#EAEAEA",
-            marginBottom: 10,
-          }}
-        >
-          <Image
+      {stock?.map((s, index) => {
+        return (
+          <View
+            key={index}
             style={{
-              height: 65,
-              width: 65,
-              marginRight: 10,
-              borderRadius: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
               marginBottom: 10,
             }}
-            source={burger}
-          />
-          <View>
-            <Text style={{ fontSize: 15 }}>Fries</Text>
-            <Text style={{ fontSize: 16, fontWeight: "bold", color: "red" }}>
-              Rs 65
-            </Text>
-            <Text
+          >
+            <Image
               style={{
-                fontSize: 12,
-                fontWeight: "bold",
-                color: STYLES.theme.blue,
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
               }}
-            >
-              McDonalds
-            </Text>
+              source={s?.image ? { uri: s.immage } : Defaults.getDefaultImage()}
+            />
+            <View>
+              <Text style={{ fontSize: 15 }}>{s.name}</Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: "red" }}>
+                Rs {s.price}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: "bold",
+                  color: STYLES.theme.blue,
+                }}
+              >
+                {s?.vendor.name}
+              </Text>
+            </View>
+            <View style={{ marginLeft: "auto" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto", flexDirection: "row" }}
+              >
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={{ marginLeft: "auto" }}>
-            <TouchableOpacity
-              style={{ marginLeft: "auto", flexDirection: "row" }}
-            >
-              <Feather
-                name="edit"
-                size={24}
-                color="green"
-                style={{ marginRight: 15 }}
-              />
-              <MaterialIcons name="delete-outline" size={24} color="red" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
