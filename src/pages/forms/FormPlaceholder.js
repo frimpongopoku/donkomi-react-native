@@ -41,7 +41,9 @@ class FormPlaceholder extends Component {
       case FORM_PAGES.VENDOR:
         return vendors.find((v) => v.id === id);
       case FORM_PAGES.STOCK:
-        return stock.find((v) => v.id === id);
+        return stock?.find((v) => v.id === id);
+      case FORM_PAGES.ROUTINE:
+        return routines?.find((v) => v.id === id);
       default:
         return {};
     }
@@ -216,6 +218,7 @@ class FormPlaceholder extends Component {
     return route?.params.notificationMessage;
   }
   render() {
+    console.log("i am the routines", this.props.routines);
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;

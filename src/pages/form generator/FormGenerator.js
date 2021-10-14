@@ -89,6 +89,8 @@ export default class FormGenerator extends Component {
   }
 
   useValueToFindName(value, field) {
+    const { isInEditMode } = this.props;
+    // if (isInEditMode) return field?.labelExtractor(value) || value?.toString();
     var found;
     if (field.valueExtractor)
       found = field.data?.find((item) => field.valueExtractor(item) === value);
@@ -160,7 +162,7 @@ export default class FormGenerator extends Component {
       <>
         {this.renderLabel(field)}
         {this.defaultValueDisplay(field)}
-        {/* {this.renderDropdownChips(field)} */}
+
         <Picker
           style={{
             width: "100%",

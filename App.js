@@ -17,6 +17,7 @@ import {
   setAvailableRolesAction,
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
+  setRoutinesAction,
   setStockAction,
   setUserShopItemsAction,
   setUserShopsAction,
@@ -44,6 +45,7 @@ class App extends React.Component {
         this.props.setRoles(data.roles);
         this.props.setVendors(data.vendors);
         this.props.setStock(data.stock);
+        this.props.setRoutines(data.routines);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -198,6 +200,7 @@ const mapDispatchToProps = (dispatch) => {
       setRoles: setAvailableRolesAction,
       setVendors: setVendorsAction,
       setStock: setStockAction,
+      setRoutines: setRoutinesAction,
     },
     dispatch
   );

@@ -20,7 +20,7 @@ export default function RiderManagement({ navigation }) {
     {
       name: "Routine",
       icon: "plus",
-      params: { page: FormPlaceholder.PAGES.ROUTINE },
+      params: { page: FormPlaceholder.PAGES.ROUTINE, edit_id: 9 },
     },
   ];
 
