@@ -8,8 +8,10 @@ import Stock from "./Stock";
 import { Entypo } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import YourShops from "./YourShops";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
-export default class ShopMainPage extends Component {
+class ShopMainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,15 +28,16 @@ export default class ShopMainPage extends Component {
   ];
 
   renderScene = ({ route }) => {
+    const { products, shops, navigation } = this.props;
     switch (route.key) {
       case "market":
-        return <Stock text={route.key} />;
+        return <Stock text={route.key} navigation={navigation} />;
       case "your-products":
-        return <ShopManagement />;
+        return <ShopManagement navigation={navigation} products={products} />;
       case "orders":
-        return <ShopOrders />;
-        case "your-shops":
-          return <YourShops />;
+        return <ShopOrders navigation={navigation} />;
+      case "your-shops":
+        return <YourShops navigation={navigation} shops={shops} />;
       default:
         return <Text>These are the orders from my shop</Text>;
     }
@@ -93,3 +96,14 @@ export default class ShopMainPage extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    products: state.products,
+    shop: state.shops,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({}, dispatch);
+};
+export default connect(mapStateToProps, mapDispatchToProps)(ShopMainPage);

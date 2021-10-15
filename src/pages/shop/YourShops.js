@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import Subtitle from "../../components/Subtitle";
 import { Defaults } from "../../shared/classes/Defaults";
 
-export default function YourShops() {
+export default function YourShops({ navigation, shops }) {
   return (
     <View style={{ flex: 1, backgroundColor: "white", padding: 15 }}>
       <Subtitle text="A list of all your shops" />
