@@ -9,6 +9,8 @@ import burger from "./../../shared/images/burger.jpg";
 import { MaterialIcons } from "@expo/vector-icons";
 import NotFound from "../../components/NotFound";
 import { Defaults } from "../../shared/classes/Defaults";
+import { getPropsArrayFromJsonArray, makeAlert } from "../../shared/utils";
+import FormPlaceholder from "../forms/FormPlaceholder";
 export default class ListContentDisplay extends Component {
   tabs = [
     { key: "vendors", title: "Vendors" },
@@ -17,12 +19,42 @@ export default class ListContentDisplay extends Component {
   ];
 
   renderScene = ({ route }) => {
-    const { vendors, stock, routines } = this.props;
+    const {
+      vendors,
+      stock,
+      routines,
+      navigation,
+      user,
+      processAndDeleteVendor,
+    } = this.props;
     switch (route.key) {
       case "vendors":
-        return <VendorsList vendors={vendors} />;
+        return (
+          <VendorsList
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+            processAndDeleteVendor={processAndDeleteVendor}
+          />
+        );
       case "stock":
-        return <StockList stock={stock} />;
+        return (
+          <StockList
+            stock={stock}
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+          />
+        );
+      case "routines":
+        return (
+          <RoutineList
+            routines={routines}
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+          />
+        );
       default:
         return <Text style={{ padding: 2 }}>I am the {route.key} page</Text>;
     }
@@ -45,8 +77,99 @@ export default class ListContentDisplay extends Component {
   }
 }
 
-const VendorsList = ({ vendors }) => {
-  if (!vendors) return <NotFound text="No vendors yet, create some" />;
+const RoutineList = ({ routines, vendors }) => {
+  if (!routines || routines?.length === 0)
+    return <NotFound text="You have not created any routines yet.." />;
+  return (
+    <View
+      style={{
+        paddingLeft: 10,
+        paddingRight: 15,
+        paddingTop: 20,
+      }}
+    >
+      {routines?.map((routine, index) => {
+        var involvedVendors = routine.involved_vendors?.map((id) =>
+          vendors?.find((v) => v.id === id)
+        );
+        involvedVendors = getPropsArrayFromJsonArray(involvedVendors, "name");
+        var vendorString = involvedVendors.join(",");
+        vendorString =
+          vendorString?.length > 30
+            ? vendorString.substring(0, 27) + "..."
+            : vendorString;
+
+        return (
+          <View
+            key={index.toString()}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
+              marginBottom: 10,
+            }}
+          >
+            <Image
+              style={{
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+              source={
+                routine?.image
+                  ? { uri: routine?.image }
+                  : Defaults.getDefaultImage()
+              }
+            />
+            <View style={{ flexDirection: "column", justifyContent: "center" }}>
+              <Text style={{ fontSize: 15 }}>
+                {routine?.title || " Rolandisco Routine And Co"}
+              </Text>
+              <Text style={{ fontSize: 13, color: STYLES.theme.blue }}>
+                {vendorString}
+              </Text>
+              <Text
+                style={{ fontSize: 14, fontWeight: "bold", color: "green" }}
+              >
+                @Rs {routine?.fee} per order
+              </Text>
+            </View>
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
+              <TouchableOpacity style={{ marginLeft: "auto" }}>
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
+
+const VendorsList = ({ vendors, navigation, user, processAndDeleteVendor }) => {
+  const deleteVendor = (vendor) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${vendor?.name}'?. All stock related to this vendor will be removed as well`,
+      null,
+      () => processAndDeleteVendor({ vendors, vendor, user_id: user?.user_id }),
+      () => console.log("Delete canceled")
+    );
+  };
+  if (!vendors || vendors?.length === 0)
+    return <NotFound text="No vendors yet, create some" />;
   return (
     <View
       style={{
@@ -83,9 +206,18 @@ const VendorsList = ({ vendors }) => {
               }
             />
             <Text style={{ fontSize: 15 }}>{vendor?.name}</Text>
-            <View style={{ marginLeft: "auto" }}>
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
               <TouchableOpacity
                 style={{ marginLeft: "auto", flexDirection: "row" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.VENDOR,
+                      edit_id: vendor.id,
+                    },
+                  })
+                }
               >
                 <Feather
                   name="edit"
@@ -93,6 +225,8 @@ const VendorsList = ({ vendors }) => {
                   color="green"
                   style={{ marginRight: 15 }}
                 />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteVendor(vendor)}>
                 <MaterialIcons name="delete-outline" size={24} color="red" />
               </TouchableOpacity>
             </View>
@@ -102,8 +236,9 @@ const VendorsList = ({ vendors }) => {
     </View>
   );
 };
-const StockList = ({ stock }) => {
-  console.log("I am teh stock list", stock);
+const StockList = ({ stock, vendors }) => {
+  if (!stock || stock?.length == 0)
+    return <NotFound text="You have not added any stock yet..." />;
   return (
     <View
       style={{
@@ -113,6 +248,7 @@ const StockList = ({ stock }) => {
       }}
     >
       {stock?.map((s, index) => {
+        const vendor = vendors?.find((v) => v.id === s.vendor);
         return (
           <View
             key={index}
@@ -147,19 +283,19 @@ const StockList = ({ stock }) => {
                   color: STYLES.theme.blue,
                 }}
               >
-                {s?.vendor.name}
+                {vendor?.name}
               </Text>
             </View>
-            <View style={{ marginLeft: "auto" }}>
-              <TouchableOpacity
-                style={{ marginLeft: "auto", flexDirection: "row" }}
-              >
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
+              <TouchableOpacity style={{ marginLeft: "auto" }}>
                 <Feather
                   name="edit"
                   size={24}
                   color="green"
                   style={{ marginRight: 15 }}
                 />
+              </TouchableOpacity>
+              <TouchableOpacity>
                 <MaterialIcons name="delete-outline" size={24} color="red" />
               </TouchableOpacity>
             </View>
