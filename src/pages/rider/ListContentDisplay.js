@@ -161,7 +161,7 @@ const RoutineList = ({
                 style={{ marginLeft: "auto" }}
                 onPress={() =>
                   navigation.navigate("singles", {
-                    screen: "univeral-form",
+                    screen: "universal-form",
                     params: {
                       page: FormPlaceholder.PAGES.ROUTINE,
                       edit_id: routine.id,

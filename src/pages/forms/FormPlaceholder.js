@@ -32,7 +32,7 @@ class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
   state = { pageJson: {} };
 
-  getItemToEdit() {
+  getItemToEdit() { 
     const { vendors, routines, campaigns, stock } = this.props;
     if (!this.isInEditMode()) return {};
     const id = this.getIdOfItemToEdit();
