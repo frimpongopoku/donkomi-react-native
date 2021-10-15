@@ -96,11 +96,23 @@ class FormPlaceholder extends Component {
           this.getCurrentPage(),
           pageJson.formFields
         ),
-        editObject: itemToEdit,
+        editObject: this.modifyItemToEdit(itemToEdit),
       },
     });
   }
 
+  modifyItemToEdit(itemToEdit) {
+    if (!itemToEdit) return null;
+    switch (this.getCurrentPage()) {
+      // case FORM_PAGES.ROUTINE:
+      //   const vendors = itemToEdit?.involved_vendors?.map((v) => v.id);
+      //   itemToEdit.involved_vendors = vendors;
+      //   return itemToEdit;
+
+      default:
+        return itemToEdit;
+    }
+  }
   isInEditMode() {
     const { route } = this.props;
     return route?.params?.edit_id;
@@ -218,7 +230,6 @@ class FormPlaceholder extends Component {
     return route?.params.notificationMessage;
   }
   render() {
-    console.log("i am the routines", this.props.routines);
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;

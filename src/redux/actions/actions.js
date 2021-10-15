@@ -14,7 +14,7 @@ import {
 } from "./constants";
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
-import { REGISTER_USER } from "../../shared/urls";
+import { DELETE_A_VENDOR, REGISTER_USER } from "../../shared/urls";
 
 export const doNothingAction = () => {
   return { type: NOTHING, payload: ["something", "Here", "there"] };
@@ -67,4 +67,36 @@ export const setRoutinesAction = (data = []) => {
 
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
+};
+
+export const processAndDeleteVendor = (params) => {
+  const { vendor, vendors, user_id } = params;
+  return (dispatch, getState) => {
+    const { stock } = getState();
+    dispatch(
+      deleteContentFromBackend(DELETE_A_VENDOR, {
+        vendor_id: vendor.id,
+        user_id,
+      })
+    );
+    dispatch(removeRelatedStock(vendor, stock));
+    dispatch(removeItemFromRedux(vendors, "id", vendor.id, SET_VENDORS));
+  };
+};
+
+const removeRelatedStock = (vendor, stock = []) => {
+  const items = stock.filter((s) => s.vendor !== vendor.id);
+  return { type: SET_STOCK, payload: items };
+};
+
+const deleteContentFromBackend = (URL, body) => {
+  InternetExplorer.send(URL, "POST", body).catch((e) => {
+    console.log("ERROR_DELETING_CONTENT_FROM_BACKEND", e?.toString());
+  });
+  return { type: "NOTHING", payload: null };
+};
+const removeItemFromRedux = (list = [], key, value, type) => {
+  const rem = list.filter((itm) => itm[key] !== value);
+  console.log("I am teh remaineder", rem);
+  return { type, payload: rem };
 };

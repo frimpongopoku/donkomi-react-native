@@ -5,13 +5,22 @@ import { STYLES } from "../../shared/ui";
 import ListContentDisplay from "./ListContentDisplay";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { processAndDeleteVendor } from "../../redux/actions/actions";
 
-function RiderManagement({ navigation, routines, stock, vendors }) {
+function RiderManagement({
+  navigation,
+  routines,
+  stock,
+  vendors,
+  user,
+  deleteVendor,
+}) {
   const buttons = [
     {
       name: "Vendor",
       icon: "plus",
-      params: { page: FormPlaceholder.PAGES.VENDOR, edit_id: 24 },
+      params: { page: FormPlaceholder.PAGES.VENDOR },
     },
     {
       name: "Stock",
@@ -28,7 +37,14 @@ function RiderManagement({ navigation, routines, stock, vendors }) {
   return (
     <View style={{ width: "100%", height: "100%", backgroundColor: "white" }}>
       <BigPlusButtons buttons={buttons} navigation={navigation} />
-      <ListContentDisplay routines={routines} stock={stock} vendors={vendors} />
+      <ListContentDisplay
+        routines={routines}
+        stock={stock}
+        vendors={vendors}
+        navigation={navigation}
+        user={user}
+        processAndDeleteVendor={deleteVendor}
+      />
     </View>
   );
 }
@@ -82,7 +98,17 @@ export const mapStateToProps = (state) => {
     stock: state.stock,
     routines: state.routines,
     vendors: state.vendors,
+    user: state.user,
   };
 };
 
-export default connect(mapStateToProps, null)(RiderManagement);
+export const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      deleteVendor: processAndDeleteVendor,
+    },
+    dispatch
+  );
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RiderManagement);

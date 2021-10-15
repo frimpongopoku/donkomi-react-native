@@ -34,3 +34,10 @@ export const makeAlert = (
 export const getRandomIntegerInRange = (range = 99999999) => {
   return Math.floor(Math.random() * Math.floor(range));
 };
+
+export function getPropsArrayFromJsonArray(array, property) {
+  if (!array || !property) return [];
+  const toGo = [];
+  array.forEach((item) => item && toGo.push(item[property]));
+  return toGo;
+}
