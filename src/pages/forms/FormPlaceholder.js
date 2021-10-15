@@ -225,10 +225,6 @@ class FormPlaceholder extends Component {
     }
   }
 
-  getRouteNotification() {
-    const { route } = this.props;
-    return route?.params.notificationMessage;
-  }
   render() {
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
@@ -241,7 +237,6 @@ class FormPlaceholder extends Component {
           backgroundColor: "white",
         }}
       >
-        <Text>{this.getRouteNotification()} </Text>
         <FormGenerator
           user={this.props.user}
           URL={pageJson?.url}

@@ -6,7 +6,11 @@ import ListContentDisplay from "./ListContentDisplay";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { processAndDeleteVendor } from "../../redux/actions/actions";
+import {
+  deleteRoutineFromBackend,
+  processAndDeleteStock,
+  processAndDeleteVendor,
+} from "../../redux/actions/actions";
 
 function RiderManagement({
   navigation,
@@ -15,6 +19,8 @@ function RiderManagement({
   vendors,
   user,
   deleteVendor,
+  deleteStock,
+  deleteRoutine,
 }) {
   const buttons = [
     {
@@ -44,6 +50,8 @@ function RiderManagement({
         navigation={navigation}
         user={user}
         processAndDeleteVendor={deleteVendor}
+        processAndDeleteStock={deleteStock}
+        processAndDeleteRoutine={deleteRoutine}
       />
     </View>
   );
@@ -106,6 +114,8 @@ export const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       deleteVendor: processAndDeleteVendor,
+      deleteStock: processAndDeleteStock,
+      deleteRoutine: deleteRoutineFromBackend,
     },
     dispatch
   );

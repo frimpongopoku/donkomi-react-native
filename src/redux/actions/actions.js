@@ -14,7 +14,12 @@ import {
 } from "./constants";
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
-import { DELETE_A_VENDOR, REGISTER_USER } from "../../shared/urls";
+import {
+  DELETE_A_ROUTINE,
+  DELETE_A_VENDOR,
+  DELETE_STOCK,
+  REGISTER_USER,
+} from "../../shared/urls";
 
 export const doNothingAction = () => {
   return { type: NOTHING, payload: ["something", "Here", "there"] };
@@ -67,8 +72,35 @@ export const setRoutinesAction = (data = []) => {
 
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
-};
+}; 
 
+export const deleteRoutineFromBackend = (params) => {
+  const { routine } = params;
+  return (dispatch, getState) => {
+    const { routines, user } = getState();
+    dispatch(
+      deleteContentFromBackend(DELETE_A_ROUTINE, {
+        user_id: user?.user_id,
+        routine_id: routine?.id,
+      })
+    );
+    dispatch(removeItemFromRedux(routines, "id", routine.id, SET_ROUTINES));
+  };
+};
+export const processAndDeleteStock = (params) => {
+  const { stock } = params;
+  return (dispatch, getState) => {
+    const allStock = getState().stock;
+    const user = getState().user;
+    dispatch(
+      deleteContentFromBackend(DELETE_STOCK, {
+        user_id: user?.user_id,
+        stock_id: stock?.id,
+      })
+    );
+    dispatch(removeItemFromRedux(allStock, "id", stock.id, SET_STOCK));
+  };
+};
 export const processAndDeleteVendor = (params) => {
   const { vendor, vendors, user_id } = params;
   return (dispatch, getState) => {

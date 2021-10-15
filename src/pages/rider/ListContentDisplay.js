@@ -26,6 +26,8 @@ export default class ListContentDisplay extends Component {
       navigation,
       user,
       processAndDeleteVendor,
+      processAndDeleteStock,
+      processAndDeleteRoutine,
     } = this.props;
     switch (route.key) {
       case "vendors":
@@ -44,6 +46,7 @@ export default class ListContentDisplay extends Component {
             vendors={vendors}
             navigation={navigation}
             user={user}
+            processAndDeleteStock={processAndDeleteStock}
           />
         );
       case "routines":
@@ -53,6 +56,7 @@ export default class ListContentDisplay extends Component {
             vendors={vendors}
             navigation={navigation}
             user={user}
+            processAndDeleteRoutine={processAndDeleteRoutine}
           />
         );
       default:
@@ -77,7 +81,21 @@ export default class ListContentDisplay extends Component {
   }
 }
 
-const RoutineList = ({ routines, vendors }) => {
+const RoutineList = ({
+  routines,
+  vendors,
+  navigation,
+  processAndDeleteRoutine,
+}) => {
+  const deleteRoutine = (routine) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${routine?.title}'? All campaigns related to this routine will be removed as well...`,
+      null,
+      () => processAndDeleteRoutine({ routine }),
+      () => console.log("Delete canceled")
+    );
+  };
   if (!routines || routines?.length === 0)
     return <NotFound text="You have not created any routines yet.." />;
   return (
@@ -139,7 +157,18 @@ const RoutineList = ({ routines, vendors }) => {
               </Text>
             </View>
             <View style={{ marginLeft: "auto", flexDirection: "row" }}>
-              <TouchableOpacity style={{ marginLeft: "auto" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "univeral-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.ROUTINE,
+                      edit_id: routine.id,
+                    },
+                  })
+                }
+              >
                 <Feather
                   name="edit"
                   size={24}
@@ -147,7 +176,7 @@ const RoutineList = ({ routines, vendors }) => {
                   style={{ marginRight: 15 }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteRoutine(routine)}>
                 <MaterialIcons name="delete-outline" size={24} color="red" />
               </TouchableOpacity>
             </View>
@@ -236,7 +265,17 @@ const VendorsList = ({ vendors, navigation, user, processAndDeleteVendor }) => {
     </View>
   );
 };
-const StockList = ({ stock, vendors }) => {
+const StockList = ({ stock, vendors, navigation, processAndDeleteStock }) => {
+  const deleteStock = (stock) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${stock?.name}'?`,
+      null,
+      () => processAndDeleteStock({ stock }),
+      () => console.log("Delete canceled")
+    );
+  };
+
   if (!stock || stock?.length == 0)
     return <NotFound text="You have not added any stock yet..." />;
   return (
@@ -287,7 +326,18 @@ const StockList = ({ stock, vendors }) => {
               </Text>
             </View>
             <View style={{ marginLeft: "auto", flexDirection: "row" }}>
-              <TouchableOpacity style={{ marginLeft: "auto" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.STOCK,
+                      edit_id: s.id,
+                    },
+                  })
+                }
+              >
                 <Feather
                   name="edit"
                   size={24}
@@ -295,7 +345,7 @@ const StockList = ({ stock, vendors }) => {
                   style={{ marginRight: 15 }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteStock(s)}>
                 <MaterialIcons name="delete-outline" size={24} color="red" />
               </TouchableOpacity>
             </View>
