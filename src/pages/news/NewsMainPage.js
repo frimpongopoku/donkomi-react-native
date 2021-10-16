@@ -12,7 +12,7 @@ export default class NewsMainPage extends Component {
       <ScrollView>
         <View style={{ flex: 1, backgroundColor: "white" }}>
           <RoutineNewsCard navigation={this.props.navigation} />
-          <ShopNewsCard />
+          <ShopNewsCard navigation={this.props.navigation} />
           <RoutineNewsCard navigation={this.props.navigation} />
         </View>
       </ScrollView>
@@ -22,10 +22,12 @@ export default class NewsMainPage extends Component {
 
 // ------------------------- WIDGETS AREA ----------------------------
 
-export const ShopNewsCard = (props) => {
+export const ShopNewsCard = ({ navigation }) => {
   return (
     <View>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("singles", { screen: "full-view" })}
+      >
         <Image source={burger} style={{ width: "100%", height: 250 }} />
       </TouchableOpacity>
       <View

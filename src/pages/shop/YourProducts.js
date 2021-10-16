@@ -8,7 +8,6 @@ import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
 import { makeAlert } from "../../shared/utils";
 import ShopCreationContainer from "./creation/ShopCreationContainer";
-import { Entypo } from "@expo/vector-icons";
 export default class YourProducts extends Component {
   deleteProduct(product) {
     const { processAndDeleteProduct } = this.props;

@@ -15,6 +15,7 @@ import PlaceOrder from "../pages/order placement/PlaceOrder";
 import FormPlaceholder from "../pages/forms/FormPlaceholder";
 import EditYourProfile from "../pages/profile/EditYourProfile";
 import ShopCreationContainer from "../pages/shop/creation/ShopCreationContainer";
+import FullView from "../pages/full view/FullView";
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
@@ -149,6 +150,14 @@ const makeHeaderLeft = (navigation) => {
 const SinglePageStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="full-view"
+        component={FullView}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          title: "View Item In Full",
+        })}
+      />
       <Stack.Screen
         name="universal-form"
         component={FormPlaceholder}
