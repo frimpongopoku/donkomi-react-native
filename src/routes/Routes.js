@@ -22,6 +22,7 @@ import { Octicons } from "@expo/vector-icons";
 import { STYLES } from "./../shared/ui";
 import Driver from "../pages/driver/Driver";
 import Merchant from "../merchant/Merchant";
+import CustomDrawer from "./drawer/CustomDrawer";
 
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -256,7 +257,11 @@ export const MainAppStackWrapper = () => (
 export const AppContainerStack = () => {
   return (
     <NavigationContainer>
-      <MyDrawer.Navigator initialRouteName="Home">
+      <MyDrawer.Navigator
+        initialRouteName="Home"
+        drawerContent={(props) => <CustomDrawer {...props} />}
+        // screenOptions={{ drawerActiveBackgroundColor: "red" }}
+      >
         <MyDrawer.Screen
           name="Home"
           component={MainAppStackWrapper}
