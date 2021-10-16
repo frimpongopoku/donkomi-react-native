@@ -127,9 +127,11 @@ const RoutineList = ({
               borderBottomWidth: 1,
               borderBottomColor: "#EAEAEA",
               marginBottom: 10,
+              padding: 10,
             }}
           >
-            <Image
+            {/*  IMAGES IN ROUTINE WILL BE USED LATER IF NECESSARY */}
+            {/* <Image
               style={{
                 height: 65,
                 width: 65,
@@ -142,7 +144,7 @@ const RoutineList = ({
                   ? { uri: routine?.image }
                   : Defaults.getDefaultImage()
               }
-            />
+            /> */}
             <View style={{ flexDirection: "column", justifyContent: "center" }}>
               <Text style={{ fontSize: 15 }}>
                 {routine?.title || " Rolandisco Routine And Co"}
@@ -308,7 +310,7 @@ const StockList = ({ stock, vendors, navigation, processAndDeleteStock }) => {
                 borderRadius: 8,
                 marginBottom: 10,
               }}
-              source={s?.image ? { uri: s.immage } : Defaults.getDefaultImage()}
+              source={s?.image ? { uri: s.image } : Defaults.getDefaultImage()}
             />
             <View>
               <Text style={{ fontSize: 15 }}>{s.name}</Text>

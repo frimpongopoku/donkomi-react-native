@@ -5,16 +5,45 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import NotFound from "../../components/NotFound";
 import Subtitle from "../../components/Subtitle";
 import { Defaults } from "../../shared/classes/Defaults";
-import burger from "./../../shared/images/burger.jpg";
-import { STYLES } from "./../../shared/ui";
-
-export default class ShopManagement extends Component {
+import { STYLES } from "../../shared/ui";
+import { makeAlert } from "../../shared/utils";
+import ShopCreationContainer from "./creation/ShopCreationContainer";
+import { Entypo } from "@expo/vector-icons";
+export default class YourProducts extends Component {
+  deleteProduct(product) {
+    const { processAndDeleteProduct } = this.props;
+    makeAlert(
+      "Delete Product",
+      `Are you sure you want to delete '${product?.name}'?`,
+      null,
+      () => processAndDeleteProduct({ product }),
+      () => console.log("Delete canceled")
+    );
+  }
   render() {
     const { products, navigation } = this.props;
     if (!products || products?.length == 0)
-      return <NotFound text="You have not created any products yet..." />;
+      return (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "white",
+            padding: 15,
+            height: "100%",
+          }}
+        >
+          <NotFound text="You have not created any products yet..." />
+        </View>
+      );
     return (
-      <View style={{ padding: 15, backgroundColor: "white", flex: 1 }}>
+      <View
+        style={{
+          padding: 15,
+          backgroundColor: "white",
+          flex: 1,
+          flexDirection: "column",
+        }}
+      >
         <Subtitle text="Here are products you have listed on the market" />
         <TextInput
           placeholder="Search for your products..."
@@ -79,9 +108,12 @@ export default class ShopManagement extends Component {
                 <TouchableOpacity
                   style={{ marginLeft: "auto" }}
                   onPress={() =>
-                    navigation.navte("singles", {
+                    navigation.navigate("singles", {
                       screen: "create-shop",
-                      edit_id: product?.id,
+                      params: {
+                        page: ShopCreationContainer.PRODUCT_PAGE,
+                        edit_id: product?.id,
+                      },
                     })
                   }
                 >
@@ -92,7 +124,7 @@ export default class ShopManagement extends Component {
                     style={{ marginRight: 15 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => this.deleteProduct(product)}>
                   <MaterialIcons name="delete-outline" size={24} color="red" />
                 </TouchableOpacity>
               </View>

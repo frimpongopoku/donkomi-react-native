@@ -29,6 +29,7 @@ import { makeAlert } from "./../../../shared/utils";
 
 const PRODUCT_PAGE = "shop-item";
 class ShopCreationContainer extends Component {
+  static PRODUCT_PAGE = PRODUCT_PAGE;
   state = {
     form: {},
     loading: false,
@@ -294,7 +295,6 @@ class ShopCreationContainer extends Component {
   }
 
   render() {
-    // console.log("I amt the producst bebe", this.props.shops);
     // console.log("Also, I am the from", this.state.form);
     return (
       <View
@@ -409,14 +409,14 @@ const CreateShopItem = ({ onFormChange, shops, form, isInEditMode }) => {
               </Text>
               <ImagePicker
                 onFileSelected={(file, error) => handleChange("image", file)}
-                value={formData["image"]}
+                value={formData?.image}
                 pickerProps={{ cropping: true }}
               />
             </View>
           );
         // --- User should not be able to change shops in edit mode. This is not the place.
         if (item.fieldType === FormGenerator.FIELDS.DROPDOWN && !isInEditMode) {
-          const selectedShop = formData["shopName"];
+          const selectedShop = formData?.shopName;
           return (
             <View key={index.toString()}>
               <Text style={{ marginBottom: 10 }}>
@@ -490,7 +490,7 @@ const CreateShopComponent = ({ onFormChange, form, isInEditMode }) => {
         style={{ ...STYLES.textbox }}
         placeholderTextColor="grey"
         onChangeText={(text) => handleChange("name", text)}
-        value={formData["name"]}
+        value={formData?.name}
       />
       <Space bottom={5} />
       <Text>Enter a brief description of your shop</Text>
@@ -500,7 +500,7 @@ const CreateShopComponent = ({ onFormChange, form, isInEditMode }) => {
         numberOfLines={6}
         placeholderTextColor="grey"
         onChangeText={(text) => handleChange("description", text)}
-        value={formData["description"]}
+        value={formData?.description}
       />
       <Space bottom={5} />
       <Text style={{ marginBottom: 10 }}>
@@ -508,7 +508,7 @@ const CreateShopComponent = ({ onFormChange, form, isInEditMode }) => {
       </Text>
       <ImagePicker
         onFileSelected={(file, error) => handleChange("image", file)}
-        value={formData["image"]}
+        value={formData?.image}
       />
     </>
   );

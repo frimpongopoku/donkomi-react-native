@@ -15,7 +15,9 @@ import {
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import {
+  DELETE_A_PRODUCT,
   DELETE_A_ROUTINE,
+  DELETE_A_SHOP,
   DELETE_A_VENDOR,
   DELETE_STOCK,
   REGISTER_USER,
@@ -72,8 +74,34 @@ export const setRoutinesAction = (data = []) => {
 
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
-}; 
+};
 
+export const deleteAProductFromBackend = (params) => {
+  const { product } = params;
+  return (dispatch, getState) => {
+    const { products, user } = getState();
+    dispatch(
+      deleteContentFromBackend(DELETE_A_PRODUCT, {
+        user_id: user?.user_id,
+        shop_id: shop?.id,
+      })
+    );
+    dispatch(removeItemFromRedux(products, "id", product.id, DELETE_A_PRODUCT));
+  };
+};
+export const deleteAShopFromBackend = (params) => {
+  const { shop } = params;
+  return (dispatch, getState) => {
+    const { shops, user } = getState();
+    dispatch(
+      deleteContentFromBackend(DELETE_A_SHOP, {
+        user_id: user?.user_id,
+        shop_id: shop?.id,
+      })
+    );
+    dispatch(removeItemFromRedux(shops, "id", shop.id, SET_USER_SHOPS));
+  };
+};
 export const deleteRoutineFromBackend = (params) => {
   const { routine } = params;
   return (dispatch, getState) => {
@@ -129,6 +157,5 @@ const deleteContentFromBackend = (URL, body) => {
 };
 const removeItemFromRedux = (list = [], key, value, type) => {
   const rem = list.filter((itm) => itm[key] !== value);
-  console.log("I am teh remaineder", rem);
   return { type, payload: rem };
 };

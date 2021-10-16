@@ -2,14 +2,19 @@ import React, { Component } from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { TabView, SceneMap } from "react-native-tab-view";
 import TabBarHeader from "../../shared/components/TabBarHeader";
-import ShopManagement from "./ShopManagement";
+import YourProducts from "./YourProducts";
 import ShopOrders from "./ShopOrders";
 import Stock from "./Stock";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import YourShops from "./YourShops";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import {
+  deleteAProductFromBackend,
+  deleteAShopFromBackend,
+} from "../../redux/actions/actions";
+import ShopCreationContainer from "./creation/ShopCreationContainer";
 
 class ShopMainPage extends Component {
   constructor(props) {
@@ -28,16 +33,29 @@ class ShopMainPage extends Component {
   ];
 
   renderScene = ({ route }) => {
-    const { products, shops, navigation } = this.props;
+    const { products, shops, navigation, deleteProduct, deleteShop } =
+      this.props;
     switch (route.key) {
       case "market":
         return <Stock text={route.key} navigation={navigation} />;
       case "your-products":
-        return <ShopManagement navigation={navigation} products={products} />;
+        return (
+          <YourProducts
+            navigation={navigation}
+            products={products}
+            processAndDeleteProduct={deleteProduct}
+          />
+        );
       case "orders":
         return <ShopOrders navigation={navigation} />;
       case "your-shops":
-        return <YourShops navigation={navigation} shops={shops} />;
+        return (
+          <YourShops
+            navigation={navigation}
+            shops={shops}
+            processAndDeleteShop={deleteShop}
+          />
+        );
       default:
         return <Text>These are the orders from my shop</Text>;
     }
@@ -55,17 +73,35 @@ class ShopMainPage extends Component {
     );
   }
 
-  handleIndexChange = (index) => this.setState({ index });
+  handleIndexChange = (index) => {
+    this.setState({ index });
+  };
 
-  addShopItem() {
+  onFloatingButtonPress() {
+    const { index } = this.state;
+    switch (index) {
+      case 0:
+        return this.openCartPage();
+      case 1:
+        return this.openShopCreationPage("is product");
+      case 2:
+        return this.openShopCreationPage();
+
+      default:
+        break;
+    }
+  }
+  openCartPage() {}
+  openShopCreationPage(isProduct) {
     const { navigation } = this.props;
     navigation.navigate("singles", {
       screen: "create-shop",
-      params: { edit_id: 7 },
+      params: { page: isProduct && ShopCreationContainer.PRODUCT_PAGE },
     });
   }
   render() {
-    const { navigation } = this.props;
+    const { index } = this.state;
+    const isMarket = index === 0;
     return (
       <>
         <TabView
@@ -75,23 +111,29 @@ class ShopMainPage extends Component {
           onIndexChange={this.handleIndexChange}
         />
 
-        <TouchableOpacity
-          onPress={() => this.addShopItem()}
-          style={{
-            position: "absolute",
-            bottom: 20,
-            right: 20,
-            borderRadius: 55,
-            width: 55,
-            height: 55,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "green",
-            elevation: 5,
-          }}
-        >
-          <Entypo name="plus" size={24} color="white" />
-        </TouchableOpacity>
+        {index !== 3 && (
+          <TouchableOpacity
+            onPress={() => this.onFloatingButtonPress()}
+            style={{
+              position: "absolute",
+              bottom: 20,
+              right: 20,
+              borderRadius: 55,
+              width: 55,
+              height: 55,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: isMarket ? "white" : "green",
+              elevation: 5,
+            }}
+          >
+            {isMarket ? (
+              <Ionicons name="cart-outline" size={24} color="green" />
+            ) : (
+              <Entypo name="plus" size={24} color="white" />
+            )}
+          </TouchableOpacity>
+        )}
       </>
     );
   }
@@ -100,10 +142,16 @@ class ShopMainPage extends Component {
 const mapStateToProps = (state) => {
   return {
     products: state.products,
-    shop: state.shops,
+    shops: state.shops,
   };
 };
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      deleteShop: deleteAShopFromBackend,
+      deleteProduct: deleteAProductFromBackend,
+    },
+    dispatch
+  );
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ShopMainPage);
