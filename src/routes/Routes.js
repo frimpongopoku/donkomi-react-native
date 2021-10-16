@@ -1,6 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import React from "react";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -16,9 +17,17 @@ import FormPlaceholder from "../pages/forms/FormPlaceholder";
 import EditYourProfile from "../pages/profile/EditYourProfile";
 import ShopCreationContainer from "../pages/shop/creation/ShopCreationContainer";
 import FullView from "../pages/full view/FullView";
+import { FontAwesome } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
+import { STYLES } from "./../shared/ui";
+import Driver from "../pages/driver/Driver";
+import Merchant from "../merchant/Merchant";
+
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
+const MyDrawer = createDrawerNavigator();
+// const TaxiStack = createStackNavigator();
 export const AuthStack = () => (
   <NavigationContainer>
     <Stack.Navigator>
@@ -88,7 +97,18 @@ const makeHeaderRight = (
     </TouchableOpacity>
   );
 };
-// ----------------------------------------- APPLICATION BOTTOM TAB STACK ------------------
+// ----------------------------------------- APPLICATION BOTTOM TAB STACK NAVIGATION ------------------
+const makeHamburgerLeft = ({ navigation }) => {
+  return () => (
+    <TouchableOpacity
+      style={{ marginRight: 5, marginLeft: 20 }}
+      onPress={() => navigation.openDrawer()}
+    >
+      <Octicons name="three-bars" size={24} color={STYLES.theme.blue} />
+    </TouchableOpacity>
+  );
+};
+
 export const ApplicationStack = () => (
   <Tabs.Navigator
     screenOptions={({ route }) => ({
@@ -104,6 +124,7 @@ export const ApplicationStack = () => (
       options={({ navigation }) => ({
         title: "News",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
@@ -112,6 +133,7 @@ export const ApplicationStack = () => (
       options={({ navigation }) => ({
         title: "Market Place",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
@@ -120,6 +142,7 @@ export const ApplicationStack = () => (
       options={({ navigation }) => ({
         title: "Rider",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
@@ -128,6 +151,7 @@ export const ApplicationStack = () => (
       options={({ navigation }) => ({
         title: "Settings",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
   </Tabs.Navigator>
@@ -205,23 +229,69 @@ const SinglePageStack = () => {
     </Stack.Navigator>
   );
 };
+
+// // -----------TAXI SERVICE STACK -------------
+// const TaxiScreenPack = () => {
+//   <TaxiStack.Navigator>
+//     <TaxiStack.Screen name="taxi-homepage" component={Driver} />
+//   </TaxiStack.Navigator>;
+// };
+
 // ----------- MAIN APP CONTAINER STACK ----------------
 
+export const MainAppStackWrapper = () => (
+  <MainAppStack.Navigator>
+    <MainAppStack.Screen
+      name="dashboard"
+      component={ApplicationStack}
+      options={{ headerShown: false }}
+    />
+    <MainAppStack.Screen
+      name="singles"
+      component={SinglePageStack}
+      options={{ headerShown: false }}
+    />
+  </MainAppStack.Navigator>
+);
 export const AppContainerStack = () => {
   return (
     <NavigationContainer>
-      <MainAppStack.Navigator>
-        <MainAppStack.Screen
-          name="dashboard"
-          component={ApplicationStack}
+      <MyDrawer.Navigator initialRouteName="Home">
+        <MyDrawer.Screen
+          name="Home"
+          component={MainAppStackWrapper}
           options={{ headerShown: false }}
         />
-        <MainAppStack.Screen
-          name="singles"
-          component={SinglePageStack}
-          options={{ headerShown: false }}
+        <MyDrawer.Screen
+          name="Merchant"
+          component={Merchant}
+          options={({ navigation }) => ({
+            title: "Merchant",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
         />
-      </MainAppStack.Navigator>
+        <MyDrawer.Screen
+          name="Taxi"
+          component={Driver}
+          options={({ navigation }) => ({
+            title: "Taxi Service",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+        <MyDrawer.Screen
+          name="Settings"
+          component={Settings}
+          options={({ navigation }) => ({
+            title: "Settings",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+      </MyDrawer.Navigator>
     </NavigationContainer>
   );
 };
+
+// ----------------------------------------------------------------
