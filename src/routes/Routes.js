@@ -6,7 +6,13 @@ import React from "react";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import { Text, TouchableOpacity } from "react-native";
-import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  Feather,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
 import RiderMainPage from "../pages/rider/RiderMainPage";
 import Settings from "../pages/settings/Settings";
@@ -23,6 +29,7 @@ import { STYLES } from "./../shared/ui";
 import Driver from "../pages/driver/Driver";
 import Merchant from "../merchant/Merchant";
 import CustomDrawer from "./drawer/CustomDrawer";
+import Help from "../pages/help/Help";
 
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -65,16 +72,17 @@ const getTabIcons = (params) => {
         color={focused ? activeColor : color}
       />
     ),
-    Rider: (
-      <MaterialIcons
-        name="delivery-dining"
+    Notifications: (
+      <Feather
+        name="bell"
+        size={24}
         size={size}
         color={focused ? activeColor : color}
       />
     ),
-    Settings: (
-      <Ionicons
-        name="settings-outline"
+    Profile: (
+      <AntDesign
+        name="user"
         size={size}
         color={focused ? activeColor : color}
       />
@@ -138,19 +146,19 @@ export const ApplicationStack = () => (
       })}
     />
     <Tabs.Screen
-      name="Rider"
+      name="Notifications"
       component={RiderMainPage}
       options={({ navigation }) => ({
-        title: "Rider",
+        title: "Notifications",
         headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
-      name="Settings"
+      name="Profile"
       component={Settings}
       options={({ navigation }) => ({
-        title: "Settings",
+        title: "Your Profile",
         headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
@@ -269,7 +277,7 @@ export const AppContainerStack = () => {
         />
         <MyDrawer.Screen
           name="Merchant"
-          component={Merchant}
+          component={RiderMainPage}
           options={({ navigation }) => ({
             title: "Merchant",
             headerRight: makeHeaderRight(navigation),
@@ -286,6 +294,15 @@ export const AppContainerStack = () => {
           })}
         />
         <MyDrawer.Screen
+          name="Help"
+          component={Help}
+          options={({ navigation }) => ({
+            title: "Help",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+        <MyDrawer.Screen
           name="Settings"
           component={Settings}
           options={({ navigation }) => ({
@@ -294,6 +311,15 @@ export const AppContainerStack = () => {
             headerLeft: makeHamburgerLeft({ navigation }),
           })}
         />
+        {/* <MyDrawer.Screen
+          name="Market Place"
+          component={ShopMainPage}
+          options={({ navigation }) => ({
+            title: "Market Place",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        /> */}
       </MyDrawer.Navigator>
     </NavigationContainer>
   );

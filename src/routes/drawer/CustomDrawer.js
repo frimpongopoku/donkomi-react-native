@@ -3,10 +3,7 @@ import { View, Text, Image } from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import {
-  DrawerContentScrollView,
-  DrawerItem,
-} from "@react-navigation/drawer";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { STYLES } from "../../shared/ui";
 import { Defaults } from "../../shared/classes/Defaults";
 const makeIcon = ({ iconName, type, color = "black" }) => {
@@ -27,6 +24,12 @@ const makeIcon = ({ iconName, type, color = "black" }) => {
 };
 const menu = [
   { name: "Home", iconType: "fa", iconName: "home", url: "Home" },
+  // {
+  //   name: "Market Place",
+  //   iconType: "fa",
+  //   iconName: "shopping-basket",
+  //   url: "Market Place",
+  // },
   {
     name: "Merchant",
     iconType: "material",
@@ -34,6 +37,12 @@ const menu = [
     url: "Merchant",
   },
   { name: "Taxi", iconType: "fa", iconName: "taxi", url: "Taxi" },
+  {
+    name: "Help",
+    iconType: "feather",
+    iconName: "help-circle",
+    url: "Help",
+  },
   {
     name: "Settings",
     iconType: "material",

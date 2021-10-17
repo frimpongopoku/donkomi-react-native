@@ -194,7 +194,7 @@ class Settings extends Component {
               color="red"
               style={{ marginRight: 10 }}
             />
-            <Text style={{ fontSize: 17 }}>Profile</Text>
+            <Text style={{ fontSize: 17 }}>Edit Profile</Text>
             <Fontisto
               style={{ marginLeft: "auto" }}
               name="angle-right"
