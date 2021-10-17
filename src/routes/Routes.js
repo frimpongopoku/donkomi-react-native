@@ -30,6 +30,7 @@ import Driver from "../pages/driver/Driver";
 import Merchant from "../merchant/Merchant";
 import CustomDrawer from "./drawer/CustomDrawer";
 import Help from "../pages/help/Help";
+import Notifications from "../pages/notifications/Notifications";
 
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -147,7 +148,7 @@ export const ApplicationStack = () => (
     />
     <Tabs.Screen
       name="Notifications"
-      component={RiderMainPage}
+      component={Notifications}
       options={({ navigation }) => ({
         title: "Notifications",
         headerRight: makeHeaderRight(navigation),
