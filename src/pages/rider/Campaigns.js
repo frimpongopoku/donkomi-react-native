@@ -1,11 +1,15 @@
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import React, { Component } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import Subtitle from "../../components/Subtitle";
 import { STYLES } from "../../shared/ui";
+import { getPropsArrayFromJsonArray } from "../../shared/utils";
 
-export default class Campaigns extends Component {
+class Campaigns extends Component {
   render() {
+    const { campaigns, vendors } = this.props;
     return (
       <ScrollView
         style={{
@@ -16,13 +20,41 @@ export default class Campaigns extends Component {
         }}
       >
         <Subtitle text="Here is a list of your campaigns..." />
-        <CampCard />
+        {campaigns.map((camp, index) => {
+          var venList = camp.involved_vendors.map((id) =>
+            vendors.find((ven) => ven.id === id)
+          );
+          venList = getPropsArrayFromJsonArray(venList, "name");
+          const vendorString = venList.join(", ");
+          // console.log("I am the vendors list ", venList);
+          return (
+            <View key={index.toString()}>
+              <CampCard
+                {...camp}
+                vendors={vendors}
+                vendorString={vendorString}
+              />
+            </View>
+          );
+        })}
       </ScrollView>
     );
   }
 }
 
-const CampCard = ({title, fee, involved_vendors, vendors, open}) => {
+const mapStateToProps = (state) => {
+  return {
+    campaigns: state.campaigns,
+    vendors: state.vendors,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({}, dispatch);
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Campaigns);
+
+const CampCard = ({ title, fee, vendorString, open }) => {
   return (
     <View
       // key={index.toString()}
@@ -36,42 +68,35 @@ const CampCard = ({title, fee, involved_vendors, vendors, open}) => {
         padding: 10,
       }}
     >
-      {/*  IMAGES IN ROUTINE WILL BE USED LATER IF NECESSARY */}
-      {/* <Image
-              style={{
-                height: 65,
-                width: 65,
-                marginRight: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-              source={
-                routine?.image
-                  ? { uri: routine?.image }
-                  : Defaults.getDefaultImage()
-              }
-            /> */}
-      <TouchableOpacity
-        style={{ flexDirection: "column", justifyContent: "center" }}
-      >
-        <Text style={{ fontSize: 15 }}>{"Rolandisco Routine And Co"}</Text>
+      <View style={{ flexDirection: "column", justifyContent: "center" }}>
+        <Text style={{ fontSize: 15 }}>{title}</Text>
         <Text style={{ fontSize: 13, color: STYLES.theme.blue }}>
-          {"Some new vendors"}
+          {vendorString}
         </Text>
         <View style={{ flexDirection: "row" }}>
           <Text style={{ fontSize: 14, fontWeight: "bold", color: "green" }}>
-            @Rs {"0.0"} per order
+            @Rs {fee} per order
           </Text>
-          <Text style={{ marginLeft: 15, fontWeight: "bold", color: "green" }}>
-            Running...
+          <Text
+            style={{
+              marginLeft: 15,
+              fontWeight: "bold",
+              color: open ? "green" : "grey",
+            }}
+          >
+            {open ? "Running..." : "Closed"}
           </Text>
-          <TouchableOpacity>
-            <Text style={{ marginLeft: 20, fontWeight: "bold", color: "red" }}>
-              STOP
-            </Text>
-          </TouchableOpacity>
+          {open && (
+            <TouchableOpacity>
+              <Text
+                style={{ marginLeft: 20, fontWeight: "bold", color: "red" }}
+              >
+                STOP
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </TouchableOpacity>
+      </View>
       <View style={{ marginLeft: "auto", flexDirection: "row" }}>
         <TouchableOpacity style={{ marginLeft: "auto" }}>
           <Feather
