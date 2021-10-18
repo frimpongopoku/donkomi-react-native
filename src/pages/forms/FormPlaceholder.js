@@ -11,9 +11,11 @@ import {
 } from "../../redux/actions/actions";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import {
+  CREATE_A_CAMPAIGN,
   CREATE_A_VENDOR,
   CREATE_ROUTINE,
   CREATE_STOCK,
+  UPDATE_A_CAMPAIGN,
   UPDATE_A_VENDOR,
   UPDATE_ROUTINE,
   UPDATE_STOCK,
@@ -192,8 +194,8 @@ class FormPlaceholder extends Component {
           formTitle:
             "Let people know where you are going, they might buy something... ",
           formFields: FORM_JSONS["campaign"],
-          url: CREATE_ROUTINE,
-          updateURL: UPDATE_ROUTINE,
+          url: CREATE_A_CAMPAIGN,
+          updateURL: UPDATE_A_CAMPAIGN,
           pageName: "campaigns",
           pagePluralName: "campaigns",
           bucket: null,
@@ -201,12 +203,12 @@ class FormPlaceholder extends Component {
           // onSuccess: (data) =>
           //   this.putItemInReduxStore(data, addRoutineToRedux, routines),
           // updateParams: { routine_id: this.getIdOfItemToEdit() },
-          // modifyData: (data) => {
-          //   return {
-          //     user_id: data.user_id,
-          //     data,
-          //   };
-          // },
+          modifyData: (data = {}) => {
+            return {
+              ...data,
+              routine_id: this.getPrefillId(),
+            };
+          },
         };
       case FORM_PAGES.STOCK:
         return {

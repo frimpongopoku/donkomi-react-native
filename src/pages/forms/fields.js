@@ -81,6 +81,13 @@ export const FORM_JSONS = {
       required: true,
     },
     {
+      fieldType: FormGenerator.FIELDS.TOGGLE,
+      placeholder: "Requires pre-payment",
+      label: "Do costomers have to pay right after they order?",
+      name: "Requires Pre Payment",
+      dbName: "requires_pre_payment",
+    },
+    {
       fieldType: FormGenerator.FIELDS.TEXTBOX,
       placeholder: "Eg. 20 minutes",
       label: "How long should would your customers have to wait?",
@@ -96,7 +103,7 @@ export const FORM_JSONS = {
       name: "fee",
       dbName: "fee",
       keyboardType: "numeric",
-      required: true,
+      // required: true,
     },
   ],
 

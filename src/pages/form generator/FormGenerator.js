@@ -196,16 +196,19 @@ export default class FormGenerator extends Component {
   }
 
   renderSwitchComponent(field) {
+    const value = this.getFieldValue(field);
     return (
-      <>
+      <View style={{ marginRight: 20 }}>
         {this.renderLabel(field)}
         <Switch
-          trackColor={"#81b0ff"}
-          thumbColor={"#f5dd4b"}
+          trackColor={"whitesmoke"}
+          thumbColor={value ? "green" : STYLES.theme.blue}
           ios_backgroundColor="#3e3e3e"
+          onValueChange={(content) => this.setContent({ field, content })}
+          value={value}
           {...field}
         />
-      </>
+      </View>
     );
   }
 
@@ -338,6 +341,20 @@ export default class FormGenerator extends Component {
     return [false, error];
   }
 
+  fashionFormData() {
+    const { formData } = this.state;
+    const { prefillObject, fields = [] } = this.props;
+    // console.log("IT DOES COME HERE BRO", prefillObject);
+    if (!prefillObject) return formData;
+    // console.log("DOENST COME HERE");
+    const data = {};
+    fields.forEach((field) => {
+      const name = field.dbName || field.Name;
+      data[name] = formData[name] || prefillObject[name];
+    });
+    // console.log("I AM TEH DATA NOW INNIT", data);
+    return data;
+  }
   onSubmit() {
     const { formData, loading } = this.state;
     if (loading) return;
@@ -350,7 +367,8 @@ export default class FormGenerator extends Component {
       return;
     }
     if (onSubmit) return onSubmit(formData);
-    this.submitForm(formData);
+    const data = this.fashionFormData();
+    this.submitForm(data);
   }
 
   submitForm(form) {
