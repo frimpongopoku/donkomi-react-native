@@ -3,6 +3,7 @@ import {
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
+  SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_ROUTINES,
@@ -75,6 +76,14 @@ export const setRoutinesAction = (data = []) => {
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
 };
+export const setCampaignAction = (data = []) => {
+  return { type: SET_CAMPAIGNS, payload: data };
+};
+
+export const putContentInStore = (type, load = []) => {
+  return { type, load };
+};
+
 
 export const deleteAProductFromBackend = (params) => {
   const { product } = params;

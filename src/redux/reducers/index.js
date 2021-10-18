@@ -9,7 +9,8 @@ import {
   setAvailableRolesReducer,
   setVendorsReducer,
   setRoutinesReducer,
-  setStockReducer
+  setStockReducer,
+  setCampaignReducer
 } from "./reducers";
 
 export default combineReducers({
@@ -23,4 +24,5 @@ export default combineReducers({
   routines: setRoutinesReducer,
   vendors: setVendorsReducer,
   stock: setStockReducer,
+  campaigns: setCampaignReducer
 });

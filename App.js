@@ -14,7 +14,9 @@ import { STYLES } from "./src/shared/ui";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
+  putContentInStore,
   setAvailableRolesAction,
+  setCampaignAction,
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
   setRoutinesAction,
@@ -46,6 +48,7 @@ class App extends React.Component {
         this.props.setVendors(data.vendors);
         this.props.setStock(data.stock);
         this.props.setRoutines(data.routines);
+        this.props.setCampaigns(data.campaigns);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -200,6 +203,7 @@ const mapDispatchToProps = (dispatch) => {
       setVendors: setVendorsAction,
       setStock: setStockAction,
       setRoutines: setRoutinesAction,
+      setCampaigns: setCampaignAction
     },
     dispatch
   );

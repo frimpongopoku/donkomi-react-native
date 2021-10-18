@@ -1,6 +1,7 @@
 import {
   GET_AVAILABLE_ROLES,
   NOTHING,
+  SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_ROUTINES,
@@ -81,6 +82,14 @@ export const setStockReducer = (
   action
 ) => {
   if (action.type === SET_STOCK) return action.payload;
+
+  return state;
+};
+export const setCampaignReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_CAMPAIGNS) return action.payload;
 
   return state;
 };

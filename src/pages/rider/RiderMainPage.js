@@ -4,12 +4,14 @@ import { TabView } from "react-native-tab-view";
 import CustomTabView from "../../shared/components/CustomTabView";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import { STYLES } from "../../shared/ui";
+import Campaigns from "./Campaigns";
 import Orders from "./Orders";
 import RiderManagement from "./RiderManagement";
 
 export default class RiderMainPage extends Component {
   tabs = [
-    { key: "manage", title: "Manage" },
+    { key: "campaigns", title: "Your Campaigns" },
+    { key: "manage", title: "Management" },
     { key: "orders", title: "Orders" },
   ];
 
@@ -19,6 +21,8 @@ export default class RiderMainPage extends Component {
         return <Orders navigation={this.props.navigation} />;
       case "manage":
         return <RiderManagement navigation={this.props.navigation} />;
+      case "campaigns":
+        return <Campaigns navigation={this.props.navigation} />;
       default:
         return <Text>No page available</Text>;
     }
