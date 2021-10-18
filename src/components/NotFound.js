@@ -3,7 +3,12 @@ import { Image, Text, View } from "react-native";
 import { Defaults } from "../shared/classes/Defaults";
 import { STYLES } from "../shared/ui";
 
-export default NotFound = ({ text = "Not found..." }) => {
+export default NotFound = ({
+  text = "Not found...",
+  image,
+  style = {},
+  containerStyle = {},
+}) => {
   return (
     <View
       style={{
@@ -12,13 +17,15 @@ export default NotFound = ({ text = "Not found..." }) => {
         height: "100%",
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: "white",
+        ...containerStyle,
       }}
     >
       <Image
-        source={Defaults.getNotFoundImage()}
+        source={image ? image : Defaults.getNotFoundImage()}
         style={{ marginBottom: 10, height: 100, width: 150 }}
       />
-      <Text style={{ color: STYLES.theme.blue }}> {text} </Text>
+      <Text style={{ color: STYLES.theme.blue, ...style }}> {text} </Text>
     </View>
   );
 };

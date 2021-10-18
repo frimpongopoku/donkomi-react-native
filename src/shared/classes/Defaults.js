@@ -1,6 +1,9 @@
 import image from "./../images/photo_default.png";
 import notFound from "./../images/not_found.png";
 import burger from "./../images/burger.jpg";
+import soon from "./../images/coming_soon.png";
+import locked from "./../images/locked.png";
+
 export class Defaults {
   static getDefaultImage() {
     return image;
@@ -11,5 +14,12 @@ export class Defaults {
   }
   static getBurgerImage() {
     return burger;
+  }
+  static getComingSoonImage() {
+    return soon;
+  }
+
+  static getPadLockImage() {
+    return locked;
   }
 }
