@@ -27,12 +27,13 @@ const FORM_PAGES = {
   SHOP: "shop",
   SHOPITEM: "shop-item",
   APPLICATIONS: "applications",
+  CAMPAIGN: "campaign",
 };
 class FormPlaceholder extends Component {
   static PAGES = FORM_PAGES;
   state = { pageJson: {} };
 
-  getItemToEdit() { 
+  getItemToEdit() {
     const { vendors, routines, campaigns, stock } = this.props;
     if (!this.isInEditMode()) return {};
     const id = this.getIdOfItemToEdit();
@@ -60,6 +61,18 @@ class FormPlaceholder extends Component {
     });
   }
 
+  getPrefillObject() {
+    const { routines = [] } = this.props;
+    const id = this.getPrefillId();
+    const page = this.getCurrentPage();
+    if (!id) return {};
+    switch (page) {
+      case FORM_PAGES.CAMPAIGN:
+        return routines.find((r) => r.id === id);
+      default:
+        return {};
+    }
+  }
   modifyFormFields(page, fields = []) {
     const { vendors } = this.props;
     switch (page) {
@@ -73,6 +86,11 @@ class FormPlaceholder extends Component {
         vendorDropField.data = vendors;
         const rem = fields.filter((f) => f.name !== "vendors");
         return [...rem, vendorDropField];
+      case FORM_PAGES.CAMPAIGN:
+        const vendorField = fields.find((f) => f.name === "vendors");
+        vendorField.data = vendors;
+        const remaining = fields.filter((f) => f.name !== "vendors");
+        return [...remaining, vendorField];
       default:
         return fields;
     }
@@ -103,19 +121,17 @@ class FormPlaceholder extends Component {
 
   modifyItemToEdit(itemToEdit) {
     if (!itemToEdit) return null;
-    switch (this.getCurrentPage()) {
-      // case FORM_PAGES.ROUTINE:
-      //   const vendors = itemToEdit?.involved_vendors?.map((v) => v.id);
-      //   itemToEdit.involved_vendors = vendors;
-      //   return itemToEdit;
-
-      default:
-        return itemToEdit;
-    }
+    // as this form grows, this is where logic will modify the item to edit before it gets into the form
+    return itemToEdit;
   }
+
   isInEditMode() {
     const { route } = this.props;
     return route?.params?.edit_id;
+  }
+  getPrefillId() {
+    const { route } = this.props;
+    return route?.params?.fill_id;
   }
 
   getIdOfItemToEdit() {
@@ -140,6 +156,7 @@ class FormPlaceholder extends Component {
     }
     reduxFxn([...oldData, item]);
   }
+
   getPageJson() {
     var { data, route, addVendorToRedux, vendors, stock, routines } =
       this.props;
@@ -167,6 +184,29 @@ class FormPlaceholder extends Component {
               data,
             };
           },
+        };
+      case FORM_PAGES.CAMPAIGN:
+        return {
+          ...json,
+          title: "Start A Campaign",
+          formTitle:
+            "Let people know where you are going, they might buy something... ",
+          formFields: FORM_JSONS["campaign"],
+          url: CREATE_ROUTINE,
+          updateURL: UPDATE_ROUTINE,
+          pageName: "campaigns",
+          pagePluralName: "campaigns",
+          bucket: null,
+          prefillObject: this.getPrefillObject(),
+          // onSuccess: (data) =>
+          //   this.putItemInReduxStore(data, addRoutineToRedux, routines),
+          // updateParams: { routine_id: this.getIdOfItemToEdit() },
+          // modifyData: (data) => {
+          //   return {
+          //     user_id: data.user_id,
+          //     data,
+          //   };
+          // },
         };
       case FORM_PAGES.STOCK:
         return {
@@ -229,12 +269,14 @@ class FormPlaceholder extends Component {
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;
+    console.log("I AM THE PREFILL----->", pageJson.prefillObject);
     return (
       <View
         style={{
           flex: 1,
           height: "100%",
           backgroundColor: "white",
+          paddingTop: 15,
         }}
       >
         <FormGenerator
@@ -255,6 +297,7 @@ class FormPlaceholder extends Component {
           onSuccess={pageJson?.onSuccess}
           scroll={pageJson?.scroll}
           modifyData={pageJson?.modifyData}
+          prefillObject={pageJson?.prefillObject}
         />
       </View>
     );

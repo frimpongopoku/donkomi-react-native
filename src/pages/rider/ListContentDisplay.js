@@ -87,6 +87,22 @@ const RoutineList = ({
   navigation,
   processAndDeleteRoutine,
 }) => {
+  const initiateCampaign = (routine) => {
+    makeAlert(
+      "New Campaign",
+      `You are are going to start a campaign from this template. '${routine?.title}'`,
+      { cancelable: true },
+      () =>
+        navigation.navigate("singles", {
+          screen: "universal-form",
+          params: {
+            fill_id: routine?.id,
+            page: FormPlaceholder.PAGES.CAMPAIGN,
+          },
+        }),
+      () => console.log("Cancelled")
+    );
+  };
   const deleteRoutine = (routine) => {
     makeAlert(
       "Delete",
@@ -145,7 +161,10 @@ const RoutineList = ({
                   : Defaults.getDefaultImage()
               }
             /> */}
-            <View style={{ flexDirection: "column", justifyContent: "center" }}>
+            <TouchableOpacity
+              onPress={() => initiateCampaign(routine)}
+              style={{ flexDirection: "column", justifyContent: "center" }}
+            >
               <Text style={{ fontSize: 15 }}>
                 {routine?.title || " Rolandisco Routine And Co"}
               </Text>
@@ -157,7 +176,7 @@ const RoutineList = ({
               >
                 @Rs {routine?.fee} per order
               </Text>
-            </View>
+            </TouchableOpacity>
             <View style={{ marginLeft: "auto", flexDirection: "row" }}>
               <TouchableOpacity
                 style={{ marginLeft: "auto" }}

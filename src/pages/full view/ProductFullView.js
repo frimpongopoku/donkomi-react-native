@@ -47,6 +47,14 @@ export default function ProductFullView() {
           <View style={{ marginLeft: "auto" }}>
             <Text style={{ color: "black" }}>By Akwesi Frimpong</Text>
             <Text style={{ color: "grey" }}>4 months ago</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity>
+                <Text style={{ color: "blue", fontWeight: "bold" }}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ marginLeft: 20}}>
+                <Text style={{ color: "red", fontWeight: "bold" }}>Remove</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 

@@ -50,6 +50,55 @@ export const FORM_JSONS = {
       required: true,
     },
   ],
+  campaign: [
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder: "Eg. Kweku's trip to Ricardos",
+      label: "Trip Title",
+      name: "Trip title",
+      dbName: "title",
+      required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.DROPDOWN,
+      label: "Choose vendors you will be buying from on this trip",
+      name: "vendors",
+      data: ["McDonalds", "Ricardos", "KFC"],
+      dbName: "involved_vendors",
+      labelExtractor: (item) => item?.name,
+      valueExtractor: (item) => item?.id,
+      multiple: true,
+      required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTAREA,
+      placeholder:
+        "What should we tell people when we notify them about your trip?",
+      label: "Trip description. What should people know about this trip?",
+      name: "description",
+      dbName: "description",
+      numberOfLines: 6,
+      required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder: "Eg. 20 minutes",
+      label: "How long should would your customers have to wait?",
+      name: "duration",
+      dbName: "duration",
+      maxLength: 20,
+      required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.TEXTBOX,
+      placeholder: "50",
+      label: "Fee per order? (Rs)",
+      name: "fee",
+      dbName: "fee",
+      keyboardType: "numeric",
+      required: true,
+    },
+  ],
 
   stock: [
     {

@@ -79,13 +79,15 @@ export default class FormGenerator extends Component {
   }
 
   getFieldValue(field) {
-    const { defaultObject = {}, isInEditMode } = this.props;
+    const { defaultObject = {}, isInEditMode, prefillObject = {} } = this.props;
     const key =
       isInEditMode && field.updateName
         ? field.updateName
         : field.dbName || field.name;
     const fromState = this.state.formData[key];
-    return fromState === undefined ? defaultObject[key] || null : fromState;
+    return fromState === undefined
+      ? defaultObject[key] || prefillObject[key] || null
+      : fromState;
   }
 
   useValueToFindName(value, field) {
