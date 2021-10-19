@@ -16,6 +16,7 @@ import {
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import {
+  DELETE_A_CAMPAIGN,
   DELETE_A_PRODUCT,
   DELETE_A_ROUTINE,
   DELETE_A_SHOP,
@@ -84,7 +85,19 @@ export const putContentInStore = (type, load = []) => {
   return { type, load };
 };
 
-
+export const deleteACampaignFromBackend = (params) => {
+  const { campaign } = params;
+  return (dispatch, getState) => {
+    const { campaigns, user } = getState();
+    dispatch(
+      deleteContentFromBackend(DELETE_A_CAMPAIGN, {
+        user_id: user?.user_id,
+        campaign_id: campaign?.id,
+      })
+    );
+    dispatch(removeItemFromRedux(campaigns, "id", campaign.id, SET_CAMPAIGNS));
+  };
+};
 export const deleteAProductFromBackend = (params) => {
   const { product } = params;
   return (dispatch, getState) => {
@@ -95,7 +108,9 @@ export const deleteAProductFromBackend = (params) => {
         shop_id: shop?.id,
       })
     );
-    dispatch(removeItemFromRedux(products, "id", product.id, DELETE_A_PRODUCT));
+    dispatch(
+      removeItemFromRedux(products, "id", product.id, SET_USER_SHOP_ITEMS)
+    );
   };
 };
 export const deleteAShopFromBackend = (params) => {
@@ -109,6 +124,7 @@ export const deleteAShopFromBackend = (params) => {
       })
     );
     dispatch(removeItemFromRedux(shops, "id", shop.id, SET_USER_SHOPS));
+    //  remove related orders here...
   };
 };
 export const deleteRoutineFromBackend = (params) => {

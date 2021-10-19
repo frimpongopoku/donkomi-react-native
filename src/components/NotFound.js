@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Image, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { Defaults } from "../shared/classes/Defaults";
 import { STYLES } from "../shared/ui";
 
@@ -8,6 +9,8 @@ export default NotFound = ({
   image,
   style = {},
   containerStyle = {},
+  action,
+  actionText = "An Action",
 }) => {
   return (
     <View
@@ -25,7 +28,33 @@ export default NotFound = ({
         source={image ? image : Defaults.getNotFoundImage()}
         style={{ marginBottom: 10, height: 100, width: 150 }}
       />
-      <Text style={{ color: STYLES.theme.blue, ...style }}> {text} </Text>
+      <Text
+        style={{
+          color: STYLES.theme.blue,
+          width: "70%",
+          textAlign: "center",
+          ...style,
+        }}
+      >
+        {" "}
+        {text}{" "}
+      </Text>
+
+      {action && (
+        <TouchableOpacity onPress={() => (action ? action() : null)}>
+          <Text
+            style={{
+              color: "green",
+              fontWeight: "bold",
+              marginTop: 10,
+              borderBottomWidth: 2,
+              borderBottomColor: "green",
+            }}
+          >
+            {actionText}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

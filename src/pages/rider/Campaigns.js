@@ -4,12 +4,34 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Subtitle from "../../components/Subtitle";
+import { deleteACampaignFromBackend } from "../../redux/actions/actions";
+import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
-import { getPropsArrayFromJsonArray } from "../../shared/utils";
-
+import { getPropsArrayFromJsonArray, makeAlert } from "../../shared/utils";
+import FormPlaceholder from "../forms/FormPlaceholder";
+import NotFound from "./../../components/NotFound";
 class Campaigns extends Component {
+  deleteCamp(camp) {
+    const { deleteCampaign } = this.props;
+    makeAlert(
+      "Delete Campaign",
+      `Are you sure you want to delete '${camp?.title}'. All orders related will be removed as well...`,
+      null,
+      () => deleteCampaign({ campaign: camp }),
+      () => console.log("Campaign deletion canceled")
+    );
+  }
   render() {
-    const { campaigns, vendors } = this.props;
+    const { campaigns, vendors, navigation } = this.props;
+
+    if (!campaigns || campaigns.length === 0)
+      return (
+        <NotFound
+          image={Defaults.getMotorImage()}
+          text="You have no running campaigns, and no history, start one now!"
+          actionText="Create A Campaign"
+        />
+      );
     return (
       <ScrollView
         style={{
@@ -19,20 +41,29 @@ class Campaigns extends Component {
           padding: 15,
         }}
       >
-        <Subtitle text="Here is a list of your campaigns..." />
+        <Subtitle text="Here is a list of your campaigns. Orders that you receive for your campaign, will be available in your orders tab" />
         {campaigns.map((camp, index) => {
           var venList = camp.involved_vendors.map((id) =>
             vendors.find((ven) => ven.id === id)
           );
           venList = getPropsArrayFromJsonArray(venList, "name");
           const vendorString = venList.join(", ");
-          // console.log("I am the vendors list ", venList);
           return (
             <View key={index.toString()}>
               <CampCard
                 {...camp}
                 vendors={vendors}
                 vendorString={vendorString}
+                edit={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      edit_id: camp.id,
+                      page: FormPlaceholder.PAGES.CAMPAIGN,
+                    },
+                  })
+                }
+                onDelete={() => this.deleteCamp(camp)}
               />
             </View>
           );
@@ -50,14 +81,16 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    { deleteCampaign: deleteACampaignFromBackend },
+    dispatch
+  );
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Campaigns);
 
-const CampCard = ({ title, fee, vendorString, open }) => {
+const CampCard = ({ title, fee, vendorString, open, edit, onDelete }) => {
   return (
     <View
-      // key={index.toString()}
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -98,7 +131,10 @@ const CampCard = ({ title, fee, vendorString, open }) => {
         </View>
       </View>
       <View style={{ marginLeft: "auto", flexDirection: "row" }}>
-        <TouchableOpacity style={{ marginLeft: "auto" }}>
+        <TouchableOpacity
+          style={{ marginLeft: "auto" }}
+          onPress={() => (edit ? edit() : null)}
+        >
           <Feather
             name="edit"
             size={24}
@@ -106,7 +142,7 @@ const CampCard = ({ title, fee, vendorString, open }) => {
             style={{ marginRight: 20 }}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => (onDelete ? onDelete() : null)}>
           <MaterialIcons name="delete-outline" size={24} color="red" />
         </TouchableOpacity>
       </View>

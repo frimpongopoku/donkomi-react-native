@@ -5,6 +5,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
+  setCampaignAction,
   setRoutinesAction,
   setStockAction,
   setVendorsAction,
@@ -47,6 +48,8 @@ class FormPlaceholder extends Component {
         return stock?.find((v) => v.id === id);
       case FORM_PAGES.ROUTINE:
         return routines?.find((v) => v.id === id);
+      case FORM_PAGES.CAMPAIGN:
+        return campaigns?.find((v) => v.id === id);
       default:
         return {};
     }
@@ -154,14 +157,25 @@ class FormPlaceholder extends Component {
   putItemInReduxStore(item, reduxFxn, oldData = []) {
     if (this.isInEditMode()) {
       const filtered = oldData.filter((old) => old.id !== item.id);
-      return reduxFxn([...filtered, item]);
+      return reduxFxn([item, ...filtered]);
     }
     reduxFxn([...oldData, item]);
   }
 
   getPageJson() {
-    var { data, route, addVendorToRedux, vendors, stock, routines } =
-      this.props;
+    var {
+      data,
+      route,
+      addVendorToRedux,
+      vendors,
+      stock,
+      routines,
+      campaigns,
+      navigation,
+      addRoutineToRedux,
+      addCampaignToRedux,
+      addStockToRedux,
+    } = this.props;
     const page = route?.params?.page || FORM_PAGES.SHOPITEM;
     const json = { page, data };
     switch (page) {
@@ -200,9 +214,11 @@ class FormPlaceholder extends Component {
           pagePluralName: "campaigns",
           bucket: null,
           prefillObject: this.getPrefillObject(),
-          // onSuccess: (data) =>
-          //   this.putItemInReduxStore(data, addRoutineToRedux, routines),
-          // updateParams: { routine_id: this.getIdOfItemToEdit() },
+          onSuccess: (data) => {
+            this.putItemInReduxStore(data, addCampaignToRedux, campaigns);
+            navigation.navigate("Merchant");
+          },
+          updateParams: { campaign_id: this.getIdOfItemToEdit() },
           modifyData: (data = {}) => {
             return {
               ...data,
@@ -271,7 +287,6 @@ class FormPlaceholder extends Component {
     const { pageJson } = this.state;
     const formTitle = "Add a new " + pageJson?.pageName;
     const editFormTitle = "Edit your " + pageJson?.pageName;
-    console.log("I AM THE PREFILL----->", pageJson.prefillObject);
     return (
       <View
         style={{
@@ -312,7 +327,7 @@ const mapStateToProps = (state) => {
     vendors: state.vendors,
     routines: state.routines,
     stock: state.stock,
-    // campaigns: state.campaigns
+    campaigns: state.campaigns,
   };
 };
 
@@ -322,6 +337,7 @@ const mapDispatchToProps = (dispatch) => {
       addVendorToRedux: setVendorsAction,
       addStockToRedux: setStockAction,
       addRoutineToRedux: setRoutinesAction,
+      addCampaignToRedux: setCampaignAction,
     },
     dispatch
   );

@@ -3,6 +3,7 @@ import notFound from "./../images/not_found.png";
 import burger from "./../images/burger.jpg";
 import soon from "./../images/coming_soon.png";
 import locked from "./../images/locked.png";
+import motor from "./../images/motor.png";
 
 export class Defaults {
   static getDefaultImage() {
@@ -21,5 +22,9 @@ export class Defaults {
 
   static getPadLockImage() {
     return locked;
+  }
+
+  static getMotorImage(){ 
+    return motor;
   }
 }
