@@ -1,5 +1,6 @@
 import {
   GET_AVAILABLE_ROLES,
+  LOAD_NEWS,
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
@@ -34,6 +35,9 @@ export const setFirebaseAuthUserAction = (user) => {
 };
 export const removeFirebaseAuthAction = () => {
   return { type: REMOVE_FIREBASE_AUTH, payload: null };
+};
+export const loadNewsAction = ( news = []) => {
+  return { type: LOAD_NEWS, payload: news };
 };
 
 export const setDonkomiUserAction = (user = null) => {

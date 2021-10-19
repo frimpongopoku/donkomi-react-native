@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { loadNewsAction } from "../actions/actions";
 import {
   doNothingReducer,
   firebaseAuthUserReducer,
@@ -10,7 +11,7 @@ import {
   setVendorsReducer,
   setRoutinesReducer,
   setStockReducer,
-  setCampaignReducer
+  setCampaignReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -18,11 +19,12 @@ export default combineReducers({
   fireAuth: firebaseAuthUserReducer,
   user: setDonkomiUserReducer,
   modal: showFloatingModalReducer,
-  shops: setUserShopsReducer, 
+  shops: setUserShopsReducer,
   products: setUserShopItemsReducer,
-  roles: setAvailableRolesReducer, 
+  roles: setAvailableRolesReducer,
   routines: setRoutinesReducer,
   vendors: setVendorsReducer,
   stock: setStockReducer,
-  campaigns: setCampaignReducer
+  campaigns: setCampaignReducer,
+  loadNews: loadNewsAction,
 });

@@ -1,5 +1,6 @@
 import {
   GET_AVAILABLE_ROLES,
+  LOAD_NEWS,
   NOTHING,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
@@ -90,6 +91,14 @@ export const setCampaignReducer = (
   action
 ) => {
   if (action.type === SET_CAMPAIGNS) return action.payload;
+
+  return state;
+};
+export const setCampaignReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === LOAD_NEWS) return action.payload;
 
   return state;
 };

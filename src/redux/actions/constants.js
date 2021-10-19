@@ -11,3 +11,4 @@ export const SET_VENDORS = "SET_VENDORS";
 export const SET_ROUTINES = "SET_ROUTINES"; 
 export const SET_CAMPAIGNS= "SET_CAMPAIGNS";
 export const SET_STOCK = "SET_STOCK";
+export const LOAD_NEWS  = "LOAD_NEWS"; 

@@ -28,3 +28,4 @@ export const DELETE_A_ROUTINE = HOST + "/routine/delete/";
 export const CREATE_A_CAMPAIGN = HOST + "/campaign/create/";
 export const UPDATE_A_CAMPAIGN = HOST + "/campaign/update/";
 export const DELETE_A_CAMPAIGN = HOST + "/campaign/delete/";
+export const GET_NEWS_FEED = HOST + "/get/news.feed/"
