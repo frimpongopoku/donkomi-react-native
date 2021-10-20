@@ -1,9 +1,9 @@
 // const HOST = "192.168.0.38:8000";
 // const HOST = "127.0.0.1:8000";
-const HOST = "http://3200-102-115-236-153.ngrok.io" + "/api/donkomi";
+const HOST = "http://b81c-102-115-227-201.ngrok.io" + "/api/donkomi";
 
 export const TEST_URL =
-  HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
+  HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/"; 
 
 export const REGISTER_USER = HOST + "/user/create/";
 export const GET_REGISTERED_USER = HOST + "/user/get/";

@@ -1,5 +1,4 @@
 import { combineReducers } from "redux";
-import { loadNewsAction } from "../actions/actions";
 import {
   doNothingReducer,
   firebaseAuthUserReducer,
@@ -12,6 +11,8 @@ import {
   setRoutinesReducer,
   setStockReducer,
   setCampaignReducer,
+  setNewsParamsReducer,
+  loadNewsReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -26,5 +27,6 @@ export default combineReducers({
   vendors: setVendorsReducer,
   stock: setStockReducer,
   campaigns: setCampaignReducer,
-  loadNews: loadNewsAction,
+  loadNews: loadNewsReducer,
+  newsParams: setNewsParamsReducer,
 });

@@ -7,6 +7,7 @@ import {
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_NEWS_PARAMS,
   SET_ROUTINES,
   SET_STOCK,
   SET_USER_SHOPS,
@@ -36,10 +37,57 @@ export const setFirebaseAuthUserAction = (user) => {
 export const removeFirebaseAuthAction = () => {
   return { type: REMOVE_FIREBASE_AUTH, payload: null };
 };
-export const loadNewsAction = ( news = []) => {
+export const loadNewsAction = (news = []) => {
   return { type: LOAD_NEWS, payload: news };
 };
 
+//
+export const setNewsParamsAction = (newsResponse = {}) => {
+  return (dispatch, getState) => {
+    const { newsParams } = getState();
+    const prodMin = newsParams.prodMin || 0;
+    const prodMax = newsParams.prodMax || 0;
+    const campMin = newsParams.campMin || 0;
+    const campMax = newsParams.campMax || 0;
+    const newProdMin = compareAndGet(
+      [prodMin, newsResponse.product_limits[0]],
+      "min"
+    );
+    const newProdMax = compareAndGet(
+      [prodMax, newsResponse.product_limits[1]],
+      "max"
+    );
+    const newCampMin = compareAndGet(
+      [campMin, newsResponse.campaign_limits[0]],
+      "min"
+    );
+    const newCampMax = compareAndGet(
+      [campMax, newsResponse.campaign_limits[1]],
+      "max"
+    );
+    const params = {
+      prodMin: newProdMin,
+      prodMax: newProdMax,
+      campMin: newCampMin,
+      campMax: newCampMax,
+    };
+    dispatch({ type: SET_NEWS_PARAMS, payload: params });
+  };
+};
+
+const compareAndGet = (values = [], comparisonType) => {
+  const value1 = values[0];
+  const value2 = values[1];
+  if (comparisonType === "min") {
+    if (value1 < value2 && value1 !== 0) return value1; // no db id is ever equal to 0, so it just means this is the first time, return value2
+    else return value2;
+  }
+  if (comparisonType === "max") {
+    if (value1 > value2) return value1;
+    else return value2;
+  }
+  return 0;
+};
 export const setDonkomiUserAction = (user = null) => {
   return { type: SET_DONKOMI_USER, payload: user };
 };

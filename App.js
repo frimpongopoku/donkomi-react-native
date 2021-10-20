@@ -14,11 +14,13 @@ import { STYLES } from "./src/shared/ui";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
+  loadNewsAction,
   putContentInStore,
   setAvailableRolesAction,
   setCampaignAction,
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
+  setNewsParamsAction,
   setRoutinesAction,
   setStockAction,
   setUserShopItemsAction,
@@ -27,7 +29,11 @@ import {
   showFloatingModalActions,
 } from "./src/redux/actions/actions";
 import InternetExplorer from "./src/shared/classes/InternetExplorer";
-import { GET_REGISTERED_USER, WHO_AM_I } from "./src/shared/urls";
+import {
+  GET_NEWS_FEED,
+  GET_REGISTERED_USER,
+  WHO_AM_I,
+} from "./src/shared/urls";
 import { AntDesign } from "@expo/vector-icons";
 
 class App extends React.Component {
@@ -102,11 +108,22 @@ class App extends React.Component {
         </SafeAreaView>
       );
   }
+
+  loadNewsContent(user_id) {
+    const { loadNews, setNewsParams } = this.props;
+    InternetExplorer.roamAndFind(GET_NEWS_FEED, "POST", { user_id })
+      .then((response) => {
+        loadNews( response?.data.feed); 
+        setNewsParams(response?.data)
+      })
+      .catch((e) => console.log("NEWS_LOAD_ERROR:-> ", e?.toString()));
+  }
   componentDidMount() {
     auth().onAuthStateChanged((user) => {
       if (user) {
         this.props.setFirebaseAuthUser(user);
         this.fetchDonkomiUser(user.uid);
+        this.loadNewsContent(user.uid);
         return;
       }
       this.setState({ loading: false });
@@ -203,7 +220,9 @@ const mapDispatchToProps = (dispatch) => {
       setVendors: setVendorsAction,
       setStock: setStockAction,
       setRoutines: setRoutinesAction,
-      setCampaigns: setCampaignAction
+      setCampaigns: setCampaignAction,
+      loadNews: loadNewsAction,
+      setNewsParams: setNewsParamsAction,
     },
     dispatch
   );

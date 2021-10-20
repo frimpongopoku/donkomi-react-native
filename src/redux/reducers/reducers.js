@@ -94,7 +94,15 @@ export const setCampaignReducer = (
 
   return state;
 };
-export const setCampaignReducer = (
+export const loadNewsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === LOAD_NEWS) return action.payload;
+
+  return state;
+};
+export const setNewsParamsReducer = (
   state = null,
   action
 ) => {
