@@ -27,6 +27,6 @@ export default combineReducers({
   vendors: setVendorsReducer,
   stock: setStockReducer,
   campaigns: setCampaignReducer,
-  loadNews: loadNewsReducer,
+  news: loadNewsReducer,
   newsParams: setNewsParamsReducer,
 });

@@ -1,9 +1,9 @@
 // const HOST = "192.168.0.38:8000";
 // const HOST = "127.0.0.1:8000";
-const HOST = "http://b81c-102-115-227-201.ngrok.io" + "/api/donkomi";
+const HOST = "http://f70f-102-115-227-201.ngrok.io" + "/api/donkomi";
 
 export const TEST_URL =
-  HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/"; 
+  HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
 
 export const REGISTER_USER = HOST + "/user/create/";
 export const GET_REGISTERED_USER = HOST + "/user/get/";
@@ -28,4 +28,4 @@ export const DELETE_A_ROUTINE = HOST + "/routine/delete/";
 export const CREATE_A_CAMPAIGN = HOST + "/campaign/create/";
 export const UPDATE_A_CAMPAIGN = HOST + "/campaign/update/";
 export const DELETE_A_CAMPAIGN = HOST + "/campaign/delete/";
-export const GET_NEWS_FEED = HOST + "/get/news.feed/"
+export const GET_NEWS_FEED = HOST + "/get/news.feed/";

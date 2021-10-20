@@ -9,6 +9,7 @@ export const FORM_JSONS = {
       name: "Trip title",
       dbName: "title",
       required: true,
+      maxLength: 25,
     },
     {
       fieldType: FormGenerator.FIELDS.DROPDOWN,
@@ -58,6 +59,7 @@ export const FORM_JSONS = {
       name: "Trip title",
       dbName: "title",
       required: true,
+      maxLength: 25,
     },
     {
       fieldType: FormGenerator.FIELDS.DROPDOWN,

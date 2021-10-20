@@ -9,6 +9,7 @@ export default function FlatButton({
   onPress,
   props = {},
   loading = false,
+  loaderColor = "white"
 }) {
   return (
     <TouchableOpacity
@@ -28,7 +29,7 @@ export default function FlatButton({
       {loading && (
         <ActivityIndicator
           size="small"
-          color="white"
+          color={loaderColor}
           style={{ marginRight: 5 }}
         />
       )}
