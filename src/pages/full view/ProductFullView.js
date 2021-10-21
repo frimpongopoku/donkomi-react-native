@@ -3,9 +3,14 @@ import React from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import FlatButton from "../../components/FlatButton";
 import Subtitle from "../../components/Subtitle";
+import { deleteAProductFromBackend } from "../../redux/actions/actions";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
-import { Space } from "../shop/creation/ShopCreationContainer";
+import { makeAlert } from "../../shared/utils";
+// import FormPlaceholder from "../forms/FormPlaceholder";
+import ShopCreationContainer, {
+  Space,
+} from "../shop/creation/ShopCreationContainer";
 
 export default function ProductFullView({
   name,
@@ -18,7 +23,42 @@ export default function ProductFullView({
   size,
   created_at,
   user,
+  navigation,
+  id,
+  deleteProduct,
 }) {
+  const edit = (product) => {
+    makeAlert(
+      "Edit",
+      `You are about to edit '${product?.name}'`,
+      { cancelable: true },
+      () =>
+        navigation.navigate("singles", {
+          screen: "create-shop",
+          params: {
+            page: ShopCreationContainer.PRODUCT_PAGE,
+            edit_id: product?.id,
+          },
+        }),
+      () => console.log("Edit canceled...!")
+    );
+  };
+  const remove = (product) => {
+    makeAlert(
+      "Remove",
+      `Are you sure you want to completely remove ${product?.name}`,
+      { cancelable: true },
+      () => deleteProductFromBack(product),
+      () => console.log("Delete canceled...!"),
+      { okText: "Yes", cancelText: "No" }
+    );
+  };
+
+  const deleteProductFromBack = (product) => {
+    deleteProduct({ product });
+    // now navigate out of this page back to news feed
+    navigation.goBack();
+  };
   const shop = (shops && shops[0]) || {};
   const isForUser = creator?.user_id === user?.user_id;
   return (
@@ -132,14 +172,17 @@ export default function ProductFullView({
                 justifyContent: "center",
               }}
             >
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => edit({ name, id })}>
                 <Text
                   style={{ color: "blue", fontWeight: "bold", fontSize: 18 }}
                 >
                   Edit
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{ marginLeft: 20 }}>
+              <TouchableOpacity
+                style={{ marginLeft: 20 }}
+                onPress={() => remove({ name, id })}
+              >
                 <Text
                   style={{ color: "red", fontWeight: "bold", fontSize: 18 }}
                 >

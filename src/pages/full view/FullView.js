@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import { deleteAProductFromBackend } from "../../redux/actions/actions";
 import ProductFullView from "./ProductFullView";
 export const FULL_VIEW_PAGES = {
   PRODUCT: "product",
@@ -61,9 +62,17 @@ class FullView extends Component {
 
   getComponentWithPage() {
     const { page, content } = this.state;
+    const { navigation, deleteProduct } = this.props;
     switch (page) {
       case FULL_VIEW_PAGES.PRODUCT:
-        return <ProductFullView {...content} user={this.props.user} />;
+        return (
+          <ProductFullView
+            {...content}
+            user={this.props.user}
+            navigation={navigation}
+            deleteProduct = {deleteProduct}
+          />
+        );
       default:
         return <Text>Dont have this page yet...</Text>;
     }
@@ -94,7 +103,12 @@ const mapStateToProps = (state) => {
   return { news: state.news, user: state.user };
 };
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      deleteProcuct: deleteAProductFromBackend,
+    },
+    dispatch
+  );
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FullView);

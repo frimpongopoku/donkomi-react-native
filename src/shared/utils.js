@@ -13,17 +13,19 @@ export const makeAlert = (
   message,
   props = { cancelable: true },
   okFxn,
-  cancelFxn
+  cancelFxn,
+  params = {}
 ) => {
   const btns = [];
+  const { okText, cancelText } = params || {};
   if (okFxn)
     btns.push({
-      text: "Ok",
+      text: okText || "Ok",
       onPress: () => okFxn(),
     });
   if (cancelFxn)
     btns.push({
-      text: "Cancel",
+      text: cancelText || "Cancel",
       onPress: () => cancelFxn(),
       style: "cancel",
     });

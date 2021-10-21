@@ -29,6 +29,7 @@ const FORM_PAGES = {
   VENDOR: "vendor",
   SHOP: "shop",
   SHOPITEM: "shop-item",
+  PRODUCT: "shop-item",
   APPLICATIONS: "applications",
   CAMPAIGN: "campaign",
 };
