@@ -7,7 +7,20 @@ import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
 import { Space } from "../shop/creation/ShopCreationContainer";
 
-export default function ProductFullView() {
+export default function ProductFullView({
+  name,
+  shops,
+  image,
+  description,
+  variation,
+  price,
+  creator,
+  size,
+  created_at,
+  user,
+}) {
+  const shop = (shops && shops[0]) || {};
+  const isForUser = creator?.user_id === user?.user_id;
   return (
     <View
       style={{
@@ -19,7 +32,7 @@ export default function ProductFullView() {
     >
       <ScrollView>
         <Image
-          source={Defaults.getBurgerImage()}
+          source={image ? { uri: image } : Defaults.getBurgerImage()}
           style={{ width: "100%", height: 400 }}
         />
         <View
@@ -32,7 +45,7 @@ export default function ProductFullView() {
           }}
         >
           <View>
-            <Text style={{ fontSize: 20 }}>Item Name Is Here</Text>
+            <Text style={{ fontSize: 20 }}>{name || "..."}</Text>
             <Text
               style={{
                 color: "green",
@@ -41,35 +54,31 @@ export default function ProductFullView() {
                 fontWeight: "bold",
               }}
             >
-              Another Shop Bi
+              {shop.name}
             </Text>
           </View>
           <View style={{ marginLeft: "auto" }}>
-            <Text style={{ color: "black" }}>By Akwesi Frimpong</Text>
-            <Text style={{ color: "grey" }}>4 months ago</Text>
-            <View style={{ flexDirection: "row" }}>
+            <Text style={{ color: "black" }}>
+              By {creator?.preferred_name || "..."}
+            </Text>
+            <Text style={{ color: "grey" }}>
+              {created_at?.substr(0, 10) || "..."}
+            </Text>
+            {/* <View style={{ flexDirection: "row" }}>
               <TouchableOpacity>
                 <Text style={{ color: "blue", fontWeight: "bold" }}>Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{ marginLeft: 20}}>
+              <TouchableOpacity style={{ marginLeft: 20 }}>
                 <Text style={{ color: "red", fontWeight: "bold" }}>Remove</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
         </View>
 
         <View style={{ padding: 15 }}>
           <View>
             <Subtitle text="Description" />
-            <Text>
-              I am the description today, I shall not be tomorrow, only God be
-              constant
-            </Text>
-          </View>
-          <Space bottom={5} />
-          <View>
-            <Subtitle text="Variation" />
-            <Text>Demolished one bi saa no</Text>
+            <Text>{description || "No description provided"}</Text>
           </View>
           <Space bottom={5} />
           <View style={{ flexDirection: "row" }}>
@@ -82,38 +91,16 @@ export default function ProductFullView() {
                 color: "red",
               }}
             >
-              32
-            </Text>
-          </View>
-        </View>
-        <View style={{ padding: 15 }}>
-          <View>
-            <Subtitle text="Description" />
-            <Text>
-              I am the description today, I shall not be tomorrow, only God be
-              constant
+              {size || "No size details provided"}
             </Text>
           </View>
           <Space bottom={5} />
           <View>
             <Subtitle text="Variation" />
-            <Text>Demolished one bi saa no</Text>
-          </View>
-          <Space bottom={5} />
-          <View style={{ flexDirection: "row" }}>
-            <Subtitle text="Size" />
-            <Text
-              style={{
-                marginLeft: 10,
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "red",
-              }}
-            >
-              32
-            </Text>
+            <Text>{variation || "No variation details provided"}</Text>
           </View>
         </View>
+        <Space bottom={200} />
       </ScrollView>
       {/* ----------- BOTTOM SHEET -------- */}
       <View
@@ -132,36 +119,68 @@ export default function ProductFullView() {
           <View>
             <Text style={{ fontWeight: "bold" }}>Price</Text>
             <Text style={{ fontSize: 30, fontWeight: "bold", color: "green" }}>
-              492.5
+              {price || 0.0}
             </Text>
           </View>
-          <View
-            style={{
-              marginLeft: "auto",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity style={{ padding: 6 }}>
-              <Entypo name="minus" size={35} color="red" />
-            </TouchableOpacity>
-            <Text
+
+          {isForUser ? (
+            <View
               style={{
-                fontSize: 27,
-                fontWeight: "bold",
-                marginLeft: 15,
-                marginRight: 15,
-                color: "black",
+                flexDirection: "row",
+                marginLeft: "auto",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              1
-            </Text>
-            <TouchableOpacity style={{ padding: 6 }}>
-              <Entypo name="plus" size={35} color="green" />
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity>
+                <Text
+                  style={{ color: "blue", fontWeight: "bold", fontSize: 18 }}
+                >
+                  Edit
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ marginLeft: 20 }}>
+                <Text
+                  style={{ color: "red", fontWeight: "bold", fontSize: 18 }}
+                >
+                  Remove
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View
+              style={{
+                marginLeft: "auto",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity style={{ padding: 6 }}>
+                <Entypo name="minus" size={35} color="red" />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 27,
+                  fontWeight: "bold",
+                  marginLeft: 15,
+                  marginRight: 15,
+                  color: "black",
+                }}
+              >
+                1
+              </Text>
+              <TouchableOpacity style={{ padding: 6 }}>
+                <Entypo name="plus" size={35} color="green" />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-        <FlatButton color="green">Add To Cart</FlatButton>
+        <FlatButton
+          color="green"
+          containerStyle={{ opacity: isForUser ? 0.5 : 1 }}
+        >
+          Add To Cart
+        </FlatButton>
       </View>
     </View>
   );

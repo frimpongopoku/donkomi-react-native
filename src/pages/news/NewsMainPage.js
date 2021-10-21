@@ -22,6 +22,7 @@ import {
   loadNewsAction,
   setNewsParamsAction,
 } from "../../redux/actions/actions";
+import { FULL_VIEW_PAGES } from "../full view/FullView";
 class NewsMainPage extends Component {
   constructor(props) {
     super(props);
@@ -109,11 +110,20 @@ export default connect(mapStateToProps, mapDispatchToProps)(NewsMainPage);
 
 // ------------------------- WIDGETS AREA ----------------------------
 
-export const ShopNewsCard = ({ navigation, price, shops, name, image }) => {
+export const ShopNewsCard = ({ navigation, price, shops, name, image, id }) => {
   return (
     <View>
       <TouchableOpacity
-        onPress={() => navigation.navigate("singles", { screen: "full-view" })}
+        onPress={() =>
+          navigation.navigate("singles", {
+            screen: "full-view",
+            params: {
+              page: FULL_VIEW_PAGES.PRODUCT,
+              id,
+              filterParams: { name, id, price }, // the fields that are going to be used to find the particular card (locally)
+            },
+          })
+        }
       >
         <Image
           source={image ? { uri: image } : Defaults.getDefaultImage()}
