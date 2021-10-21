@@ -86,7 +86,9 @@ export default class FormGenerator extends Component {
         : field.dbName || field.name;
     const fromState = this.state.formData[key];
     return fromState === undefined
-      ? defaultObject[key] || prefillObject[key] || null
+      ? (defaultObject && defaultObject[key]) ||
+          (prefillObject && prefillObject[key]) ||
+          null
       : fromState;
   }
 

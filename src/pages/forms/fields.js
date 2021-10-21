@@ -1,4 +1,14 @@
 import FormGenerator from "../form generator/FormGenerator";
+const TIME_DROPDOWN = [
+  "15 Minutes",
+  "30 Minutes",
+  "1 Hour",
+  "1 Hour 30 Minutes",
+  "2 Hours",
+  "2 Hours 30 Minutes",
+  "3 Hours",
+  "More than 3 hours",
+];
 
 export const FORM_JSONS = {
   routine: [
@@ -82,6 +92,7 @@ export const FORM_JSONS = {
       numberOfLines: 6,
       required: true,
     },
+
     {
       fieldType: FormGenerator.FIELDS.TOGGLE,
       placeholder: "Requires pre-payment",
@@ -96,6 +107,14 @@ export const FORM_JSONS = {
       name: "duration",
       dbName: "duration",
       maxLength: 20,
+      required: true,
+    },
+    {
+      fieldType: FormGenerator.FIELDS.DROPDOWN,
+      label: "How long should this campaign run for?",
+      name: "Run Time",
+      data: TIME_DROPDOWN,
+      dbName: "run_time",
       required: true,
     },
     {

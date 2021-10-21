@@ -16,6 +16,12 @@ import FlatButton from "../../components/FlatButton";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Defaults } from "../../shared/classes/Defaults";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { GET_NEWS_FEED } from "../../shared/urls";
+import {
+  loadNewsAction,
+  setNewsParamsAction,
+} from "../../redux/actions/actions";
 class NewsMainPage extends Component {
   constructor(props) {
     super(props);
@@ -24,8 +30,19 @@ class NewsMainPage extends Component {
   }
 
   onRefresh() {
+    const { user, putNewsInRedux, putNewsParamsInRedux } = this.props;
     this.setState({ refreshing: true }),
-      setTimeout(() => this.setState({ refreshing: false }), 2000);
+      InternetExplorer.roamAndFind(GET_NEWS_FEED, "POST", {
+        user_id: user?.user_id,
+      })
+        .then((response) => {
+          this.setState({ refreshing: false });
+          putNewsInRedux(response?.data?.feed);
+          putNewsParamsInRedux(response);
+        })
+        .catch((e) =>
+          console.log("REFRESHING_FOR_NEWS_ERROR:->", e?.toString())
+        );
   }
 
   getCardToDisplay(newsItem = {}, params = {}) {
@@ -63,7 +80,7 @@ class NewsMainPage extends Component {
         <FlatButton
           onPress={() => this.setState({ loading: true })}
           containerStyle={{ backgroundColor: "whitesmoke" }}
-          style={{ color: "green" }}
+          style={{ color: "black" }}
           loaderColor="green"
           loading={loading}
         >
@@ -76,10 +93,17 @@ class NewsMainPage extends Component {
 const mapStateToProps = (state) => {
   return {
     news: state.news,
+    user: state.user,
   };
 };
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      putNewsInRedux: loadNewsAction,
+      putNewsParamsInRedux: setNewsParamsAction,
+    },
+    dispatch
+  );
 };
 export default connect(mapStateToProps, mapDispatchToProps)(NewsMainPage);
 
@@ -291,7 +315,7 @@ export const CampaignNewsCard = ({
           <View style={{ marginLeft: "auto", alignItems: "flex-end" }}>
             <Text style={{ fontSize: 12, color: "green" }}>LEAVING IN</Text>
             <Text style={{ fontSize: 30, fontWeight: "bold", color: "green" }}>
-              {run_time || "1hr:30 mins"}
+              {run_time || "1 Hour 30 Minutes"}
             </Text>
           </View>
         </View>

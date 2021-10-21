@@ -213,6 +213,7 @@ class FormPlaceholder extends Component {
           pageName: "campaigns",
           pagePluralName: "campaigns",
           bucket: null,
+          scroll: true,
           prefillObject: this.getPrefillObject(),
           onSuccess: (data) => {
             this.putItemInReduxStore(data, addCampaignToRedux, campaigns);
