@@ -4,6 +4,7 @@ import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import FlatButton from "../../components/FlatButton";
 import Subtitle from "../../components/Subtitle";
 import { deleteAProductFromBackend } from "../../redux/actions/actions";
+import DateHandler from "../../shared/classes/DateHandler";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
 import { makeAlert } from "../../shared/utils";
@@ -102,7 +103,7 @@ export default function ProductFullView({
               By {creator?.preferred_name || "..."}
             </Text>
             <Text style={{ color: "grey" }}>
-              {created_at?.substr(0, 10) || "..."}
+              {DateHandler.makeTimeAgo(new Date(created_at))}
             </Text>
             {/* <View style={{ flexDirection: "row" }}>
               <TouchableOpacity>

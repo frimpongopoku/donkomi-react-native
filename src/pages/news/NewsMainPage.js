@@ -70,7 +70,7 @@ class NewsMainPage extends Component {
         }
         style={{ flex: 1, backgroundColor: "white" }}
       >
-        {news.map((one, index) => {
+        {news?.map((one, index) => {
           return (
             <View key={index.toString()}>{this.getCardToDisplay(one)}</View>
           );
