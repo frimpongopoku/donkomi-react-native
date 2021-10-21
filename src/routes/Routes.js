@@ -174,7 +174,7 @@ const makeHeaderLeft = (navigation) => {
     <TouchableOpacity onPress={() => navigation.goBack()}>
       <Ionicons
         name="arrow-back-outline"
-        style={{ marginLeft: 8 }}
+        style={{ marginLeft: 15 }}
         size={24}
         color="black"
       />
