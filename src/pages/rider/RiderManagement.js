@@ -28,11 +28,11 @@ function RiderManagement({
       icon: "plus",
       params: { page: FormPlaceholder.PAGES.VENDOR },
     },
-    {
-      name: "Stock",
-      icon: "plus",
-      params: { page: FormPlaceholder.PAGES.STOCK, edit_id: 20 },
-    },
+    // {  ----- STOCK FXNALITY will be included later on in life
+    //   name: "Stock",
+    //   icon: "plus",
+    //   params: { page: FormPlaceholder.PAGES.STOCK, edit_id: 20 },
+    // },
     {
       name: "Routine",
       icon: "plus",

@@ -6,6 +6,8 @@ import { Feather } from "@expo/vector-icons";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { STYLES } from "../../shared/ui";
 import { Defaults } from "../../shared/classes/Defaults";
+import { connect } from "react-redux";
+import { logoutAction } from "../../redux/actions/actions";
 const makeIcon = ({ iconName, type, color = "black" }) => {
   switch (type) {
     case "fa":
@@ -50,8 +52,8 @@ const menu = [
     url: "Settings",
   },
 ];
-export default function CustomDrawer(props) {
-  const { navigation, state } = props;
+function CustomDrawer(props) {
+  const { navigation, state, logout } = props;
   return (
     <DrawerContentScrollView>
       <View
@@ -108,9 +110,20 @@ export default function CustomDrawer(props) {
           icon={() =>
             makeIcon({ iconName: "logout", type: "ant", color: "red" })
           }
+          onPress={() => {
+            logout();
+            navigation.navigate("Login");
+          }}
           labelStyle={{ fontSize: 15, color: "red" }}
         />
       </View>
     </DrawerContentScrollView>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
+};
+export default connect(mapStateToProps, { logout: logoutAction })(CustomDrawer);

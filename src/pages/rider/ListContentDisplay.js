@@ -14,7 +14,7 @@ import FormPlaceholder from "../forms/FormPlaceholder";
 export default class ListContentDisplay extends Component {
   tabs = [
     { key: "vendors", title: "Vendors" },
-    { key: "stock", title: "Stock" },
+    // { key: "stock", title: "Stock" },
     { key: "routines", title: "Routines" },
   ];
 

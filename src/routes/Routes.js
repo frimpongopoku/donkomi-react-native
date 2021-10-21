@@ -10,7 +10,7 @@ import {
   AntDesign,
   Entypo,
   Feather,
-  Ionicons,
+  Ionicons, 
   MaterialIcons,
 } from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
