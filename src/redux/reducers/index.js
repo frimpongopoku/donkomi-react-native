@@ -15,6 +15,8 @@ import {
   loadNewsReducer,
   marketNewsReducer,
   marketNewsParamsReducer,
+  merchantCartReducer,
+  cartReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -31,6 +33,8 @@ export default combineReducers({
   campaigns: setCampaignReducer,
   news: loadNewsReducer,
   newsParams: setNewsParamsReducer,
-  market: marketNewsReducer, 
-  marketParams: marketNewsParamsReducer
+  market: marketNewsReducer,
+  marketParams: marketNewsParamsReducer,
+  cart: cartReducer,
+  merchantCar: merchantCartReducer,
 });

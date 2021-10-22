@@ -1,6 +1,8 @@
 import {
   GET_AVAILABLE_ROLES,
   LOAD_NEWS,
+  MODIFY_CART,
+  MODIFY_MERCHANT_CART,
   NOTHING,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
@@ -39,92 +41,69 @@ export const showFloatingModalReducer = (
 
   return state;
 };
-export const setUserShopsReducer = (
-  state = null,
-  action
-) => {
+export const setUserShopsReducer = (state = null, action) => {
   if (action.type === SET_USER_SHOPS) return action.payload;
 
   return state;
 };
-export const setUserShopItemsReducer = (
-  state = null,
-  action
-) => {
+export const setUserShopItemsReducer = (state = null, action) => {
   if (action.type === SET_USER_SHOP_ITEMS) return action.payload;
 
   return state;
 };
-export const setAvailableRolesReducer = (
-  state = null,
-  action
-) => {
+export const setAvailableRolesReducer = (state = null, action) => {
   if (action.type === GET_AVAILABLE_ROLES) return action.payload;
 
   return state;
 };
-export const setVendorsReducer = (
-  state = null,
-  action
-) => {
+export const setVendorsReducer = (state = null, action) => {
   if (action.type === SET_VENDORS) return action.payload;
 
   return state;
 };
-export const setRoutinesReducer = (
-  state = null,
-  action
-) => {
+export const setRoutinesReducer = (state = null, action) => {
   if (action.type === SET_ROUTINES) return action.payload;
 
   return state;
 };
 
-export const setStockReducer = (
-  state = null,
-  action
-) => {
+export const setStockReducer = (state = null, action) => {
   if (action.type === SET_STOCK) return action.payload;
 
   return state;
 };
-export const setCampaignReducer = (
-  state = null,
-  action
-) => {
+export const setCampaignReducer = (state = null, action) => {
   if (action.type === SET_CAMPAIGNS) return action.payload;
 
   return state;
 };
-export const loadNewsReducer = (
-  state = null,
-  action
-) => {
+export const loadNewsReducer = (state = null, action) => {
   if (action.type === LOAD_NEWS) return action.payload;
 
   return state;
 };
-export const setNewsParamsReducer = (
-  state = null,
-  action
-) => {
+export const setNewsParamsReducer = (state = null, action) => {
   if (action.type === LOAD_NEWS) return action.payload;
 
   return state;
 };
-export const marketNewsReducer = (
-  state = null,
-  action
-) => {
+export const marketNewsReducer = (state = null, action) => {
   if (action.type === SET_MARKET_NEWS) return action.payload;
 
   return state;
 };
-export const marketNewsParamsReducer = (
-  state = null,
-  action
-) => {
+export const marketNewsParamsReducer = (state = null, action) => {
   if (action.type === SET_MARKET_NEWS_PARAMS) return action.payload;
+
+  return state;
+};
+export const cartReducer = (state = null, action) => {
+  if (action.type === MODIFY_CART) return action.payload;
+
+  return state;
+};
+export const merchantCartReducer = (state = null, action) => {
+  if (action.type === MODIFY_MERCHANT_CART) return action.payload;
 
   return state;
 };

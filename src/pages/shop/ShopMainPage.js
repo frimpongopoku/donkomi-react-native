@@ -13,6 +13,7 @@ import { bindActionCreators } from "redux";
 import {
   deleteAProductFromBackend,
   deleteAShopFromBackend,
+  modifyCartAction,
   setMarketNewsAction,
   setMarketNewsParamsAction,
 } from "../../redux/actions/actions";
@@ -46,6 +47,7 @@ class ShopMainPage extends Component {
       setMarketContent,
       setMarketParams,
       user,
+      modifyCart,
     } = this.props;
     switch (route.key) {
       case "market":
@@ -58,6 +60,7 @@ class ShopMainPage extends Component {
             setMarketContent={setMarketContent}
             setMarketParams={setMarketParams}
             user={user}
+            modifyCart={modifyCart}
           />
         );
       case "your-products":
@@ -168,6 +171,7 @@ const mapStateToProps = (state) => {
     market: state.market,
     markeParams: state.marketParams,
     user: state.user,
+    cart: state.cart,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -177,6 +181,7 @@ const mapDispatchToProps = (dispatch) => {
       deleteProduct: deleteAProductFromBackend,
       setMarketContent: setMarketNewsAction,
       setMarketParams: setMarketNewsParamsAction,
+      modifyCart: modifyCartAction,
     },
     dispatch
   );

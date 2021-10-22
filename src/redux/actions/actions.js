@@ -1,6 +1,8 @@
 import {
   GET_AVAILABLE_ROLES,
   LOAD_NEWS,
+  MODIFY_CART,
+  MODIFY_MERCHANT_CART,
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
@@ -111,6 +113,13 @@ export const showFloatingModalActions = (
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
 
+export const modifyCartAction = (data =[]) => {
+  return { type: MODIFY_CART, payload: data };
+};
+export const modifyMerchantCartAction = (data =[]) => {
+  return { type: MODIFY_MERCHANT_CART, payload: data };
+};
+
 export const setUserShopsAction = (shops = null) => {
   return { type: SET_USER_SHOPS, payload: shops };
 };
@@ -131,6 +140,7 @@ export const setRoutinesAction = (data = []) => {
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
 };
+
 export const setCampaignAction = (data = []) => {
   return { type: SET_CAMPAIGNS, payload: data };
 };
