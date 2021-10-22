@@ -27,14 +27,14 @@ export default function ShopCheckout({ cart, modifyCart }) {
     }
   };
 
-  const removeFromCart = (product) => {
+  const removeFromCart = (product, deleteKey = false) => {
     const [itemInCart, rest, index] = pop(
       product.id,
       "product_id",
       cart?.basket || []
     );
 
-    if (itemInCart?.qty > 1) {
+    if (itemInCart?.qty > 1 && !deleteKey) {
       itemInCart.qty -= 1;
       itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
       rest.splice(index, 0, itemInCart); // put that item back at the same index
@@ -133,7 +133,7 @@ export const CheckoutItemCard = ({
           <TouchableOpacity onPress={() => addToCart({ id })}>
             <Entypo name="plus" color="green" size={25} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => removeFromCart({ id }, true)}>
             <Text style={{ marginLeft: 20, color: "red" }}>Remove</Text>
           </TouchableOpacity>
         </View>
