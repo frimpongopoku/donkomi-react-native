@@ -113,7 +113,6 @@ class ShopMainPage extends Component {
         return this.openShopCreationPage("is product");
       case 2:
         return this.openShopCreationPage();
-
       default:
         break;
     }
@@ -129,6 +128,7 @@ class ShopMainPage extends Component {
   render() {
     const { index } = this.state;
     const isMarket = index === 0;
+    const { cart } = this.props;
     return (
       <>
         <TabView
@@ -155,7 +155,17 @@ class ShopMainPage extends Component {
             }}
           >
             {isMarket ? (
-              <Ionicons name="cart-outline" size={24} color="green" />
+              <>
+                {cart?.numberOfItems ? (
+                  <Text
+                    style={{ fontWeight: "bold", color: "green", fontSize: 17 }}
+                  >
+                    {cart?.numberOfItems}
+                  </Text>
+                ) : (
+                  <Ionicons name="cart-outline" size={24} color="green" />
+                )}
+              </>
             ) : (
               <Entypo name="plus" size={24} color="white" />
             )}

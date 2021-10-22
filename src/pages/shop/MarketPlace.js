@@ -58,8 +58,6 @@ export default function MarketPlace({
       "product_id",
       cart?.basket || []
     );
-    // console.log(itemInCart, rest, index);
-
     if (itemInCart) {
       itemInCart.qty += 1;
       itemInCart.price = itemInCart.qty * itemInCart.price;
@@ -71,13 +69,45 @@ export default function MarketPlace({
     // first time product is being added to cart
     const basket = [
       ...(cart?.basket || []),
-      { product_id: product?.id, qty: 1, price: Number(product?.price) },
+      {
+        product_id: product?.id,
+        qty: 1,
+        price: Number(product?.price),
+        product,
+      },
     ];
 
     const [number, price] = summariseCartContent(basket || []);
     modifyCart({ basket, numberOfItems: number, totalPrice: price });
   };
-  console.log("I AM THE CART BREO", cart);
+
+  /**
+   * IF item is in cart,
+   * take it out, bring the rest
+   * now check quantity of the object that you have found,
+   * if its not one, just decrease by 1,
+   * and add the modified object back to fold
+   * if it is 1, dont add it back
+   */
+  const removeFromCart = (product) => {
+    const [itemInCart, rest, index] = pop(
+      product.id,
+      "product_id",
+      cart?.basket || []
+    );
+
+    if (itemInCart?.qty > 1) {
+      itemInCart.qty -= 1;
+      itemInCart.price = itemInCart.qty * itemInCart.price;
+      rest.splice(index, 0, itemInCart); // put that item back at the same index
+      const [number, price] = summariseCartContent(rest || []);
+      modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+      return;
+    }
+    const [number, price] = summariseCartContent(rest || []);
+    modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+  };
+
   return (
     <ScrollView
       style={{ backgroundColor: "white" }}
@@ -125,6 +155,7 @@ export default function MarketPlace({
               {/* ------- IN CART MARKER ------- */}
               {itemInCart && (
                 <TouchableOpacity
+                  onPress={() => removeFromCart(product)}
                   style={{
                     backgroundColor: "green",
                     borderRadius: 55,
