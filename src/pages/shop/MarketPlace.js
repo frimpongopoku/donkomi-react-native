@@ -16,7 +16,7 @@ import { GET_MARKET_NEWS } from "../../shared/urls";
 import FlatButton from "../../components/FlatButton";
 import { pop } from "../../shared/utils";
 
-const summariseCartContent = (arr = []) => {
+export const summariseCartContent = (arr = []) => {
   var number = 0,
     price = 0;
   arr.forEach((item) => {
@@ -60,7 +60,7 @@ export default function MarketPlace({
     );
     if (itemInCart) {
       itemInCart.qty += 1;
-      itemInCart.price = itemInCart.qty * itemInCart.price;
+      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
       rest.splice(index, 0, itemInCart);
       const [number, price] = summariseCartContent(rest || []);
       modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
@@ -81,14 +81,6 @@ export default function MarketPlace({
     modifyCart({ basket, numberOfItems: number, totalPrice: price });
   };
 
-  /**
-   * IF item is in cart,
-   * take it out, bring the rest
-   * now check quantity of the object that you have found,
-   * if its not one, just decrease by 1,
-   * and add the modified object back to fold
-   * if it is 1, dont add it back
-   */
   const removeFromCart = (product) => {
     const [itemInCart, rest, index] = pop(
       product.id,
@@ -98,7 +90,7 @@ export default function MarketPlace({
 
     if (itemInCart?.qty > 1) {
       itemInCart.qty -= 1;
-      itemInCart.price = itemInCart.qty * itemInCart.price;
+      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
       rest.splice(index, 0, itemInCart); // put that item back at the same index
       const [number, price] = summariseCartContent(rest || []);
       modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });

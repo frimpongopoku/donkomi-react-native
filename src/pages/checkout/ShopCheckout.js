@@ -6,26 +6,87 @@ import burger from "./../../shared/images/burger.jpg";
 import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons";
 // import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
-export default function ShopCheckout({}) {
+import { Defaults } from "../../shared/classes/Defaults";
+import { pop } from "../../shared/utils";
+import { summariseCartContent } from "../shop/MarketPlace";
+import NotFound from "../../components/NotFound";
+export default function ShopCheckout({ cart, modifyCart }) {
+  const addToCart = (product) => {
+    const [itemInCart, rest, index] = pop(
+      product.id,
+      "product_id",
+      cart?.basket || []
+    );
+    if (itemInCart) {
+      itemInCart.qty += 1;
+      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed();
+      rest.splice(index, 0, itemInCart);
+      const [number, price] = summariseCartContent(rest || []);
+      modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+      return;
+    }
+  };
+
+  const removeFromCart = (product) => {
+    const [itemInCart, rest, index] = pop(
+      product.id,
+      "product_id",
+      cart?.basket || []
+    );
+
+    if (itemInCart?.qty > 1) {
+      itemInCart.qty -= 1;
+      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
+      rest.splice(index, 0, itemInCart); // put that item back at the same index
+      const [number, price] = summariseCartContent(rest || []);
+      modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+      return;
+    }
+    const [number, price] = summariseCartContent(rest || []);
+    modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+  };
+
+  if (!cart || !cart?.basket || cart?.basket.length === 0)
+    return (
+      <NotFound text="No items in your cart yet, add from the market place..." />
+    );
+
+  // console.log("--------------------------------------------------");
+  // console.log(cart);
+  // console.log("--------------------------------------------------");
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <ScrollView>
-        <CheckoutItemCard />
-        <CheckoutItemCard />
-        <CheckoutItemCard />
+        {cart?.basket?.map((cartItem, index) => {
+          return (
+            <View key={index.toString()}>
+              <CheckoutItemCard
+                {...cartItem}
+                addToCart={addToCart}
+                removeFromCart={removeFromCart}
+              />
+            </View>
+          );
+        })}
       </ScrollView>
       <FlatButton
         color="green"
         containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
         style={{ fontWeight: "bold" }}
       >
-        Checkout ( Rs 5,678 )
+        Checkout ( Rs {cart?.totalPrice} )
       </FlatButton>
     </View>
   );
 }
 
-export const CheckoutItemCard = ({ product, qty, price }) => {
+export const CheckoutItemCard = ({
+  product,
+  qty,
+  removeFromCart,
+  addToCart,
+}) => {
+  const { image, name, price, shops, id } = product || {};
   return (
     <View
       style={{
@@ -40,7 +101,7 @@ export const CheckoutItemCard = ({ product, qty, price }) => {
       }}
     >
       <Image
-        source={burger}
+        source={image ? { uri: image } : Defaults.getDefaultImage()}
         style={{ width: 80, height: 80, borderRadius: 6, marginRight: 15 }}
       />
 
@@ -52,12 +113,10 @@ export const CheckoutItemCard = ({ product, qty, price }) => {
             color: STYLES.theme.blue,
           }}
         >
-          4K Burger Full Release
+          {name || "..."}
         </Text>
-        <Text style={{}}>Sandra's Shop</Text>
-        <Text style={{ fontWeight: "bold", color: "green" }}>
-          Rs 20,000 (60,000)
-        </Text>
+        <Text style={{}}>{shops && shops[0]?.name}</Text>
+        <Text style={{ fontWeight: "bold", color: "green" }}>Rs {price}</Text>
 
         <View
           style={{
@@ -65,18 +124,17 @@ export const CheckoutItemCard = ({ product, qty, price }) => {
             alignItems: "center",
           }}
         >
-          <TouchableOpacity>
-            {/* <Feather name="minus-circle" size={24} color="red" /> */}
+          <TouchableOpacity onPress={() => removeFromCart({ id })}>
             <Entypo name="minus" color="red" size={25} />
           </TouchableOpacity>
           <Text style={{ margin: 10, fontSize: 17, fontWeight: "bold" }}>
-            3
+            {qty}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => addToCart({ id })}>
             <Entypo name="plus" color="green" size={25} />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={{ marginLeft: 20, color: "red" }}>Delete</Text>
+            <Text style={{ marginLeft: 20, color: "red" }}>Remove</Text>
           </TouchableOpacity>
         </View>
       </View>
