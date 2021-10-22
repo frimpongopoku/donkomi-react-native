@@ -1,30 +1,134 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, Image } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import burger from "./../../shared/images/burger.jpg";
-export default class NewsMainPage extends Component {
+import FlatButton from "../../components/FlatButton";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { Defaults } from "../../shared/classes/Defaults";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { GET_NEWS_FEED } from "../../shared/urls";
+import {
+  loadNewsAction,
+  setNewsParamsAction,
+} from "../../redux/actions/actions";
+import { FULL_VIEW_PAGES } from "../full view/FullView";
+class NewsMainPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { refreshing: false };
+    this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  onRefresh() {
+    const { user, putNewsInRedux, putNewsParamsInRedux } = this.props;
+    this.setState({ refreshing: true }),
+      InternetExplorer.roamAndFind(GET_NEWS_FEED, "POST", {
+        user_id: user?.user_id,
+      })
+        .then((response) => {
+          this.setState({ refreshing: false });
+          putNewsInRedux(response?.data?.feed);
+          putNewsParamsInRedux(response);
+        })
+        .catch((e) =>
+          console.log("REFRESHING_FOR_NEWS_ERROR:->", e?.toString())
+        );
+  }
+
+  getCardToDisplay(newsItem = {}, params = {}) {
+    const { navigation } = this.props;
+    params = { ...params, navigation };
+    const isCampaign = newsItem?.routine && newsItem?.title; // only campaign items surely have routines and title
+    const isProduct = newsItem?.name && newsItem?.shops; // a product will have name, and shops
+    if (isCampaign) {
+      return <CampaignNewsCard {...newsItem} {...params} />;
+    }
+    if (isProduct) return <ShopNewsCard {...newsItem} {...params} />;
+  }
   render() {
+    const { loading } = this.state;
+    const { news } = this.props;
     return (
-      <View style={{ flex: 1, backgroundColor: "white" }}>
-        <RoutineNewsCard />
-        <ShopNewsCard />
-        <RoutineNewsCard />
-      </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            colors={["red"]}
+            onRefresh={this.onRefresh}
+          />
+        }
+        style={{ flex: 1, backgroundColor: "white" }}
+      >
+        {news?.map((one, index) => {
+          return (
+            <View key={index.toString()}>{this.getCardToDisplay(one)}</View>
+          );
+        })}
+        {/* <CampaignNewsCard navigation={this.props.navigation} />
+        <ShopNewsCard navigation={this.props.navigation} />
+        <CampaignNewsCard navigation={this.props.navigation} /> */}
+        <FlatButton
+          onPress={() => this.setState({ loading: true })}
+          containerStyle={{ backgroundColor: "whitesmoke" }}
+          style={{ color: "black" }}
+          loaderColor="green"
+          loading={loading}
+        >
+          {loading ? "" : "MORE"}
+        </FlatButton>
+      </ScrollView>
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    news: state.news,
+    user: state.user,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      putNewsInRedux: loadNewsAction,
+      putNewsParamsInRedux: setNewsParamsAction,
+    },
+    dispatch
+  );
+};
+export default connect(mapStateToProps, mapDispatchToProps)(NewsMainPage);
 
 // ------------------------- WIDGETS AREA ----------------------------
 
-export const ShopNewsCard = (props) => {
+export const ShopNewsCard = ({ navigation, price, shops, name, image, id }) => {
   return (
     <View>
-      <TouchableOpacity>
-        <Image source={burger} style={{ width: "100%", height: 250 }} />
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("singles", {
+            screen: "full-view",
+            params: {
+              page: FULL_VIEW_PAGES.PRODUCT,
+              id,
+              filterParams: { name, id, price }, // the fields that are going to be used to find the particular card (locally)
+            },
+          })
+        }
+      >
+        <Image
+          source={image ? { uri: image } : Defaults.getDefaultImage()}
+          style={{ width: "100%", height: 250 }}
+        />
       </TouchableOpacity>
       <View
         style={{
@@ -37,11 +141,9 @@ export const ShopNewsCard = (props) => {
       >
         <View>
           <Text style={{ fontWeight: "bold", color: "red", fontSize: 16 }}>
-            Rs 4,532
+            Rs {price}
           </Text>
-          <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-            Abinchin Burgers
-          </Text>
+          <Text style={{ fontWeight: "bold", fontSize: 16 }}>{name}</Text>
           <Text style={{ color: "grey", fontSize: 13 }}>2 hours ago</Text>
         </View>
         <TouchableOpacity
@@ -142,7 +244,16 @@ export const NewsTweet = (props) => {
   );
 };
 
-export const RoutineNewsCard = (props) => {
+export const CampaignNewsCard = ({
+  navigation,
+  title,
+  fee,
+  duration,
+  created_at,
+  involved_vendors,
+  run_time,
+}) => {
+  // console.log("I am the involved vendros", involved_vendors);
   return (
     <View style={{ width: "100%" }}>
       <View style={{ padding: 15 }}>
@@ -162,33 +273,43 @@ export const RoutineNewsCard = (props) => {
                 color: STYLES.theme.blue,
               }}
             >
-              TRIP TO GRAND BAIE
+              {title?.toUpperCase()}
             </Text>
           </View>
           <View style={{ marginLeft: "auto" }}>
-            <Text style={{ fontSize: 28, fontWeight: "bold", color: "red" }}>
-              {" "}
-              +50 Rs
+            <Text style={{ fontSize: 23, fontWeight: "bold", color: "red" }}>
+              +{fee} Rs
             </Text>
           </View>
         </View>
         {/* -------- SHOP HORIZONTAL LIST--------- */}
         <View>
-          <Text style={{ color: "grey" }}>Order anything from</Text>
-          <View style={{ flexDirection: "row", marginBottom: 5 }}>
-            <Text style={{ marginRight: 10 }}>LA CROISETTE</Text>
-            <Text style={{ marginRight: 10 }}>SUPER U</Text>
-            <Text style={{ marginRight: 10 }}>JUMBO</Text>
-          </View>
+          <Text style={{ color: "grey" }}>Order From</Text>
 
-          <View>
+          <View style={{ flexDirection: "row", marginBottom: 5 }}>
+            {involved_vendors?.map((vendor, index) => {
+              return (
+                <Text style={{ marginRight: 10 }} key={index.toString()}>
+                  {vendor?.name?.toUpperCase()}
+                </Text>
+              );
+            })}
+
+            {/* <Text style={{ marginRight: 10 }}>SUPER U</Text>
+            <Text style={{ marginRight: 10 }}>JUMBO</Text> */}
+          </View>
+          <Text style={{ color: "green", fontWeight: "bold" }}>
+            TRIP DURATION: {duration}
+          </Text>
+          <Text style={{ color: "grey" }}>Posted 30 minutes ago </Text>
+          {/* <View>
             <Text style={{ color: "grey" }}>You can only order </Text>
             <View style={{ flexDirection: "row", marginBottom: 5 }}>
               <Text style={{ marginRight: 10 }}>FOOD</Text>
               <Text style={{ marginRight: 10 }}>GROCERIES</Text>
               <Text style={{ marginRight: 10 }}>CHIPS</Text>
             </View>
-          </View>
+          </View> */}
         </View>
 
         {/* -------- CAR AND TIME LEAVING ----------- */}
@@ -204,7 +325,7 @@ export const RoutineNewsCard = (props) => {
           <View style={{ marginLeft: "auto", alignItems: "flex-end" }}>
             <Text style={{ fontSize: 12, color: "green" }}>LEAVING IN</Text>
             <Text style={{ fontSize: 30, fontWeight: "bold", color: "green" }}>
-              2hr:30 mins
+              {run_time || "1 Hour 30 Minutes"}
             </Text>
           </View>
         </View>
@@ -213,11 +334,14 @@ export const RoutineNewsCard = (props) => {
       {/* ---------- PLACE YOUR ORDER BOTTOM TILE ------- */}
 
       <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("singles", { screen: "place-routine-order" })
+        }
         style={{
           padding: 15,
           backgroundColor: STYLES.theme.blue,
           flexDirection: "row",
-          // justifyContent: "center",
+
           alignItems: "center",
         }}
       >

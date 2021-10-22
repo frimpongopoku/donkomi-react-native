@@ -1,11 +1,18 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import React from "react";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import { Text, TouchableOpacity } from "react-native";
-import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  Feather,
+  Ionicons, 
+  MaterialIcons,
+} from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
 import RiderMainPage from "../pages/rider/RiderMainPage";
 import Settings from "../pages/settings/Settings";
@@ -13,9 +20,23 @@ import NewsMainPage from "../pages/news/NewsMainPage";
 import Checkout from "../pages/checkout/Checkout";
 import PlaceOrder from "../pages/order placement/PlaceOrder";
 import FormPlaceholder from "../pages/forms/FormPlaceholder";
+import EditYourProfile from "../pages/profile/EditYourProfile";
+import ShopCreationContainer from "../pages/shop/creation/ShopCreationContainer";
+import FullView from "../pages/full view/FullView";
+import { FontAwesome } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
+import { STYLES } from "./../shared/ui";
+import Driver from "../pages/driver/Driver";
+import Merchant from "../merchant/Merchant";
+import CustomDrawer from "./drawer/CustomDrawer";
+import Help from "../pages/help/Help";
+import Notifications from "../pages/notifications/Notifications";
+
 const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
+const MyDrawer = createDrawerNavigator();
+// const TaxiStack = createStackNavigator();
 export const AuthStack = () => (
   <NavigationContainer>
     <Stack.Navigator>
@@ -52,16 +73,17 @@ const getTabIcons = (params) => {
         color={focused ? activeColor : color}
       />
     ),
-    Rider: (
-      <MaterialIcons
-        name="delivery-dining"
+    Notifications: (
+      <Feather
+        name="bell"
+        size={24}
         size={size}
         color={focused ? activeColor : color}
       />
     ),
-    Settings: (
-      <Ionicons
-        name="settings-outline"
+    Profile: (
+      <AntDesign
+        name="user"
         size={size}
         color={focused ? activeColor : color}
       />
@@ -71,17 +93,32 @@ const getTabIcons = (params) => {
   return TABS_AND_ICONS[tabName];
 };
 
-const makeHeaderRight = (navigation, destination = "singles") => {
+const makeHeaderRight = (
+  navigation,
+  destination = "singles",
+  routeParams = { screen: "checkout" }
+) => {
   return () => (
     <TouchableOpacity
       style={{ marginRight: 20 }}
-      onPress={() => navigation.navigate(destination)}
+      onPress={() => navigation.navigate(destination, routeParams || {})}
     >
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
   );
 };
-// ----------------------------------------- APPLICATION BOTTOM TAB STACK ------------------
+// ----------------------------------------- APPLICATION BOTTOM TAB STACK NAVIGATION ------------------
+const makeHamburgerLeft = ({ navigation }) => {
+  return () => (
+    <TouchableOpacity
+      style={{ marginRight: 5, marginLeft: 20 }}
+      onPress={() => navigation.openDrawer()}
+    >
+      <Octicons name="three-bars" size={24} color={STYLES.theme.blue} />
+    </TouchableOpacity>
+  );
+};
+
 export const ApplicationStack = () => (
   <Tabs.Navigator
     screenOptions={({ route }) => ({
@@ -97,30 +134,34 @@ export const ApplicationStack = () => (
       options={({ navigation }) => ({
         title: "News",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
       name="Shop"
       component={ShopMainPage}
       options={({ navigation }) => ({
-        title: "Shop",
+        title: "Market Place",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
-      name="Rider"
-      component={RiderMainPage}
+      name="Notifications"
+      component={Notifications}
       options={({ navigation }) => ({
-        title: "Rider",
+        title: "Notifications",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
     <Tabs.Screen
-      name="Settings"
+      name="Profile"
       component={Settings}
       options={({ navigation }) => ({
-        title: "Settings",
+        title: "Your Profile",
         headerRight: makeHeaderRight(navigation),
+        headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
   </Tabs.Navigator>
@@ -130,12 +171,10 @@ export const ApplicationStack = () => (
 
 const makeHeaderLeft = (navigation) => {
   return () => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("place-routine-order")}
-    >
+    <TouchableOpacity onPress={() => navigation.goBack()}>
       <Ionicons
         name="arrow-back-outline"
-        style={{ marginLeft: 8 }}
+        style={{ marginLeft: 15 }}
         size={24}
         color="black"
       />
@@ -146,12 +185,20 @@ const SinglePageStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
+        name="full-view"
+        component={FullView}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          title: "View Item In Full",
+        })}
+      />
+      <Stack.Screen
         name="universal-form"
         component={FormPlaceholder}
         options={({ navigation }) => ({
           headerLeft: makeHeaderLeft(navigation),
           headerRight: makeHeaderRight(navigation, "place-routine-order"),
-          title: "Test Form Genrator",
+          title: "Form",
         })}
       />
       <Stack.Screen
@@ -171,26 +218,112 @@ const SinglePageStack = () => {
           title: "Place Your Order",
         })}
       />
+      <Stack.Screen
+        name="edit-your-profile"
+        component={EditYourProfile}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          // headerRight: makeHeaderRight(navigation, "checkout"),
+          title: "Edit your profile",
+        })}
+      />
+      <Stack.Screen
+        name="create-shop"
+        component={ShopCreationContainer}
+        options={({ navigation }) => ({
+          headerLeft: makeHeaderLeft(navigation),
+          // headerRight: makeHeaderRight(navigation, "place-routine-order"),
+          title: "Create New Shop",
+        })}
+      />
     </Stack.Navigator>
   );
 };
+
+// // -----------TAXI SERVICE STACK -------------
+// const TaxiScreenPack = () => {
+//   <TaxiStack.Navigator>
+//     <TaxiStack.Screen name="taxi-homepage" component={Driver} />
+//   </TaxiStack.Navigator>;
+// };
+
 // ----------- MAIN APP CONTAINER STACK ----------------
 
+export const MainAppStackWrapper = () => (
+  <MainAppStack.Navigator>
+    <MainAppStack.Screen
+      name="dashboard"
+      component={ApplicationStack}
+      options={{ headerShown: false }}
+    />
+    <MainAppStack.Screen
+      name="singles"
+      component={SinglePageStack}
+      options={{ headerShown: false }}
+    />
+  </MainAppStack.Navigator>
+);
 export const AppContainerStack = () => {
   return (
     <NavigationContainer>
-      <MainAppStack.Navigator>
-        <MainAppStack.Screen
-          name="singles"
-          component={SinglePageStack}
+      <MyDrawer.Navigator
+        initialRouteName="Home"
+        drawerContent={(props) => <CustomDrawer {...props} />}
+        // screenOptions={{ drawerActiveBackgroundColor: "red" }}
+      >
+        <MyDrawer.Screen
+          name="Home"
+          component={MainAppStackWrapper}
           options={{ headerShown: false }}
         />
-        <MainAppStack.Screen
-          name="dashboard"
-          component={ApplicationStack}
-          options={{ headerShown: false }}
+        <MyDrawer.Screen
+          name="Merchant"
+          component={RiderMainPage}
+          options={({ navigation }) => ({
+            title: "Merchant",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
         />
-      </MainAppStack.Navigator>
+        <MyDrawer.Screen
+          name="Taxi"
+          component={Driver}
+          options={({ navigation }) => ({
+            title: "Taxi Service",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+        <MyDrawer.Screen
+          name="Help"
+          component={Help}
+          options={({ navigation }) => ({
+            title: "Help",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+        <MyDrawer.Screen
+          name="Settings"
+          component={Settings}
+          options={({ navigation }) => ({
+            title: "Settings",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        />
+        {/* <MyDrawer.Screen
+          name="Market Place"
+          component={ShopMainPage}
+          options={({ navigation }) => ({
+            title: "Market Place",
+            headerRight: makeHeaderRight(navigation),
+            headerLeft: makeHamburgerLeft({ navigation }),
+          })}
+        /> */}
+      </MyDrawer.Navigator>
     </NavigationContainer>
   );
 };
+
+// ----------------------------------------------------------------

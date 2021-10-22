@@ -7,19 +7,58 @@ import { STYLES } from "../../shared/ui";
 import { Feather } from "@expo/vector-icons";
 import burger from "./../../shared/images/burger.jpg";
 import { MaterialIcons } from "@expo/vector-icons";
+import NotFound from "../../components/NotFound";
+import { Defaults } from "../../shared/classes/Defaults";
+import { getPropsArrayFromJsonArray, makeAlert } from "../../shared/utils";
+import FormPlaceholder from "../forms/FormPlaceholder";
 export default class ListContentDisplay extends Component {
   tabs = [
     { key: "vendors", title: "Vendors" },
-    { key: "stock", title: "Stock" },
+    // { key: "stock", title: "Stock" },
     { key: "routines", title: "Routines" },
   ];
 
   renderScene = ({ route }) => {
+    const {
+      vendors,
+      stock,
+      routines,
+      navigation,
+      user,
+      processAndDeleteVendor,
+      processAndDeleteStock,
+      processAndDeleteRoutine,
+    } = this.props;
     switch (route.key) {
       case "vendors":
-        return <VendorsList />;
+        return (
+          <VendorsList
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+            processAndDeleteVendor={processAndDeleteVendor}
+          />
+        );
       case "stock":
-        return <StockList />;
+        return (
+          <StockList
+            stock={stock}
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+            processAndDeleteStock={processAndDeleteStock}
+          />
+        );
+      case "routines":
+        return (
+          <RoutineList
+            routines={routines}
+            vendors={vendors}
+            navigation={navigation}
+            user={user}
+            processAndDeleteRoutine={processAndDeleteRoutine}
+          />
+        );
       default:
         return <Text style={{ padding: 2 }}>I am the {route.key} page</Text>;
     }
@@ -42,7 +81,39 @@ export default class ListContentDisplay extends Component {
   }
 }
 
-const VendorsList = ({ data = [1, 2, 3, 4] }) => {
+const RoutineList = ({
+  routines,
+  vendors,
+  navigation,
+  processAndDeleteRoutine,
+}) => {
+  const initiateCampaign = (routine) => {
+    makeAlert(
+      "New Campaign",
+      `You are are going to start a campaign from this template. '${routine?.title}'`,
+      { cancelable: true },
+      () =>
+        navigation.navigate("singles", {
+          screen: "universal-form",
+          params: {
+            fill_id: routine?.id,
+            page: FormPlaceholder.PAGES.CAMPAIGN,
+          },
+        }),
+      () => console.log("Cancelled")
+    );
+  };
+  const deleteRoutine = (routine) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${routine?.title}'? All campaigns related to this routine will be removed as well...`,
+      null,
+      () => processAndDeleteRoutine({ routine }),
+      () => console.log("Delete canceled")
+    );
+  };
+  if (!routines || routines?.length === 0)
+    return <NotFound text="You have not created any routines yet.." />;
   return (
     <View
       style={{
@@ -51,48 +122,104 @@ const VendorsList = ({ data = [1, 2, 3, 4] }) => {
         paddingTop: 20,
       }}
     >
-      {data.map((item, index) => (
-        <View
-          key={index}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            borderBottomWidth: 1,
-            borderBottomColor: "#EAEAEA",
-            marginBottom: 10,
-          }}
-        >
-          <Image
+      {routines?.map((routine, index) => {
+        var involvedVendors = routine.involved_vendors?.map((id) =>
+          vendors?.find((v) => v.id === id)
+        );
+        involvedVendors = getPropsArrayFromJsonArray(involvedVendors, "name");
+        var vendorString = involvedVendors.join(",");
+        vendorString =
+          vendorString?.length > 30
+            ? vendorString.substring(0, 27) + "..."
+            : vendorString;
+
+        return (
+          <View
+            key={index.toString()}
             style={{
-              height: 65,
-              width: 65,
-              marginRight: 10,
-              borderRadius: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
               marginBottom: 10,
+              padding: 10,
             }}
-            source={burger}
-          />
-          <Text style={{ fontSize: 15 }}>McDondalds</Text>
-          <View style={{ marginLeft: "auto" }}>
+          >
+            {/*  IMAGES IN ROUTINE WILL BE USED LATER IF NECESSARY */}
+            {/* <Image
+              style={{
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+              source={
+                routine?.image
+                  ? { uri: routine?.image }
+                  : Defaults.getDefaultImage()
+              }
+            /> */}
             <TouchableOpacity
-              style={{ marginLeft: "auto", flexDirection: "row" }}
+              onPress={() => initiateCampaign(routine)}
+              style={{ flexDirection: "column", justifyContent: "center" }}
             >
-              <Feather
-                name="edit"
-                size={24}
-                color="green"
-                style={{ marginRight: 15 }}
-              />
-              <MaterialIcons name="delete-outline" size={24} color="red" />
+              <Text style={{ fontSize: 15 }}>
+                {routine?.title || " Rolandisco Routine And Co"}
+              </Text>
+              <Text style={{ fontSize: 13, color: STYLES.theme.blue }}>
+                {vendorString}
+              </Text>
+              <Text
+                style={{ fontSize: 14, fontWeight: "bold", color: "green" }}
+              >
+                @Rs {routine?.fee} per order
+              </Text>
             </TouchableOpacity>
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.ROUTINE,
+                      edit_id: routine.id,
+                    },
+                  })
+                }
+              >
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteRoutine(routine)}>
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
-const StockList = ({ data = [1, 2, 3, 4] }) => {
+
+const VendorsList = ({ vendors, navigation, user, processAndDeleteVendor }) => {
+  const deleteVendor = (vendor) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${vendor?.name}'?. All stock related to this vendor will be removed as well`,
+      null,
+      () => processAndDeleteVendor({ vendors, vendor, user_id: user?.user_id }),
+      () => console.log("Delete canceled")
+    );
+  };
+  if (!vendors || vendors?.length === 0)
+    return <NotFound text="No vendors yet, create some" />;
   return (
     <View
       style={{
@@ -101,58 +228,151 @@ const StockList = ({ data = [1, 2, 3, 4] }) => {
         paddingTop: 20,
       }}
     >
-      {data.map((item, index) => (
-        <View
-          key={index}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            borderBottomWidth: 1,
-            borderBottomColor: "#EAEAEA",
-            marginBottom: 10,
-          }}
-        >
-          <Image
+      {vendors?.map((vendor, index) => {
+        return (
+          <View
+            key={index.toString()}
             style={{
-              height: 65,
-              width: 65,
-              marginRight: 10,
-              borderRadius: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
               marginBottom: 10,
             }}
-            source={burger}
-          />
-          <View>
-            <Text style={{ fontSize: 15 }}>Fries</Text>
-            <Text style={{ fontSize: 16, fontWeight: "bold", color: "red" }}>
-              Rs 65
-            </Text>
-            <Text
+          >
+            <Image
               style={{
-                fontSize: 12,
-                fontWeight: "bold",
-                color: STYLES.theme.blue,
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
               }}
-            >
-              McDonalds
-            </Text>
+              source={
+                vendor?.image
+                  ? { uri: vendor?.image }
+                  : Defaults.getDefaultImage()
+              }
+            />
+            <Text style={{ fontSize: 15 }}>{vendor?.name}</Text>
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto", flexDirection: "row" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.VENDOR,
+                      edit_id: vendor.id,
+                    },
+                  })
+                }
+              >
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteVendor(vendor)}>
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={{ marginLeft: "auto" }}>
-            <TouchableOpacity
-              style={{ marginLeft: "auto", flexDirection: "row" }}
-            >
-              <Feather
-                name="edit"
-                size={24}
-                color="green"
-                style={{ marginRight: 15 }}
-              />
-              <MaterialIcons name="delete-outline" size={24} color="red" />
-            </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+};
+const StockList = ({ stock, vendors, navigation, processAndDeleteStock }) => {
+  const deleteStock = (stock) => {
+    makeAlert(
+      "Delete",
+      `Are you sure you want to delete '${stock?.name}'?`,
+      null,
+      () => processAndDeleteStock({ stock }),
+      () => console.log("Delete canceled")
+    );
+  };
+
+  if (!stock || stock?.length == 0)
+    return <NotFound text="You have not added any stock yet..." />;
+  return (
+    <View
+      style={{
+        paddingLeft: 10,
+        paddingRight: 15,
+        paddingTop: 20,
+      }}
+    >
+      {stock?.map((s, index) => {
+        const vendor = vendors?.find((v) => v.id === s.vendor);
+        return (
+          <View
+            key={index}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              borderBottomWidth: 1,
+              borderBottomColor: "#EAEAEA",
+              marginBottom: 10,
+            }}
+          >
+            <Image
+              style={{
+                height: 65,
+                width: 65,
+                marginRight: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+              source={s?.image ? { uri: s.image } : Defaults.getDefaultImage()}
+            />
+            <View>
+              <Text style={{ fontSize: 15 }}>{s.name}</Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: "red" }}>
+                Rs {s.price}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: "bold",
+                  color: STYLES.theme.blue,
+                }}
+              >
+                {vendor?.name}
+              </Text>
+            </View>
+            <View style={{ marginLeft: "auto", flexDirection: "row" }}>
+              <TouchableOpacity
+                style={{ marginLeft: "auto" }}
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "universal-form",
+                    params: {
+                      page: FormPlaceholder.PAGES.STOCK,
+                      edit_id: s.id,
+                    },
+                  })
+                }
+              >
+                <Feather
+                  name="edit"
+                  size={24}
+                  color="green"
+                  style={{ marginRight: 15 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteStock(s)}>
+                <MaterialIcons name="delete-outline" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };

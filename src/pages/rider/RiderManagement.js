@@ -3,23 +3,61 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import ListContentDisplay from "./ListContentDisplay";
+import FormPlaceholder from "../forms/FormPlaceholder";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import {
+  deleteRoutineFromBackend,
+  processAndDeleteStock,
+  processAndDeleteVendor,
+} from "../../redux/actions/actions";
 
-export default function RiderManagement() {
+function RiderManagement({
+  navigation,
+  routines,
+  stock,
+  vendors,
+  user,
+  deleteVendor,
+  deleteStock,
+  deleteRoutine,
+}) {
   const buttons = [
-    { name: "Vendor", icon: "plus" },
-    { name: "Stock", icon: "plus" },
-    { name: "Routine", icon: "plus" },
+    {
+      name: "Vendor",
+      icon: "plus",
+      params: { page: FormPlaceholder.PAGES.VENDOR },
+    },
+    // {  ----- STOCK FXNALITY will be included later on in life
+    //   name: "Stock",
+    //   icon: "plus",
+    //   params: { page: FormPlaceholder.PAGES.STOCK, edit_id: 20 },
+    // },
+    {
+      name: "Routine",
+      icon: "plus",
+      params: { page: FormPlaceholder.PAGES.ROUTINE, edit_id: 9 },
+    },
   ];
 
   return (
     <View style={{ width: "100%", height: "100%", backgroundColor: "white" }}>
-      <BigPlusButtons buttons={buttons} />
-      <ListContentDisplay />
+      <BigPlusButtons buttons={buttons} navigation={navigation} />
+      <ListContentDisplay
+        routines={routines}
+        stock={stock}
+        vendors={vendors}
+        navigation={navigation}
+        user={user}
+        processAndDeleteVendor={deleteVendor}
+        processAndDeleteStock={deleteStock}
+        processAndDeleteRoutine={deleteRoutine}
+      />
     </View>
   );
 }
 
-const BigPlusButtons = ({ buttons }) => (
+const BigPlusButtons = ({ buttons, navigation }) => (
   <View
     style={{
       width: "100%",
@@ -30,6 +68,12 @@ const BigPlusButtons = ({ buttons }) => (
   >
     {buttons.map((btn, index) => (
       <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("singles", {
+            screen: "universal-form",
+            params: btn.params,
+          })
+        }
         key={index}
         style={{
           flexDirection: "column",
@@ -56,3 +100,25 @@ const BigPlusButtons = ({ buttons }) => (
     ))}
   </View>
 );
+
+export const mapStateToProps = (state) => {
+  return {
+    stock: state.stock,
+    routines: state.routines,
+    vendors: state.vendors,
+    user: state.user,
+  };
+};
+
+export const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      deleteVendor: processAndDeleteVendor,
+      deleteStock: processAndDeleteStock,
+      deleteRoutine: deleteRoutineFromBackend,
+    },
+    dispatch
+  );
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RiderManagement);

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "121356826295",
+    "project_id": "donkomi-dev-7c62b",
+    "storage_bucket": "donkomi-dev-7c62b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121356826295:android:a6c0ed90b22a5740b87f32",
+        "android_client_info": {
+          "package_name": "com.pongo.donkomireactnative"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121356826295-jejht09v4rhm1v1v0k6v1eb5dfiogcaa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pongo.donkomireactnative",
+            "certificate_hash": "0f027fa7cce078afbb4a56b606c72834f3bed333"
+          }
+        },
+        {
+          "client_id": "121356826295-bcpidhvi924rqac482spsbu2hhqo8pl2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl8XMYTLTPwMhu4umIhdeJLLc_4bWGtGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "121356826295-bcpidhvi924rqac482spsbu2hhqo8pl2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
