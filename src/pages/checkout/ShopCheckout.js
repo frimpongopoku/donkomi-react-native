@@ -1,16 +1,15 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Image, Text, View } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import FlatButton from "../../components/FlatButton";
-import burger from "./../../shared/images/burger.jpg";
-import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons";
-// import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import { Defaults } from "../../shared/classes/Defaults";
-import { pop } from "../../shared/utils";
+import { makeAlert, pop } from "../../shared/utils";
 import { summariseCartContent } from "../shop/MarketPlace";
 import NotFound from "../../components/NotFound";
-export default function ShopCheckout({ cart, modifyCart }) {
+export default function ShopCheckout({ cart, modifyCart, checkout }) {
+  const [loading, setLoading] = useState(false);
   const addToCart = (product) => {
     const [itemInCart, rest, index] = pop(
       product.id,
@@ -46,6 +45,20 @@ export default function ShopCheckout({ cart, modifyCart }) {
     modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
   };
 
+  const checkoutMyProducts = () => {
+    makeAlert(
+      "Checkout",
+      `You have ${cart?.numberOfItems} item(s) worth Rs ${cart?.totalPrice} in your cart, are you sure you want to complete this order?`,
+      { cancelable: true },
+      () => {
+        checkout();
+        setLoading(true);
+      },
+      () => {},
+      { okText: "Yes", cancelText: "No" }
+    );
+  };
+
   if (!cart || !cart?.basket || cart?.basket.length === 0)
     return (
       <NotFound text="No items in your cart yet, add from the market place..." />
@@ -70,6 +83,8 @@ export default function ShopCheckout({ cart, modifyCart }) {
         })}
       </ScrollView>
       <FlatButton
+        loading={loading}
+        onPress={() => checkoutMyProducts()}
         color="green"
         containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
         style={{ fontWeight: "bold" }}

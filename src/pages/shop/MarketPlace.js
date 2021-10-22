@@ -131,6 +131,7 @@ export default function MarketPlace({
             "product_id",
             cart?.basket || []
           );
+
           return (
             <View
               key={index.toString()}
@@ -168,24 +169,26 @@ export default function MarketPlace({
                 </TouchableOpacity>
               )}
               {/* ------- ADD TO CART BUTTON ------- */}
-              <TouchableOpacity
-                onPress={() => addToCart(product)}
-                style={{
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                  paddingTop: 8,
-                  paddingBottom: 8,
-                  backgroundColor: "white",
-                  position: "absolute",
-                  top: 5,
-                  right: 5,
-                  zIndex: 4,
-                  borderRadius: 3,
-                  elevation: 8,
-                }}
-              >
-                <FontAwesome5 name="plus" size={20} color="green" />
-              </TouchableOpacity>
+              {product?.creator?.user_id !== user?.user_id && (
+                <TouchableOpacity
+                  onPress={() => addToCart(product)}
+                  style={{
+                    paddingLeft: 10,
+                    paddingRight: 10,
+                    paddingTop: 8,
+                    paddingBottom: 8,
+                    backgroundColor: "white",
+                    position: "absolute",
+                    top: 5,
+                    right: 5,
+                    zIndex: 4,
+                    borderRadius: 3,
+                    elevation: 8,
+                  }}
+                >
+                  <FontAwesome5 name="plus" size={20} color="green" />
+                </TouchableOpacity>
+              )}
               <Image
                 source={
                   product?.image

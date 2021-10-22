@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { modifyCartAction } from "../../redux/actions/actions";
+import { checkoutAction, modifyCartAction } from "../../redux/actions/actions";
 import CustomTabView from "../../shared/components/CustomTabView";
 import { STYLES } from "../../shared/ui";
 import DeliveryCheckout from "./DeliveryCheckout";
@@ -16,10 +16,10 @@ class Checkout extends Component {
   ];
 
   renderScene = ({ route }) => {
-    const { cart, modifyCart } = this.props;
+    const { cart, modifyCart, checkout } = this.props;
     switch (route.key) {
       case "shop":
-        return <ShopCheckout cart={cart} modifyCart={modifyCart} />;
+        return <ShopCheckout cart={cart} modifyCart={modifyCart} checkout = {checkout} />;
       case "delivery":
         return <DeliveryCheckout />;
       default:
@@ -46,7 +46,7 @@ const mapStateToProps = (state) => {
   return { cart: state.cart };
 };
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ modifyCart: modifyCartAction }, dispatch);
+  return bindActionCreators({ modifyCart: modifyCartAction, checkout:checkoutAction }, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Checkout);

@@ -22,6 +22,7 @@ import {
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import {
+  CHECKOUT_PRODUCTS,
   DELETE_A_CAMPAIGN,
   DELETE_A_PRODUCT,
   DELETE_A_ROUTINE,
@@ -83,7 +84,8 @@ const compareAndGet = (values = [], comparisonType) => {
   const value1 = values[0];
   const value2 = values[1];
   if (comparisonType === "min") {
-    if (value1 < value2 && value1 !== 0) return value1; // no db id is ever equal to 0, so it just means this is the first time, return value2
+    if (value1 < value2 && value1 !== 0) return value1;
+    // no db id is ever equal to 0, so it just means this is the first time, return value2
     else return value2;
   }
   if (comparisonType === "max") {
@@ -107,16 +109,54 @@ export const logoutAction = () => {
   };
 };
 
+export const checkoutAction = () => {
+  return (dispatch, getState) => {
+    const { cart, user } = getState();
+    const basket = cart?.basket || [];
+    const packet = {};
+    // group all products according to sellers
+    basket.forEach((item) => {
+      const user_id = item?.product?.creator.user_id;
+      const sellerContent = packet[user_id];
+      const obj = {
+        qty: item.qty,
+        total_price: item.price,
+        product_id: item.product.id,
+        shop: item?.product?.shops[0].id,
+      };
+      if (sellerContent) packet[user_id] = [...sellerContent, obj];
+      else packet[user_id] = [obj];
+    });
+
+    InternetExplorer.roamAndFind(CHECKOUT_PRODUCTS, "POST", {
+      user_id: user?.user_id,
+      order_type: "PRODUCT_ORDER",
+      cart: packet,
+    })
+      .then((response) => {
+        if (!response) return;
+        if (!response.success)
+          return console.log(
+            "BACKEND_CHECKOUT_ERROR",
+            response.error?.message?.toString()
+          );
+        console.log("Checkout was successful!", response.data);
+        dispatch(modifyCartAction({}));
+      })
+      .catch((e) => console.log("CHECKOUT_ERROR", e?.toString()));
+  };
+};
+
 export const showFloatingModalActions = (
   props = { show: false, Jsx: null, close: true }
 ) => {
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
 
-export const modifyCartAction = (data ={}) => {
+export const modifyCartAction = (data = {}) => {
   return { type: MODIFY_CART, payload: data };
 };
-export const modifyMerchantCartAction = (data ={}) => {
+export const modifyMerchantCartAction = (data = {}) => {
   return { type: MODIFY_MERCHANT_CART, payload: data };
 };
 
@@ -147,7 +187,7 @@ export const setCampaignAction = (data = []) => {
 export const setMarketNewsAction = (data = []) => {
   return { type: SET_MARKET_NEWS, payload: data };
 };
-export const setMarketNewsParamsAction = (response ={}) => {
+export const setMarketNewsParamsAction = (response = {}) => {
   return { type: SET_MARKET_NEWS_PARAMS, payload: response };
 };
 
