@@ -5,6 +5,8 @@ import {
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_MARKET_NEWS,
+  SET_MARKET_NEWS_PARAMS,
   SET_ROUTINES,
   SET_STOCK,
   SET_USER_SHOPS,
@@ -107,6 +109,22 @@ export const setNewsParamsReducer = (
   action
 ) => {
   if (action.type === LOAD_NEWS) return action.payload;
+
+  return state;
+};
+export const marketNewsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_MARKET_NEWS) return action.payload;
+
+  return state;
+};
+export const marketNewsParamsReducer = (
+  state = null,
+  action
+) => {
+  if (action.type === SET_MARKET_NEWS_PARAMS) return action.payload;
 
   return state;
 };

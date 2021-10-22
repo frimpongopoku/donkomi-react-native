@@ -20,6 +20,8 @@ import {
   setCampaignAction,
   setDonkomiUserAction,
   setFirebaseAuthUserAction,
+  setMarketNewsAction,
+  setMarketNewsParamsAction,
   setNewsParamsAction,
   setRoutinesAction,
   setStockAction,
@@ -30,6 +32,7 @@ import {
 } from "./src/redux/actions/actions";
 import InternetExplorer from "./src/shared/classes/InternetExplorer";
 import {
+  GET_MARKET_NEWS,
   GET_NEWS_FEED,
   GET_REGISTERED_USER,
   WHO_AM_I,
@@ -113,10 +116,19 @@ class App extends React.Component {
     const { loadNews, setNewsParams } = this.props;
     InternetExplorer.roamAndFind(GET_NEWS_FEED, "POST", { user_id })
       .then((response) => {
-        loadNews( response?.data.feed); 
-        setNewsParams(response?.data)
+        loadNews(response?.data.feed);
+        setNewsParams(response?.data);
       })
       .catch((e) => console.log("NEWS_LOAD_ERROR:-> ", e?.toString()));
+  }
+  loadMarketNews(user_id) {
+    const { setMarketNews, setMarketNewsParams } = this.props;
+    InternetExplorer.roamAndFind(GET_MARKET_NEWS, "POST", { user_id })
+      .then((response) => {
+        setMarketNews(response?.data.feed);
+        setMarketNewsParams(response?.data);
+      })
+      .catch((e) => console.log("MARKET_NEWS_LOAD_ERROR:-> ", e?.toString()));
   }
   componentDidMount() {
     auth().onAuthStateChanged((user) => {
@@ -124,6 +136,7 @@ class App extends React.Component {
         this.props.setFirebaseAuthUser(user);
         this.fetchDonkomiUser(user.uid);
         this.loadNewsContent(user.uid);
+        this.loadMarketNews(user.uid);
         return;
       }
       this.setState({ loading: false });
@@ -223,6 +236,8 @@ const mapDispatchToProps = (dispatch) => {
       setCampaigns: setCampaignAction,
       loadNews: loadNewsAction,
       setNewsParams: setNewsParamsAction,
+      setMarketNews: setMarketNewsAction,
+      setMarketNewsParams: setMarketNewsParamsAction,
     },
     dispatch
   );

@@ -4,7 +4,7 @@ import { TabView, SceneMap } from "react-native-tab-view";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import YourProducts from "./YourProducts";
 import ShopOrders from "./ShopOrders";
-import Stock from "./Stock";
+import MarketPlace from "./MarketPlace";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import YourShops from "./YourShops";
@@ -13,6 +13,8 @@ import { bindActionCreators } from "redux";
 import {
   deleteAProductFromBackend,
   deleteAShopFromBackend,
+  setMarketNewsAction,
+  setMarketNewsParamsAction,
 } from "../../redux/actions/actions";
 import ShopCreationContainer from "./creation/ShopCreationContainer";
 
@@ -33,11 +35,31 @@ class ShopMainPage extends Component {
   ];
 
   renderScene = ({ route }) => {
-    const { products, shops, navigation, deleteProduct, deleteShop } =
-      this.props;
+    const {
+      products,
+      shops,
+      navigation,
+      deleteProduct,
+      deleteShop,
+      market,
+      marketParams,
+      setMarketContent,
+      setMarketParams,
+      user,
+    } = this.props;
     switch (route.key) {
       case "market":
-        return <Stock text={route.key} navigation={navigation} />;
+        return (
+          <MarketPlace
+            text={route.key}
+            navigation={navigation}
+            market={market}
+            marketParams={marketParams}
+            setMarketContent={setMarketContent}
+            setMarketParams={setMarketParams}
+            user={user}
+          />
+        );
       case "your-products":
         return (
           <YourProducts
@@ -143,6 +165,9 @@ const mapStateToProps = (state) => {
   return {
     products: state.products,
     shops: state.shops,
+    market: state.market,
+    markeParams: state.marketParams,
+    user: state.user,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -150,6 +175,8 @@ const mapDispatchToProps = (dispatch) => {
     {
       deleteShop: deleteAShopFromBackend,
       deleteProduct: deleteAProductFromBackend,
+      setMarketContent: setMarketNewsAction,
+      setMarketParams: setMarketNewsParamsAction,
     },
     dispatch
   );

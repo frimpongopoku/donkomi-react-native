@@ -13,3 +13,5 @@ export const SET_CAMPAIGNS= "SET_CAMPAIGNS";
 export const SET_STOCK = "SET_STOCK";
 export const LOAD_NEWS  = "LOAD_NEWS"; 
 export const SET_NEWS_PARAMS = "SET_NEWS_PARAMS";
+export const SET_MARKET_NEWS = "SET_MARKET_NEWS"; 
+export const SET_MARKET_NEWS_PARAMS =  "SET_MARKET_NEWS_PARAMS"; 

@@ -7,6 +7,8 @@ import {
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
+  SET_MARKET_NEWS,
+  SET_MARKET_NEWS_PARAMS,
   SET_NEWS_PARAMS,
   SET_ROUTINES,
   SET_STOCK,
@@ -131,6 +133,12 @@ export const setStockAction = (data = []) => {
 };
 export const setCampaignAction = (data = []) => {
   return { type: SET_CAMPAIGNS, payload: data };
+};
+export const setMarketNewsAction = (data = []) => {
+  return { type: SET_MARKET_NEWS, payload: data };
+};
+export const setMarketNewsParamsAction = (response ={}) => {
+  return { type: SET_MARKET_NEWS_PARAMS, payload: response };
 };
 
 export const putContentInStore = (type, load = []) => {
