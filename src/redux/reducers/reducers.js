@@ -97,12 +97,12 @@ export const marketNewsParamsReducer = (state = null, action) => {
 
   return state;
 };
-export const cartReducer = (state = null, action) => {
+export const cartReducer = (state = {}, action) => {
   if (action.type === MODIFY_CART) return action.payload;
 
   return state;
 };
-export const merchantCartReducer = (state = null, action) => {
+export const merchantCartReducer = (state = {}, action) => {
   if (action.type === MODIFY_MERCHANT_CART) return action.payload;
 
   return state;

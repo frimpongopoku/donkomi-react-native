@@ -113,10 +113,10 @@ export const showFloatingModalActions = (
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
 
-export const modifyCartAction = (data =[]) => {
+export const modifyCartAction = (data ={}) => {
   return { type: MODIFY_CART, payload: data };
 };
-export const modifyMerchantCartAction = (data =[]) => {
+export const modifyMerchantCartAction = (data ={}) => {
   return { type: MODIFY_MERCHANT_CART, payload: data };
 };
 

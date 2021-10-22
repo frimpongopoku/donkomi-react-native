@@ -48,6 +48,7 @@ class ShopMainPage extends Component {
       setMarketParams,
       user,
       modifyCart,
+      cart,
     } = this.props;
     switch (route.key) {
       case "market":
@@ -61,6 +62,7 @@ class ShopMainPage extends Component {
             setMarketParams={setMarketParams}
             user={user}
             modifyCart={modifyCart}
+            cart={cart}
           />
         );
       case "your-products":

@@ -43,3 +43,17 @@ export function getPropsArrayFromJsonArray(array, property) {
   array.forEach((item) => item && toGo.push(item[property]));
   return toGo;
 }
+
+export const pop = (value, field, array) => {
+  if (!array || !value || !field) return [];
+  const rest = [];
+  var foundIndex = -1;
+  const found = array.filter((item, index) => {
+    if (item[field] === value) {
+      foundIndex = index;
+      return item;
+    } else rest.push(item);
+  })[0];
+
+  return [found, rest, foundIndex];
+};
