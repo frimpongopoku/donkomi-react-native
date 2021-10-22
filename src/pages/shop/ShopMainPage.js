@@ -117,7 +117,10 @@ class ShopMainPage extends Component {
         break;
     }
   }
-  openCartPage() {}
+  openCartPage() {
+    const { navigation } = this.props;
+    navigation.navigate("singles", { screen: "checkout" });
+  }
   openShopCreationPage(isProduct) {
     const { navigation } = this.props;
     navigation.navigate("singles", {

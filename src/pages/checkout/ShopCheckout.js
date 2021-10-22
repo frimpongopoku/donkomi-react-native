@@ -1,31 +1,31 @@
 import React, { Component } from "react";
 import { Image, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import FlatButton from "../../components/FlatButton";
 import burger from "./../../shared/images/burger.jpg";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons";
+// import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
-export default class ShopCheckout extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1, backgroundColor: "white" }}>
+export default function ShopCheckout({}) {
+  return (
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView>
         <CheckoutItemCard />
         <CheckoutItemCard />
         <CheckoutItemCard />
-        <FlatButton
-          color="green"
-          containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
-          style={{ fontWeight: "bold", fontSize: 18 }}
-        >
-          Checkout ( Rs 5,678 )
-        </FlatButton>
-      </View>
-    );
-  }
+      </ScrollView>
+      <FlatButton
+        color="green"
+        containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
+        style={{ fontWeight: "bold" }}
+      >
+        Checkout ( Rs 5,678 )
+      </FlatButton>
+    </View>
+  );
 }
 
-export const CheckoutItemCard = (props) => {
+export const CheckoutItemCard = ({ product, qty, price }) => {
   return (
     <View
       style={{
@@ -41,21 +41,21 @@ export const CheckoutItemCard = (props) => {
     >
       <Image
         source={burger}
-        style={{ width: 90, height: 90, borderRadius: 6, marginRight: 15 }}
+        style={{ width: 80, height: 80, borderRadius: 6, marginRight: 15 }}
       />
 
       <View style={{ height: "100%", width: "100%", marginTop: 10 }}>
         <Text
           style={{
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: "bold",
             color: STYLES.theme.blue,
           }}
         >
           4K Burger Full Release
         </Text>
-        <Text style={{ fontSize: 16 }}>Sandra's Shop</Text>
-        <Text style={{ fontSize: 16, fontWeight: "bold", color: "green" }}>
+        <Text style={{}}>Sandra's Shop</Text>
+        <Text style={{ fontWeight: "bold", color: "green" }}>
           Rs 20,000 (60,000)
         </Text>
 
@@ -66,13 +66,14 @@ export const CheckoutItemCard = (props) => {
           }}
         >
           <TouchableOpacity>
-            <Feather name="minus-circle" size={24} color="red" />
+            {/* <Feather name="minus-circle" size={24} color="red" /> */}
+            <Entypo name="minus" color="red" size={25} />
           </TouchableOpacity>
           <Text style={{ margin: 10, fontSize: 17, fontWeight: "bold" }}>
             3
           </Text>
           <TouchableOpacity>
-            <Feather name="plus-circle" size={24} color="green" />
+            <Entypo name="plus" color="green" size={25} />
           </TouchableOpacity>
           <TouchableOpacity>
             <Text style={{ marginLeft: 20, color: "red" }}>Delete</Text>
