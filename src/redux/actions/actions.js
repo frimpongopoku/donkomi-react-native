@@ -109,7 +109,7 @@ export const logoutAction = () => {
   };
 };
 
-export const checkoutAction = () => {
+export const checkoutAction = (successJsx) => {
   return (dispatch, getState) => {
     const { cart, user } = getState();
     const basket = cart?.basket || [];
@@ -140,8 +140,10 @@ export const checkoutAction = () => {
             "BACKEND_CHECKOUT_ERROR",
             response.error?.message?.toString()
           );
-        console.log("Checkout was successful!", response.data);
         dispatch(modifyCartAction({}));
+        dispatch(
+          showFloatingModalActions({ show: true, Jsx: successJsx, close: true })
+        );
       })
       .catch((e) => console.log("CHECKOUT_ERROR", e?.toString()));
   };

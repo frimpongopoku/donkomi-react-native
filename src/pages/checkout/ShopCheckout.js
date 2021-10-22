@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Image, Text, View } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import FlatButton from "../../components/FlatButton";
-import { Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
 import { STYLES } from "../../shared/ui";
 import { Defaults } from "../../shared/classes/Defaults";
 import { makeAlert, pop } from "../../shared/utils";
@@ -51,7 +51,7 @@ export default function ShopCheckout({ cart, modifyCart, checkout }) {
       `You have ${cart?.numberOfItems} item(s) worth Rs ${cart?.totalPrice} in your cart, are you sure you want to complete this order?`,
       { cancelable: true },
       () => {
-        checkout();
+        checkout(<SuccessJSX />);
         setLoading(true);
       },
       () => {},
@@ -94,6 +94,45 @@ export default function ShopCheckout({ cart, modifyCart, checkout }) {
     </View>
   );
 }
+
+const SuccessJSX = () => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Feather
+        name="check-circle"
+        size={24}
+        color="green"
+        style={{ fontSize: 60 }}
+      />
+      {/* <AntDesign
+        name="checkcircle"
+        size={24}
+        color="green"
+        style={{ fontSize: 60 }}
+      /> */}
+      <Text
+        style={{
+          width: "70%",
+          marginTop: 20,
+          fontSize: 15,
+          textAlign: "center",
+          fontWeight: "bold",
+          color: "green",
+        }}
+      >
+        Congratulations! your order has been placed. You can view more details
+        about your order , in your order history.
+      </Text>
+    </View>
+  );
+};
 
 export const CheckoutItemCard = ({
   product,
