@@ -56,7 +56,7 @@ const OrderHistoryCard = ({
       onPress={() =>
         navigation.navigate("singles", {
           screen: "full-view",
-          params: { page: FULL_VIEW_PAGES.ORDER },
+          params: { page: FULL_VIEW_PAGES.ORDER, id },
         })
       }
       style={{

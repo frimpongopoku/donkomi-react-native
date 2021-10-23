@@ -41,7 +41,7 @@ class FullView extends Component {
   }
 
   fetchContentLocally() {
-    const { news = [], navigation } = this.props;
+    const { news = [], navigation, history } = this.props;
     const page = this.getCurrentPage();
     const params = this.getParams();
     var content;
@@ -59,26 +59,35 @@ class FullView extends Component {
       this.setState({ content });
     }
 
-    if (page === FULL_VIEW_PAGES.ORDER) this.setState({ content: "dfdsdf" });
+    if (page === FULL_VIEW_PAGES.ORDER) {
+      const id = this.getId();
+      const order = (history || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+
+      this.setState({ content: order });
+    }
   }
 
   fetchContentOnline() {}
 
   getComponentWithPage() {
     const { page, content } = this.state;
-    const { navigation, deleteProduct } = this.props;
+    const { navigation, deleteProduct, user } = this.props;
     switch (page) {
       case FULL_VIEW_PAGES.PRODUCT:
         return (
           <ProductFullView
             {...content}
-            user={this.props.user}
+            user={user}
             navigation={navigation}
             deleteProduct={deleteProduct}
           />
         );
       case FULL_VIEW_PAGES.ORDER:
-        return <OrderFullView />;
+        return (
+          <OrderFullView {...content} navigation={navigation} user={user} />
+        );
       default:
         return <Text>Dont have this page yet...</Text>;
     }
@@ -106,7 +115,7 @@ class FullView extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { news: state.news, user: state.user };
+  return { news: state.news, user: state.user, history: state.orderHistory };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
