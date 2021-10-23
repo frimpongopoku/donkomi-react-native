@@ -1,13 +1,25 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
-
+import BottomSheet from "react-native-raw-bottom-sheet";
+import Subtitle from "../../components/Subtitle";
+import { Space } from "../shop/creation/ShopCreationContainer";
 export default class OrderFullView extends Component {
   componentDidMount() {
     const { id, navigation } = this.props;
-    navigation.setOptions({ title: "Order #" + id });
+    navigation.setOptions({
+      title: "Order #" + id,
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 20 }}
+          onPress={() => this.bottomSheet?.open()}
+        >
+          <Text>Talk To Seller</Text>
+        </TouchableOpacity>
+      ),
+    });
   }
 
   render() {
@@ -43,7 +55,13 @@ export default class OrderFullView extends Component {
                   size={14}
                   color={STYLES.theme.blue}
                 />
-                <Text style={{ marginLeft: 6, color: STYLES.theme.blue, fontSize:13 }}>
+                <Text
+                  style={{
+                    marginLeft: 6,
+                    color: STYLES.theme.blue,
+                    fontSize: 13,
+                  }}
+                >
                   2nd July 2020
                 </Text>
               </View>
@@ -80,13 +98,12 @@ export default class OrderFullView extends Component {
                 color: STYLES.theme.blue,
                 borderColor: STYLES.theme.blue,
                 fontWeight: "bold",
-                // textTransform: "capitalize",
               }}
             >
               A list of the items in your order
             </Text>
             <View style={{ padding: 15 }}>
-              {[1, 2, 3, 4, 4, 5, 6].map((product, index) => {
+              {[1, 2, 3, 4].map((product, index) => {
                 return (
                   <View key={index.toString()}>
                     <OrderProductItem />
@@ -94,8 +111,37 @@ export default class OrderFullView extends Component {
                 );
               })}
             </View>
+            <Text
+              style={{
+                padding: 15,
+
+                borderBottomWidth: 1,
+                borderTopWidth: 1,
+                color: STYLES.theme.blue,
+                borderColor: STYLES.theme.blue,
+                fontWeight: "bold",
+              }}
+            >
+              Sandra's details
+            </Text>
+            <View style={{ padding: 15 }}>
+              <Text>You can contact the seller on any of these platforms</Text>
+              <Subtitle text="Phone Number" />
+              <Text>+230 45 65 43</Text>
+              <Space bottom={5} />
+              <Subtitle text="Whatsapp Number" />
+              <Text>+234 897382</Text>
+            </View>
           </View>
         </ScrollView>
+        <BottomSheet
+          ref={(el) => (this.bottomSheet = el)}
+          closeOnDragDown={true}
+          // minClosingHeight={200}
+          // height={500}
+        >
+          <Text>I am the first item here bro</Text>
+        </BottomSheet>
       </View>
     );
   }
