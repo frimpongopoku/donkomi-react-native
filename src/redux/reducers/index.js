@@ -17,6 +17,7 @@ import {
   marketNewsParamsReducer,
   merchantCartReducer,
   cartReducer,
+  setOrderHistoryReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -37,4 +38,5 @@ export default combineReducers({
   marketParams: marketNewsParamsReducer,
   cart: cartReducer,
   merchantCar: merchantCartReducer,
+  orderHistory: setOrderHistoryReducer,
 });

@@ -1,5 +1,26 @@
 import { Alert } from "react-native";
 
+export const getDetailsFromProductOrders = (arr) => {
+  var shopString="", image;
+  var quantity = 0;
+  var totalPrice = 0;
+  if (!arr) return {};
+  arr.forEach((item, index) => {
+    totalPrice += Number(item.total_price);
+    quantity += item.quantity;
+    if (!shopString) shopString = shopString + item?.product?.name;
+    else shopString = shopString + " , " + item?.product?.name;
+    if (index === 0) image = item.product?.image;
+  });
+
+  return { quantity, shopString, image, totalPrice };
+};
+export const getTotalPrice = (arr) => {
+  if (!arr) return;
+  var sum = 0;
+  arr.forEach((product) => (sum += Number(product?.total_price)));
+  return sum;
+};
 /**
  *
  * @param {*} title

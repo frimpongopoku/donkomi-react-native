@@ -3,9 +3,11 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { deleteAProductFromBackend } from "../../redux/actions/actions";
+import OrderFullView from "./OrderFullView";
 import ProductFullView from "./ProductFullView";
 export const FULL_VIEW_PAGES = {
   PRODUCT: "product",
+  ORDER: "order-full-view",
 };
 class FullView extends Component {
   PAGES = FULL_VIEW_PAGES;
@@ -56,6 +58,8 @@ class FullView extends Component {
         });
       this.setState({ content });
     }
+
+    if (page === FULL_VIEW_PAGES.ORDER) this.setState({ content: "dfdsdf" });
   }
 
   fetchContentOnline() {}
@@ -70,9 +74,11 @@ class FullView extends Component {
             {...content}
             user={this.props.user}
             navigation={navigation}
-            deleteProduct = {deleteProduct}
+            deleteProduct={deleteProduct}
           />
         );
+      case FULL_VIEW_PAGES.ORDER:
+        return <OrderFullView />;
       default:
         return <Text>Dont have this page yet...</Text>;
     }

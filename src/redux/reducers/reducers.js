@@ -9,6 +9,7 @@ import {
   SET_FIREBASE_AUTH_USER,
   SET_MARKET_NEWS,
   SET_MARKET_NEWS_PARAMS,
+  SET_ORDER_HISTORY,
   SET_ROUTINES,
   SET_STOCK,
   SET_USER_SHOPS,
@@ -104,6 +105,11 @@ export const cartReducer = (state = {}, action) => {
 };
 export const merchantCartReducer = (state = {}, action) => {
   if (action.type === MODIFY_MERCHANT_CART) return action.payload;
+
+  return state;
+};
+export const setOrderHistoryReducer = (state = [], action) => {
+  if (action.type === SET_ORDER_HISTORY) return action.payload;
 
   return state;
 };

@@ -23,6 +23,7 @@ import {
   setMarketNewsAction,
   setMarketNewsParamsAction,
   setNewsParamsAction,
+  setOrderHistoryAction,
   setRoutinesAction,
   setStockAction,
   setUserShopItemsAction,
@@ -58,6 +59,7 @@ class App extends React.Component {
         this.props.setStock(data.stock);
         this.props.setRoutines(data.routines);
         this.props.setCampaigns(data.campaigns);
+        this.props.loadOrderHistory(data.client_order_history);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -238,6 +240,7 @@ const mapDispatchToProps = (dispatch) => {
       setNewsParams: setNewsParamsAction,
       setMarketNews: setMarketNewsAction,
       setMarketNewsParams: setMarketNewsParamsAction,
+      loadOrderHistory: setOrderHistoryAction,
     },
     dispatch
   );

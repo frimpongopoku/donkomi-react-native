@@ -159,7 +159,7 @@ export default function MarketPlace({
                     position: "absolute",
                     bottom: 0,
                     right: 5,
-                    zIndex: 1,
+                    zIndex: 4,
                     elevation: 5,
                   }}
                 >

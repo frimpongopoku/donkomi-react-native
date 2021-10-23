@@ -12,6 +12,7 @@ import {
   SET_MARKET_NEWS,
   SET_MARKET_NEWS_PARAMS,
   SET_NEWS_PARAMS,
+  SET_ORDER_HISTORY,
   SET_ROUTINES,
   SET_STOCK,
   SET_USER_SHOPS,
@@ -97,6 +98,9 @@ const compareAndGet = (values = [], comparisonType) => {
 export const setDonkomiUserAction = (user = null) => {
   return { type: SET_DONKOMI_USER, payload: user };
 };
+export const setOrderHistoryAction = (data = []) => {
+  return { type: SET_ORDER_HISTORY, payload: data };
+};
 
 export const removeDonkomiUserAuthAction = () => {
   return setDonkomiUserAction();
@@ -111,7 +115,7 @@ export const logoutAction = () => {
 
 export const checkoutAction = (successJsx) => {
   return (dispatch, getState) => {
-    const { cart, user } = getState();
+    const { cart, user, orderHistory } = getState();
     const basket = cart?.basket || [];
     const packet = {};
     // group all products according to sellers
@@ -140,10 +144,13 @@ export const checkoutAction = (successJsx) => {
             "BACKEND_CHECKOUT_ERROR",
             response.error?.message?.toString()
           );
-        dispatch(modifyCartAction({}));
+        dispatch(modifyCartAction({})); // clear cart
+        //shop notification of checkout success
         dispatch(
           showFloatingModalActions({ show: true, Jsx: successJsx, close: true })
         );
+        // update order history in store with response data
+        dispatch(setOrderHistoryAction([...orderHistory, response.data]));
       })
       .catch((e) => console.log("CHECKOUT_ERROR", e?.toString()));
   };
