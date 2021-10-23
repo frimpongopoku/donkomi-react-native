@@ -1,4 +1,4 @@
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
 import React, { Component } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Defaults } from "../../shared/classes/Defaults";
@@ -6,6 +6,8 @@ import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
 import Subtitle from "../../components/Subtitle";
 import { Space } from "../shop/creation/ShopCreationContainer";
+import { getDetailsFromProductOrders } from "../../shared/utils";
+import DateHandler from "../../shared/classes/DateHandler";
 export default class OrderFullView extends Component {
   componentDidMount() {
     const { id, navigation } = this.props;
@@ -23,13 +25,24 @@ export default class OrderFullView extends Component {
   }
 
   render() {
+    const {
+      product_orders,
+      seller,
+      user,
+      created_at,
+      completed,
+      time_until_complete,
+    } = this.props;
+
+    const details = getDetailsFromProductOrders(product_orders);
+    const { totalPrice, shopString, quantity } = details || {};
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
           <View style={{ flexDirection: "row", marginBottom: 10, padding: 15 }}>
             <View>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                From Market Place
+                From {seller?.preferred_name}'s shop(s)
               </Text>
               <Text
                 style={{
@@ -40,9 +53,11 @@ export default class OrderFullView extends Component {
                   marginBottom: 6,
                 }}
               >
-                Rs 4,5678
+                Rs {totalPrice}
               </Text>
-              <Text style={{ color: "black" }}>You ordered 5 Items</Text>
+              <Text style={{ color: "black" }}>
+                You ordered {quantity} Items
+              </Text>
               <View
                 style={{
                   flexDirection: "row",
@@ -62,7 +77,7 @@ export default class OrderFullView extends Component {
                     fontSize: 13,
                   }}
                 >
-                  2nd July 2020
+                  {DateHandler.makeRelativeDate(new Date(created_at))}
                 </Text>
               </View>
             </View>
@@ -74,16 +89,21 @@ export default class OrderFullView extends Component {
                 alignItems: "flex-end",
               }}
             >
-              <FontAwesome name="hourglass-start" size={24} color="green" />
+              {completed ? (
+                <Feather name="check-circle" size={24} color="green" />
+              ) : (
+                <FontAwesome name="hourglass-start" size={24} color="green" />
+              )}
+
               <Text
                 style={{ fontWeight: "bold", color: "green", marginTop: 6 }}
               >
-                In Progress
+                {completed ? "Complete" : "In Progress"}
               </Text>
               <Text
                 style={{ fontWeight: "bold", color: "green", marginTop: 6 }}
               >
-                Will be complete in 50 minutes
+                {time_until_complete || "Will be with you shortly..."}
               </Text>
             </View>
           </View>
@@ -103,10 +123,10 @@ export default class OrderFullView extends Component {
               A list of the items in your order
             </Text>
             <View style={{ padding: 15 }}>
-              {[1, 2, 3, 4].map((product, index) => {
+              {product_orders?.map((productOrderObj, index) => {
                 return (
                   <View key={index.toString()}>
-                    <OrderProductItem />
+                    <OrderProductItem {...productOrderObj} seller={seller} />
                   </View>
                 );
               })}
@@ -122,15 +142,15 @@ export default class OrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              Sandra's details
+              Contact details for {seller?.preferred_name}
             </Text>
             <View style={{ padding: 15 }}>
               <Text>You can contact the seller on any of these platforms</Text>
               <Subtitle text="Phone Number" />
-              <Text>+230 45 65 43</Text>
+              <Text>{seller?.phone || "Not Provided"}</Text>
               <Space bottom={5} />
               <Subtitle text="Whatsapp Number" />
-              <Text>+234 897382</Text>
+              <Text>{seller?.whatsapp_number || "Not Provided"}</Text>
             </View>
           </View>
         </ScrollView>
@@ -147,7 +167,7 @@ export default class OrderFullView extends Component {
   }
 }
 
-const OrderProductItem = () => {
+const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
   return (
     <View
       style={{
@@ -167,12 +187,16 @@ const OrderProductItem = () => {
           borderRadius: 8,
           marginBottom: 10,
         }}
-        source={Defaults.getDefaultImage()}
+        source={
+          product?.image ? { uri: product?.image } : Defaults.getDefaultImage()
+        }
       />
 
       <View style={{ marginBottom: 10 }}>
-        <Text style={{ fontSize: 16 }}>Indomie perfume</Text>
-        <Text style={{ fontSize: 14, color: "grey" }}>From Sandra's Shop</Text>
+        <Text style={{ fontSize: 16 }}>{product?.name}</Text>
+        <Text style={{ fontSize: 14, color: "grey" }}>
+          From {shop?.name || "..."}
+        </Text>
         <Text
           style={{
             fontSize: 12,
@@ -180,7 +204,7 @@ const OrderProductItem = () => {
             color: "red",
           }}
         >
-          Rs 1,345
+          Rs {product?.price || 0.0}
         </Text>
         <Text
           style={{
@@ -202,10 +226,10 @@ const OrderProductItem = () => {
             fontSize: 16,
           }}
         >
-          X 3
+          X {quantity}
         </Text>
         <Text style={{ fontWeight: "bold", color: "red", fontSize: 18 }}>
-          Rs 5,674
+          Rs {total_price || 0.0}
         </Text>
       </View>
     </View>
