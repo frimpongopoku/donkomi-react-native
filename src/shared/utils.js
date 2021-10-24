@@ -15,6 +15,27 @@ export const getDetailsFromProductOrders = (arr) => {
 
   return { quantity, shopString, image, totalPrice };
 };
+
+
+
+export const getDetailsFromMerchantOrders = arr => { 
+  var vendorString = "", image, campaignName, campaignId; 
+  var totalEstimated = 0; 
+  if (!arr) return {};
+  arr.forEach( (item, index) => { 
+    if(!vendorString)  vendorString = item?.vendor?.name 
+    else vendorString = vendorString + " , " + item?.vendor?.name 
+    totalEstimated += Number(item.estimated_cost)
+    if (index === 0 ) { 
+      image = item?.vendor?.image; 
+      campaignName = item?.campaign?.title; 
+      campaignId = item?.campaign?.id;
+    }
+  })
+
+  return { vendorString, image, campaignName, campaignId, totalEstimated}
+  
+}
 export const getTotalPrice = (arr) => {
   if (!arr) return;
   var sum = 0;

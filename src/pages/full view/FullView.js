@@ -3,11 +3,13 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { deleteAProductFromBackend } from "../../redux/actions/actions";
+import CampaignOrderFullView from "./CampaignOrderFullView";
 import OrderFullView from "./OrderFullView";
 import ProductFullView from "./ProductFullView";
 export const FULL_VIEW_PAGES = {
   PRODUCT: "product",
   ORDER: "order-full-view",
+  MERCHANT_ORDER: "merchant-order-full-view",
 };
 class FullView extends Component {
   PAGES = FULL_VIEW_PAGES;
@@ -67,6 +69,14 @@ class FullView extends Component {
 
       this.setState({ content: order });
     }
+    if (page === FULL_VIEW_PAGES.MERCHANT_ORDER) {
+      const id = this.getId();
+      const order = (history || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+
+      this.setState({ content: order });
+    }
   }
 
   fetchContentOnline() {}
@@ -87,6 +97,14 @@ class FullView extends Component {
       case FULL_VIEW_PAGES.ORDER:
         return (
           <OrderFullView {...content} navigation={navigation} user={user} />
+        );
+      case FULL_VIEW_PAGES.MERCHANT_ORDER:
+        return (
+          <CampaignOrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+          />
         );
       default:
         return <Text>Dont have this page yet...</Text>;

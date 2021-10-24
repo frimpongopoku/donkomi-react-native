@@ -1,4 +1,9 @@
-import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import React, { Component } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Defaults } from "../../shared/classes/Defaults";
@@ -6,9 +11,9 @@ import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
 import Subtitle from "../../components/Subtitle";
 import { Space } from "../shop/creation/ShopCreationContainer";
-import { getDetailsFromMerchantOrders, getDetailsFromProductOrders } from "../../shared/utils";
+import { getDetailsFromMerchantOrders } from "../../shared/utils";
 import DateHandler from "../../shared/classes/DateHandler";
-export default class OrderFullView extends Component {
+export default class CampaignOrderFullView extends Component {
   componentDidMount() {
     const { id, navigation } = this.props;
     navigation.setOptions({
@@ -18,7 +23,7 @@ export default class OrderFullView extends Component {
           style={{ marginRight: 20 }}
           onPress={() => this.bottomSheet?.open()}
         >
-          <Text>Talk To Seller</Text>
+          <Text>Talk To Merchant</Text>
         </TouchableOpacity>
       ),
     });
@@ -26,7 +31,7 @@ export default class OrderFullView extends Component {
 
   render() {
     const {
-      product_orders,
+      merchant_orders,
       seller,
       user,
       created_at,
@@ -34,15 +39,15 @@ export default class OrderFullView extends Component {
       time_until_complete,
     } = this.props;
 
-    const details = getDetailsFromProductOrders(product_orders);
-    const { totalPrice, shopString, quantity } = details || {};
+    const merchantDetails = getDetailsFromMerchantOrders(merchant_orders);
+    const { totalEstimated, campaignName, campaignId } = merchantDetails || {};
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
           <View style={{ flexDirection: "row", marginBottom: 10, padding: 15 }}>
             <View>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                From {seller?.preferred_name}'s shop(s)
+                {campaignName || "..."}
               </Text>
               <Text
                 style={{
@@ -53,11 +58,9 @@ export default class OrderFullView extends Component {
                   marginBottom: 6,
                 }}
               >
-                Rs {totalPrice}
+                Rs {totalEstimated}
               </Text>
-              <Text style={{ color: "black" }}>
-                You ordered {quantity} Items
-              </Text>
+              <Text style={{ color: "black" }}>Trip #{campaignId}</Text>
               <View
                 style={{
                   flexDirection: "row",
@@ -92,7 +95,11 @@ export default class OrderFullView extends Component {
               {completed ? (
                 <Feather name="check-circle" size={24} color="green" />
               ) : (
-                <FontAwesome name="hourglass-start" size={24} color="green" />
+                <MaterialCommunityIcons
+                  name="truck-delivery"
+                  size={24}
+                  color="green"
+                />
               )}
 
               <Text
@@ -120,13 +127,13 @@ export default class OrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              A list of the items in your order
+              A list of orders you made to each vendor
             </Text>
             <View style={{ padding: 15 }}>
-              {product_orders?.map((productOrderObj, index) => {
+              {merchant_orders?.map((merchOrderObj, index) => {
                 return (
                   <View key={index.toString()}>
-                    <OrderProductItem {...productOrderObj} seller={seller} />
+                    <MerchantOrderItem {...merchOrderObj} seller={seller} />
                   </View>
                 );
               })}
@@ -134,7 +141,6 @@ export default class OrderFullView extends Component {
             <Text
               style={{
                 padding: 15,
-
                 borderBottomWidth: 1,
                 borderTopWidth: 1,
                 color: STYLES.theme.blue,
@@ -157,8 +163,6 @@ export default class OrderFullView extends Component {
         <BottomSheet
           ref={(el) => (this.bottomSheet = el)}
           closeOnDragDown={true}
-          // minClosingHeight={200}
-          // height={500}
         >
           <Text>I am the first item here bro</Text>
         </BottomSheet>
@@ -167,12 +171,18 @@ export default class OrderFullView extends Component {
   }
 }
 
-const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
+// ---------------------------------
+const MerchantOrderItem = ({
+  estimated_cost,
+  campaign,
+  vendor,
+  description,
+  real_cost = 456,
+}) => {
   return (
     <View
       style={{
         flexDirection: "row",
-        alignItems: "center",
         justifyContent: "flex-start",
         borderBottomWidth: 1,
         borderBottomColor: "#EAEAEA",
@@ -188,49 +198,41 @@ const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
           marginBottom: 10,
         }}
         source={
-          product?.image ? { uri: product?.image } : Defaults.getDefaultImage()
+          vendor?.image ? { uri: vendor?.image } : Defaults.getDefaultImage()
         }
       />
 
-      <View style={{ marginBottom: 10 }}>
-        <Text style={{ fontSize: 16 }}>{product?.name}</Text>
-        <Text style={{ fontSize: 14, color: "grey" }}>
-          From {shop?.name || "..."}
+      <View style={{ marginBottom: 10, flexDirection: "column" }}>
+        <Text
+          style={{ fontSize: 16, fontWeight: "bold", color: STYLES.theme.blue }}
+        >
+          {vendor?.name || "..."}
         </Text>
         <Text
           style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            color: "red",
+            flex: 1,
+            paddingRight: 80,
+            textAlign: "justify",
+            lineHeight: 18,
           }}
         >
-          Rs {product?.price || 0.0}
+          {description || "No description of order provided..."}
         </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            color: STYLES.theme.blue,
-          }}
-        >
-          Intermat
-        </Text>
-      </View>
-      <View style={{ marginLeft: "auto", marginRight: 10 }}>
-        <Text
-          style={{
-            fontWeight: "bold",
-            color: "green",
-            fontSize: 13,
-            textAlign: "right",
-            fontSize: 16,
-          }}
-        >
-          X {quantity}
-        </Text>
-        <Text style={{ fontWeight: "bold", color: "red", fontSize: 18 }}>
-          Rs {total_price || 0.0}
-        </Text>
+
+        <View style={{ marginTop: 10 }}>
+          <Text style={{ fontWeight: "bold", color: STYLES.theme.deepOrange }}>
+            Estimated Cost
+            {real_cost && <Text style={{ color: "green" }}> , Real Cost</Text>}
+          </Text>
+          <Text style={{ color: STYLES.theme.deepOrange, fontWeight: "bold" }}>
+            Rs {estimated_cost || 0.0}{" "}
+            {real_cost && (
+              <Text style={{ color: "green", fontWeight: "bold" }}>
+                , Rs {real_cost}
+              </Text>
+            )}
+          </Text>
+        </View>
       </View>
     </View>
   );
