@@ -1,3 +1,4 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -177,9 +178,13 @@ const MerchantOrderHistoryCard = ({
       />
       <View>
         <Text style={{ fontSize: 18 }}>Order #{id}</Text>
-        <Text style={{ fontSize: 14, color: "#DD6E0F" }}>
-          For trip #{campaignId}
-        </Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={{ fontSize: 14, color: "#DD6E0F", marginRight: 6 }}>
+            For campaign #{campaignId}
+          </Text>
+
+          <FontAwesome5 name="bus" size={20} color={STYLES.theme.deepOrange} />
+        </View>
 
         <Text
           style={{
