@@ -20,7 +20,7 @@ import { bindActionCreators } from "redux";
 import { GET_ONE_CAMPAIGN } from "../../shared/urls";
 import { FontAwesome5 } from "@expo/vector-icons";
 import DateHandler from "./../../shared/classes/DateHandler";
-
+import Defaults from "./../../shared/classes/Defaults";
 /**
  * load campaign from news locally
  * inflate the state
@@ -49,10 +49,12 @@ class PlaceOrder extends Component {
       (item) => item.id === id && item.routine && item.involved_vendors
     );
     if (!campaign) return this.setState({ found: "loading" });
+    const vendors = campaign?.involved_vendors;
     this.setState({
       found: "found",
       campaign,
-      vendors: campaign?.involved_vendors,
+      vendors,
+      selectedVendor: vendors ? vendors[0] : null,
     });
     this.fetchCampaignFromBackend();
   }
@@ -83,9 +85,27 @@ class PlaceOrder extends Component {
     this.fetchCampaignLocally();
   }
 
+  handleChange(value, fieldName) {
+    var { selectedVendor, drafts = {} } = this.state;
+    const old = drafts[selectedVendor?.id] || {};
+    drafts = {
+      ...drafts,
+      [selectedVendor?.id]: { ...old, [fieldName]: value },
+    };
+    this.setState({ drafts });
+  }
+
+  getValue(fieldName) {
+    const { selectedVendor, drafts } = this.state;
+
+    if (fieldName === "description")
+      return drafts[selectedVendor?.id]?.description;
+
+    return drafts[selectedVendor?.id]?.estimated_cost || "0.0";
+  }
   render() {
     const { navigation } = this.props;
-    const { found, campaign, vendors } = this.state;
+    const { found, campaign, vendors, selectedVendor } = this.state;
     if (found === "loading")
       return (
         <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -119,9 +139,9 @@ class PlaceOrder extends Component {
                 }}
               >
                 <Text
-                  style={{ fontSize: 24, fontWeight: "bold", color: "red" }}
+                  style={{ fontSize: 22, fontWeight: "bold", color: "red" }}
                 >
-                  + {fee}
+                  + Rs {fee}
                 </Text>
                 <Text style={{ color: "red" }}>Per Order</Text>
               </View>
@@ -132,29 +152,37 @@ class PlaceOrder extends Component {
                 alignItems: "center",
               }}
             >
-              {vendors?.map((item, index) => (
-                <TouchableOpacity
-                  key={index.toString()}
-                  style={{
-                    backgroundColor: "white",
-                    elevation: 6,
-                    borderRadius: 8,
-                    margin: 6,
-                  }}
-                >
-                  <Image
-                    source={burger}
+              {vendors?.map((vendor, index) => {
+                const isSelected = selectedVendor?.id === vendor?.id;
+                return (
+                  <TouchableOpacity
+                    onPress={() => this.setState({ selectedVendor: vendor })}
+                    key={index.toString()}
                     style={{
-                      width: 73,
-                      height: 70,
+                      backgroundColor: "white",
+                      elevation: 6,
                       borderRadius: 8,
-                      borderWidth: 3,
-                      padding: 10,
-                      borderColor: "whitesmoke",
+                      margin: 6,
                     }}
-                  />
-                </TouchableOpacity>
-              ))}
+                  >
+                    <Image
+                      source={
+                        vendor?.image
+                          ? { uri: vendor?.image }
+                          : Defaults.getDefaultImage()
+                      }
+                      style={{
+                        width: 73,
+                        height: 70,
+                        borderRadius: 8,
+                        borderWidth: 3,
+                        padding: 10,
+                        borderColor: isSelected ? "orange" : "whitesmoke",
+                      }}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
             </View>
             {vendors?.length > 1 && (
               <Text style={{ color: "grey" }}>
@@ -174,12 +202,16 @@ class PlaceOrder extends Component {
               fontSize: 15,
             }}
           >
-            Place an order for
-            <Text style={{ fontWeight: "bold" }}> "Tips Food Venture"</Text>
+            Place an order to
+            <Text style={{ fontWeight: "bold" }}>
+              {" "}
+              "{selectedVendor?.name}"
+            </Text>
           </Text>
 
           <TextInput
-            placeholder="Enter your order..."
+            onChangeText={(text) => this.handleChange(text, "description")}
+            placeholder="Enter your order... [ Eg. Rounder x 4, Fiver - spicy ]"
             style={{
               fontSize: 15,
               padding: 20,
@@ -189,12 +221,32 @@ class PlaceOrder extends Component {
               textAlignVertical: "top",
               fontSize: 17,
             }}
+            value={this.getValue("description")}
             multiline={true}
             numberOfLines={18}
           />
+          <View style={{ padding: 20 }}>
+            <Text style={{ color: STYLES.theme.blue }}>
+              How much do you think the order you made will cost?
+            </Text>
+            <TextInput
+              style={{
+                padding: 10,
+                borderColor: STYLES.theme.blue,
+                color: STYLES.theme.blue,
+                borderWidth: 1,
+                marginTop: 5,
+                fontSize: 17,
+              }}
+              onChangeText={(text) => this.handleChange(text, "estimated_cost")}
+              value={this.getValue("estimated_cost")}
+              keyboardType="numeric"
+              placeholder="Estimated Cost..."
+            />
+          </View>
           <View style={{ flexDirection: "row", padding: 20 }}>
             <View>
-              <Subtitle text="ESTIMATED TIME FOR DELIVERY" />
+              <Subtitle text="Estimated Time For Delivery" />
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 {run_time || "Very quickly..."}
               </Text>
