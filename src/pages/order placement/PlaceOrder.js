@@ -18,6 +18,9 @@ import InternetExplorer from "../../shared/classes/InternetExplorer";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { GET_ONE_CAMPAIGN } from "../../shared/urls";
+import { FontAwesome5 } from "@expo/vector-icons";
+import DateHandler from "./../../shared/classes/DateHandler";
+
 /**
  * load campaign from news locally
  * inflate the state
@@ -66,11 +69,14 @@ class PlaceOrder extends Component {
           return this.setState({ found: null });
         this.setState({
           campaign: response.data,
-          vendors: campaign?.involved_vendors,
+          vendors: response?.data?.involved_vendors,
           found: "found",
         });
       })
-      .catch((e) => this.setState({ found: null }));
+      .catch((e) => {
+        this.setState({ found: null });
+        console.log("I AM THE ERROR", e.toString());
+      });
   }
 
   componentDidMount() {
@@ -79,8 +85,7 @@ class PlaceOrder extends Component {
 
   render() {
     const { navigation } = this.props;
-    const { found, campaign } = this.state;
-    console.log("I AM TEH FOUND CAMPAIGN BUDA-----> ", campaign);
+    const { found, campaign, vendors } = this.state;
     if (found === "loading")
       return (
         <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -92,19 +97,42 @@ class PlaceOrder extends Component {
       return (
         <NotFound text="Sorry, we could not find the campaign you were looking for..." />
       );
+    const { created_at, title, duration, run_time, fee, routine } =
+      campaign || {};
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
           <View style={{ padding: 15 }}>
-            <Subtitle text="Shops you can order from" />
-
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View>
+                <Subtitle text={title || "Default campaign name..."} />
+                <Text>Here are vendors you can order from </Text>
+                <Text style={{ marginBottom: 10, color: "grey", fontSize: 13 }}>
+                  Posted: {DateHandler.makeRelativeDate(new Date(created_at))}
+                </Text>
+              </View>
+              <View
+                style={{
+                  marginLeft: "auto",
+                  alignItems: "flex-end",
+                  marginRight: 5,
+                }}
+              >
+                <Text
+                  style={{ fontSize: 24, fontWeight: "bold", color: "red" }}
+                >
+                  + {fee}
+                </Text>
+                <Text style={{ color: "red" }}>Per Order</Text>
+              </View>
+            </View>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
               }}
             >
-              {[1, 2, 3].map((item, index) => (
+              {vendors?.map((item, index) => (
                 <TouchableOpacity
                   key={index.toString()}
                   style={{
@@ -128,6 +156,11 @@ class PlaceOrder extends Component {
                 </TouchableOpacity>
               ))}
             </View>
+            {vendors?.length > 1 && (
+              <Text style={{ color: "grey" }}>
+                Click vendor to start writing your order...
+              </Text>
+            )}
           </View>
 
           <Text
@@ -154,11 +187,35 @@ class PlaceOrder extends Component {
               marginTop: 10,
               borderRadius: 2,
               textAlignVertical: "top",
+              fontSize: 17,
             }}
             multiline={true}
-            numberOfLines={30}
+            numberOfLines={18}
           />
+          <View style={{ flexDirection: "row", padding: 20 }}>
+            <View>
+              <Subtitle text="ESTIMATED TIME FOR DELIVERY" />
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                {run_time || "Very quickly..."}
+              </Text>
+            </View>
+            <View style={{ marginLeft: "auto", alignItems: "flex-end" }}>
+              <FontAwesome5 name="bus" size={40} color="green" />
+              <Text style={{ color: "green" }}>LEAVING IN </Text>
+              <Text style={{ fontSize: 25, color: "green" }}>
+                {duration || "Very soon..."}
+              </Text>
+            </View>
+          </View>
+          <Text style={{ paddingLeft: 20, paddingRight: 20 }}>
+            Trip organised and run by{" "}
+            <Text style={{ fontWeight: "bold" }}>
+              @{routine?.creator?.preferred_name || "A Donkomi User..."}
+            </Text>
+          </Text>
+          <View style={{ marginBottom: 70 }}></View>
         </ScrollView>
+
         <FlatButton
           onPress={() => navigation.navigate("dashboard")}
           color="green"
@@ -172,7 +229,7 @@ class PlaceOrder extends Component {
             }}
           >
             <Text style={{ color: "white", fontSize: 15 }}>
-              Add Custom Order
+              Add My Order To Cart
             </Text>
           </View>
         </FlatButton>
