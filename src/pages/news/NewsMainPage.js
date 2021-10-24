@@ -252,6 +252,7 @@ export const CampaignNewsCard = ({
   created_at,
   involved_vendors,
   run_time,
+  id,
 }) => {
   // console.log("I am the involved vendros", involved_vendors);
   return (
@@ -335,7 +336,10 @@ export const CampaignNewsCard = ({
 
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("singles", { screen: "place-routine-order" })
+          navigation.navigate("singles", {
+            screen: "place-routine-order",
+            params: { campaign_id: id },
+          })
         }
         style={{
           padding: 15,
