@@ -21,6 +21,9 @@ import { GET_ONE_CAMPAIGN } from "../../shared/urls";
 import { FontAwesome5 } from "@expo/vector-icons";
 import DateHandler from "./../../shared/classes/DateHandler";
 import Defaults from "./../../shared/classes/Defaults";
+import { addToCampaignCartAction } from "../../redux/actions/actions";
+import BottomSheet from "react-native-raw-bottom-sheet";
+import { makeAlert } from "../../shared/utils";
 /**
  * load campaign from news locally
  * inflate the state
@@ -33,7 +36,7 @@ class PlaceOrder extends Component {
     this.state = {
       vendors: null,
       selectedVendor: null,
-      drafts: {},
+      drafts: null,
       found: "loading",
       campaign: null,
     };
@@ -86,8 +89,8 @@ class PlaceOrder extends Component {
   }
 
   handleChange(value, fieldName) {
-    var { selectedVendor, drafts = {} } = this.state;
-    const old = drafts[selectedVendor?.id] || {};
+    var { selectedVendor, drafts } = this.state;
+    const old = (drafts || {})[selectedVendor?.id] || {};
     drafts = {
       ...drafts,
       [selectedVendor?.id]: { ...old, [fieldName]: value },
@@ -96,12 +99,12 @@ class PlaceOrder extends Component {
   }
 
   getValue(fieldName) {
-    const { selectedVendor, drafts } = this.state;
-
+    var { selectedVendor, drafts } = this.state;
+    drafts = drafts || {};
     if (fieldName === "description")
       return drafts[selectedVendor?.id]?.description;
 
-    return drafts[selectedVendor?.id]?.estimated_cost || "0.0";
+    return drafts[selectedVendor?.id]?.estimated_cost;
   }
   render() {
     const { navigation } = this.props;
@@ -269,7 +272,14 @@ class PlaceOrder extends Component {
         </ScrollView>
 
         <FlatButton
-          onPress={() => navigation.navigate("dashboard")}
+          onPress={() => {
+            if (!this.state.drafts || this.state.drafts === {})
+              return makeAlert(
+                "Empty",
+                "You have not put in your order yet..."
+              );
+            this.bottomSheet?.open();
+          }}
           color="green"
           containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
         >
@@ -285,6 +295,17 @@ class PlaceOrder extends Component {
             </Text>
           </View>
         </FlatButton>
+        <BottomSheet
+          ref={(el) => (this.bottomSheet = el)}
+          closeOnDragDown={true}
+          height={500}
+        >
+          <OrderSummary
+            drafts={this.state.drafts}
+            vendors={this.state.vendors}
+            fee={fee}
+          />
+        </BottomSheet>
       </View>
     );
   }
@@ -294,13 +315,100 @@ const mapStateToProps = (store) => {
   return {
     user: store.user,
     news: store.news,
+    campaignCart: store.campaignCart,
   };
 };
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators(
+    {
+      addCampaignOrderToCart: addToCampaignCartAction,
+    },
+    dispatch
+  );
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlaceOrder);
+
+const OrderSummary = ({ drafts, vendors, fee }) => {
+  var totalEstimated = 0;
+
+  Object.keys(drafts || {}).forEach((vendor_id) => {
+    const content = drafts[vendor_id];
+    totalEstimated += Number(content?.estimated_cost);
+  });
+  const renderOrdersForVendors = () => {
+    return Object.keys(drafts || {}).map((vendor_id, index) => {
+      const content = drafts[vendor_id];
+      const vendor = vendors?.find(
+        (v) => v.id?.toString() === vendor_id.toString()
+      );
+      return (
+        <View key={index.toString()} style={{ marginBottom: 6 }}>
+          <Text style={{ fontWeight: "bold", marginBottom: 6 }}>
+            {vendor?.name || "Vendor name..."}
+          </Text>
+          <Text>{content?.description}</Text>
+          <Text style={{ color: "red", fontWeight: "bold" }}>
+            Rs {content?.estimated_cost || 0.0}
+          </Text>
+        </View>
+      );
+    });
+  };
+
+  return (
+    <View
+      style={{
+        height: "100%",
+      }}
+    >
+      <ScrollView style={{ padding: 20 }}>
+        <Subtitle text="Here is a summary of orders you have in place..." />
+
+        {renderOrdersForVendors()}
+        <Text style={{ fontWeight: "bold" }}>Total Estimated Cost</Text>
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 20,
+            color: "red",
+            marginBottom: 10,
+          }}
+        >
+          Rs {totalEstimated || 0.0} + Rs {fee || 0.0}
+        </Text>
+        <Text style={{ fontWeight: "bold", color: "green" }}>
+          Amount Payable
+        </Text>
+        <Text style={{ fontWeight: "bold", fontSize: 20, color: "green" }}>
+          Rs {Number(fee) + Number(totalEstimated)}
+        </Text>
+        <Text
+          style={{
+            padding: 10,
+            borderWidth: 1,
+            marginBottom: 120,
+            // fontWeight: "bold",
+            color: STYLES.theme.deepOrange,
+            borderColor: STYLES.theme.deepOrange,
+            borderRadius: 5,
+            marginTop: 10,
+          }}
+        >
+          Note: The amount payable is subject to change. The cost of the items
+          you have noted might have changed by the time the merchant runs the
+          errand and makes the purchases for you.
+        </Text>
+      </ScrollView>
+      <FlatButton
+        containerStyle={{ position: "absolute", bottom: 25, width: "100%" }}
+        color="green"
+      >
+        Yes, I Want To Proceed
+      </FlatButton>
+    </View>
+  );
+};
 
 // ------------------ THIS FEATURE WILL BE ADDED LATER ON ---------------
 const DeliveryShopItemCard = (props) => {

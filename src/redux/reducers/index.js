@@ -18,6 +18,7 @@ import {
   merchantCartReducer,
   cartReducer,
   setOrderHistoryReducer,
+  campaignCartReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -39,4 +40,5 @@ export default combineReducers({
   cart: cartReducer,
   merchantCar: merchantCartReducer,
   orderHistory: setOrderHistoryReducer,
+  campaignCart: campaignCartReducer
 });

@@ -19,6 +19,7 @@ import {
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
   SHOW_FLOATING_MODAL,
+  UPDATE_CAMPAIGN_CART,
 } from "./constants";
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
@@ -302,4 +303,8 @@ const deleteContentFromBackend = (URL, body) => {
 const removeItemFromRedux = (list = [], key, value, type) => {
   const rem = list.filter((itm) => itm[key] !== value);
   return { type, payload: rem };
+};
+
+export const addToCampaignCartAction = (cart = {}) => {
+  return { type: UPDATE_CAMPAIGN_CART, payload: cart };
 };

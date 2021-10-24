@@ -16,6 +16,7 @@ import {
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
   SHOW_FLOATING_MODAL,
+  UPDATE_CAMPAIGN_CART,
 } from "../actions/constants";
 
 export const doNothingReducer = (state = null, action) => {
@@ -110,6 +111,11 @@ export const merchantCartReducer = (state = {}, action) => {
 };
 export const setOrderHistoryReducer = (state = [], action) => {
   if (action.type === SET_ORDER_HISTORY) return action.payload;
+
+  return state;
+};
+export const campaignCartReducer = (state = {}, action) => {
+  if (action.type === UPDATE_CAMPAIGN_CART) return action.payload;
 
   return state;
 };
