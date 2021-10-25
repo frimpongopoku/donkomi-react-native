@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { checkoutAction, modifyCartAction } from "../../redux/actions/actions";
+import {
+  checkoutAction,
+  modifyCartAction,
+  addToCampaignCartAction,
+} from "../../redux/actions/actions";
 import CustomTabView from "../../shared/components/CustomTabView";
 import { STYLES } from "../../shared/ui";
 import DeliveryCheckout from "./DeliveryCheckout";
@@ -17,8 +21,16 @@ class Checkout extends Component {
   ];
 
   renderScene = ({ route }) => {
-    const { cart, modifyCart, checkout, user, orderHistory, navigation } =
-      this.props;
+    const {
+      cart,
+      modifyCart,
+      checkout,
+      user,
+      orderHistory,
+      navigation,
+      campaignCart,
+      modifyCampaignCart,
+    } = this.props;
     switch (route.key) {
       case "shop":
         return (
@@ -29,7 +41,13 @@ class Checkout extends Component {
           />
         );
       case "delivery":
-        return <DeliveryCheckout />;
+        return (
+          <DeliveryCheckout
+            navigation={navigation}
+            cart={campaignCart}
+            modifyCampaignCart={modifyCampaignCart}
+          />
+        );
       case "history":
         return (
           <OrderHistory
@@ -59,11 +77,19 @@ class Checkout extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { cart: state.cart, orderHistory: state.orderHistory };
+  return {
+    cart: state.cart,
+    orderHistory: state.orderHistory,
+    campaignCart: state.campaignCart,
+  };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { modifyCart: modifyCartAction, checkout: checkoutAction },
+    {
+      modifyCart: modifyCartAction,
+      checkout: checkoutAction,
+      modifyCampaignCart: addToCampaignCartAction,
+    },
     dispatch
   );
 };

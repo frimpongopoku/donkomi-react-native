@@ -1,13 +1,14 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import {
   ActivityIndicator,
   Image,
   ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 import FlatButton from "../../components/FlatButton";
 import burger from "./../../shared/images/burger.jpg";
 import { STYLES } from "./../../shared/ui";
@@ -24,12 +25,6 @@ import Defaults from "./../../shared/classes/Defaults";
 import { addToCampaignCartAction } from "../../redux/actions/actions";
 import BottomSheet from "react-native-raw-bottom-sheet";
 import { makeAlert } from "../../shared/utils";
-/**
- * load campaign from news locally
- * inflate the state
- * While that is done, fetch the campaign from backend for any updates and inflate that state again,
- * then replace the news array with the current campaign from the backend so everything is updated
- */
 class PlaceOrder extends Component {
   constructor(props) {
     super(props);
@@ -39,7 +34,10 @@ class PlaceOrder extends Component {
       drafts: null,
       found: "loading",
       campaign: null,
+      done: false,
     };
+    this.sendToRedux = this.sendToRedux.bind(this);
+    this.setDone = this.setDone.bind(this);
   }
   getId() {
     const { route } = this.props;
@@ -80,7 +78,7 @@ class PlaceOrder extends Component {
       })
       .catch((e) => {
         this.setState({ found: null });
-        console.log("I AM THE ERROR", e.toString());
+        console.log("BACKEND_CAMPAIGN_FETCH_ERROR", e.toString());
       });
   }
 
@@ -93,9 +91,13 @@ class PlaceOrder extends Component {
     const old = (drafts || {})[selectedVendor?.id] || {};
     drafts = {
       ...drafts,
-      [selectedVendor?.id]: { ...old, [fieldName]: value },
+      [selectedVendor?.id]: {
+        ...old,
+        [fieldName]: value,
+        vendor: selectedVendor,
+      },
     };
-    this.setState({ drafts });
+    this.setState({ drafts, done: false });
   }
 
   getValue(fieldName) {
@@ -103,11 +105,37 @@ class PlaceOrder extends Component {
     drafts = drafts || {};
     if (fieldName === "description")
       return drafts[selectedVendor?.id]?.description;
-
     return drafts[selectedVendor?.id]?.estimated_cost;
   }
+  sendToRedux(params) {
+    const { drafts, campaign } = this.state;
+    const { campaignCart, addCampaignOrderToCart } = this.props;
+    // var { totalNumberOfOrdersInCart, estimatedTotalOfCartItems } =
+    //   campaignCart || {};
+    // totalNumberOfOrdersInCart = (totalNumberOfOrdersInCart || 0) + 1;
+    // estimatedTotalOfCartItems =
+    //   (estimatedTotalOfCartItems || 0) + (params?.estimatedTotal || 0);
+    addCampaignOrderToCart({
+      basket: {
+        ...(campaignCart.basket || {}),
+        //add order to redux object for campaign cart by using the campaign id as key
+        [this.getId()]: {
+          orders: { ...drafts },
+          summary: { ...(params || {}) },
+          campaign: {
+            id: campaign?.id,
+            title: campaign?.title,
+            fee: campaign?.fee,
+          },
+        },
+      },
+    });
+  }
+  setDone(value) {
+    this.setState({ done: value });
+  }
   render() {
-    const { navigation } = this.props;
+    const { navigation, campaignCart } = this.props;
     const { found, campaign, vendors, selectedVendor } = this.state;
     if (found === "loading")
       return (
@@ -120,8 +148,11 @@ class PlaceOrder extends Component {
       return (
         <NotFound text="Sorry, we could not find the campaign you were looking for..." />
       );
+
+    console.log("I AM THE CMAPAING CART ---------> ", campaignCart);
     const { created_at, title, duration, run_time, fee, routine } =
       campaign || {};
+    const description = this.getValue("description");
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
@@ -206,10 +237,7 @@ class PlaceOrder extends Component {
             }}
           >
             Place an order to
-            <Text style={{ fontWeight: "bold" }}>
-              {" "}
-              "{selectedVendor?.name}"
-            </Text>
+            <Text style={{ fontWeight: "bold" }}>"{selectedVendor?.name}"</Text>
           </Text>
 
           <TextInput
@@ -228,25 +256,29 @@ class PlaceOrder extends Component {
             multiline={true}
             numberOfLines={18}
           />
-          <View style={{ padding: 20 }}>
-            <Text style={{ color: STYLES.theme.blue }}>
-              How much do you think the order you made will cost?
-            </Text>
-            <TextInput
-              style={{
-                padding: 10,
-                borderColor: STYLES.theme.blue,
-                color: STYLES.theme.blue,
-                borderWidth: 1,
-                marginTop: 5,
-                fontSize: 17,
-              }}
-              onChangeText={(text) => this.handleChange(text, "estimated_cost")}
-              value={this.getValue("estimated_cost")}
-              keyboardType="numeric"
-              placeholder="Estimated Cost..."
-            />
-          </View>
+          {description ? (
+            <View style={{ padding: 20 }}>
+              <Text style={{ color: STYLES.theme.blue }}>
+                How much do you think the order you made will cost?
+              </Text>
+              <TextInput
+                style={{
+                  padding: 10,
+                  borderColor: STYLES.theme.blue,
+                  color: STYLES.theme.blue,
+                  borderWidth: 1,
+                  marginTop: 5,
+                  fontSize: 17,
+                }}
+                onChangeText={(text) =>
+                  this.handleChange(text, "estimated_cost")
+                }
+                value={this.getValue("estimated_cost")}
+                keyboardType="numeric"
+                placeholder="Estimated Cost..."
+              />
+            </View>
+          ) : null}
           <View style={{ flexDirection: "row", padding: 20 }}>
             <View>
               <Subtitle text="Estimated Time For Delivery" />
@@ -295,15 +327,20 @@ class PlaceOrder extends Component {
             </Text>
           </View>
         </FlatButton>
+
         <BottomSheet
           ref={(el) => (this.bottomSheet = el)}
           closeOnDragDown={true}
           height={500}
         >
           <OrderSummary
+            navigation={navigation}
+            done={this.state.done}
             drafts={this.state.drafts}
             vendors={this.state.vendors}
+            setDone={this.setDone}
             fee={fee}
+            sendToRedux={this.sendToRedux}
           />
         </BottomSheet>
       </View>
@@ -329,12 +366,22 @@ const mapDispatchToProps = (dispatch) => {
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlaceOrder);
 
-const OrderSummary = ({ drafts, vendors, fee }) => {
+const OrderSummary = ({
+  drafts,
+  vendors,
+  fee,
+  sendToRedux,
+  done,
+  setDone,
+  navigation,
+}) => {
   var totalEstimated = 0;
+  var numberOfOrders = 0;
 
   Object.keys(drafts || {}).forEach((vendor_id) => {
     const content = drafts[vendor_id];
-    totalEstimated += Number(content?.estimated_cost);
+    totalEstimated += Number(content?.estimated_cost || 0);
+    numberOfOrders += 1;
   });
   const renderOrdersForVendors = () => {
     return Object.keys(drafts || {}).map((vendor_id, index) => {
@@ -342,20 +389,92 @@ const OrderSummary = ({ drafts, vendors, fee }) => {
       const vendor = vendors?.find(
         (v) => v.id?.toString() === vendor_id.toString()
       );
+      const description = content?.description;
+      const cost = content?.estimated_cost;
       return (
         <View key={index.toString()} style={{ marginBottom: 6 }}>
           <Text style={{ fontWeight: "bold", marginBottom: 6 }}>
             {vendor?.name || "Vendor name..."}
           </Text>
-          <Text>{content?.description}</Text>
+          <Text>{description}</Text>
           <Text style={{ color: "red", fontWeight: "bold" }}>
-            Rs {content?.estimated_cost || 0.0}
+            Rs {cost || 0.0}
           </Text>
         </View>
       );
     });
   };
-
+  if (done)
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          zIndex: 2,
+        }}
+      >
+        <Feather name="check-circle" size={50} color="green" />
+        <Text
+          style={{
+            marginTop: 10,
+            width: "60%",
+            // color: "green",
+            fontWeight: "bold",
+            marginBottom: 5,
+          }}
+        >
+          Nice! Your orders have been added, you may now go to your cart to
+          checkout, or visit the market place to shop some more.
+        </Text>
+        <View style={{ marginTop: 6 }}>
+          <TouchableOpacity
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+            onPress={() => navigation.navigate("dashboard", { screen: "Shop" })}
+          >
+            <Text
+              style={{
+                borderBottomWidth: 1,
+                borderColor: "green",
+                color: "green",
+              }}
+            >
+              Continue Shopping on market place..
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+            onPress={() => navigation.navigate("dashboard", { screen: "News" })}
+          >
+            <Text
+              style={{
+                borderBottomWidth: 1,
+                borderColor: "green",
+                color: "green",
+              }}
+            >
+              Find more campaigns to place my orders...
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+            onPress={() =>
+              navigation.navigate("singles", { screen: "checkout" })
+            }
+          >
+            <Text
+              style={{
+                borderBottomWidth: 1,
+                borderColor: "green",
+                color: "green",
+              }}
+            >
+              Checkout my cart items...
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   return (
     <View
       style={{
@@ -381,14 +500,13 @@ const OrderSummary = ({ drafts, vendors, fee }) => {
           Amount Payable
         </Text>
         <Text style={{ fontWeight: "bold", fontSize: 20, color: "green" }}>
-          Rs {Number(fee) + Number(totalEstimated)}
+          Rs {Number(fee) + Number(totalEstimated || 0)}
         </Text>
         <Text
           style={{
             padding: 10,
             borderWidth: 1,
             marginBottom: 120,
-            // fontWeight: "bold",
             color: STYLES.theme.deepOrange,
             borderColor: STYLES.theme.deepOrange,
             borderRadius: 5,
@@ -401,6 +519,10 @@ const OrderSummary = ({ drafts, vendors, fee }) => {
         </Text>
       </ScrollView>
       <FlatButton
+        onPress={() => {
+          setDone(true);
+          sendToRedux({ numberOfOrders, estimatedTotal: totalEstimated });
+        }}
         containerStyle={{ position: "absolute", bottom: 25, width: "100%" }}
         color="green"
       >
