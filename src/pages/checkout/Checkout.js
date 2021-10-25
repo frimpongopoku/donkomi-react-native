@@ -6,6 +6,7 @@ import {
   checkoutAction,
   modifyCartAction,
   addToCampaignCartAction,
+  setOrderHistoryAction,
 } from "../../redux/actions/actions";
 import CustomTabView from "../../shared/components/CustomTabView";
 import { STYLES } from "../../shared/ui";
@@ -30,6 +31,7 @@ class Checkout extends Component {
       navigation,
       campaignCart,
       modifyCampaignCart,
+      setOrderHistory,
     } = this.props;
     switch (route.key) {
       case "shop":
@@ -46,6 +48,8 @@ class Checkout extends Component {
             navigation={navigation}
             cart={campaignCart}
             modifyCampaignCart={modifyCampaignCart}
+            user={user}
+            setOrderHistory={setOrderHistory}
           />
         );
       case "history":
@@ -78,6 +82,7 @@ class Checkout extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    user: state.user,
     cart: state.cart,
     orderHistory: state.orderHistory,
     campaignCart: state.campaignCart,
@@ -89,6 +94,7 @@ const mapDispatchToProps = (dispatch) => {
       modifyCart: modifyCartAction,
       checkout: checkoutAction,
       modifyCampaignCart: addToCampaignCartAction,
+      setOrderHistory: setOrderHistoryAction,
     },
     dispatch
   );

@@ -1,93 +1,135 @@
 import { Entypo } from "@expo/vector-icons";
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import FlatButton from "../../components/FlatButton";
 import NotFound from "../../components/NotFound";
 import { STYLES } from "../../shared/ui";
 import { Defaults } from "./../../shared/classes/Defaults";
+import InternetExplorer from "./../../shared/classes/InternetExplorer";
+import { makeAlert } from "./../../shared/utils";
+import {
+  CHECKOUT_CAMPAIGN_ORDER,
+  CHECKOUT_ONE_CAMPAIGN_ORDER_BASKET,
+} from "../../shared/urls";
+export default function DeliveryCheckout({
+  modifyCampaignCart,
+  cart,
+  navigation,
+  setOrderHistory,
+  user,
+}) {
+  const [loading, setLoading] = useState(false);
+  const sendOrderToBackend = (campaignOrderBasket, campaignId) => {
+    setLoading(campaignId);
+    InternetExplorer.send(CHECKOUT_ONE_CAMPAIGN_ORDER_BASKET, "POST", {
+      user_id: user?.user_id,
+      cart: campaignOrderBasket,
+      campaign_id: campaignId,
+    })
+      .then((response) => {
+        setLoading(false);
+        if (!response || !response.success)
+          return makeAlert("Sorry", `Oopsy, ${response?.error?.message || ""}`);
 
-export default class DeliveryCheckout extends Component {
-  render() {
-    const { modifyCampaignCart, cart, navigation } = this.props;
-
-    const removeEnterCampaignBasketFromCart = (
-      campaignId,
-      modifyRedux = false
-    ) => {
-      const basketAsArray = Object.entries(cart.basket);
-      const filteredAsArray = basketAsArray.filter(
-        ([campId, obj]) => campId !== campaignId.toString()
-      );
-      const obj = Object.fromEntries(filteredAsArray);
-
-      const res = filteredAsArray.length > 0 ? obj : null;
-      if (modifyRedux) return modifyCampaignCart({ ...cart, basket: res });
-      return res;
-    };
-    // Note To Self: check the donkomi cheatsheet on dropbox  paper to know more about the entire system....
-    const removeOrder = (campaignId, vendorId) => {
-      var campaignOrder = cart?.basket[campaignId.toString()]; // find the particular campaign  that has the order
-      const asArray = Object.entries(campaignOrder?.orders || {}); // change the object into an array of arrays
-      var newEstimatedTotal = 0;
-      var remAsArray = asArray?.filter(
-        ([key, obj]) => key !== vendorId?.toString()
-      ); // now filter out the vendor order the user wants to remove
-      remAsArray.forEach(
-        ([key, obj]) => (newEstimatedTotal += Number(obj.estimated_cost))
-      );
-      var remAsObject = Object.fromEntries(remAsArray); // change filtered back to objects
-      // fix the assembled object back into the campaign order
-      campaignOrder = {
-        ...campaignOrder,
-        orders: remAsObject,
-        summary: {
-          estimatedTotal: newEstimatedTotal,
-          numerOfOrders: remAsArray?.length || 0,
-        },
-      };
-      //put the campaign order back into the basket
-      if (remAsArray.length > 0) {
-        //only do this if the particular campaign order basket still has items in it
-        const newCart = {
-          ...cart,
-          basket: { ...cart.basket, [campaignId]: campaignOrder },
-        };
-        modifyCampaignCart(newCart);
-      } else {
-        // const basketAsArray = Object.entries(cart.basket);
-        // const filteredAsArray = basketAsArray.filter(
-        //   ([campId, obj]) => campId !== campaignId.toString()
-        // );
-        // const obj = Object.fromEntries(filteredAsArray);
-        modifyCampaignCart({
-          ...cart,
-          basket: removeEnterCampaignBasketFromCart(campaignId),
-        });
-      }
-    };
-    if (!cart?.basket)
-      return (
-        <NotFound text="You will see your campaign orders here if you make any..." />
-      );
-    return (
-      <View style={{ flex: 1 }}>
-        {Object.keys(cart.basket || {}).map((campaignKey, index) => {
-          const campaignOrder = cart.basket[campaignKey];
-          return (
-            <View key={index.toString()}>
-              <MiniCarts
-                {...(campaignOrder || {})}
-                navigation={navigation}
-                removeOrder={removeOrder}
-                removeCampaign={removeEnterCampaignBasketFromCart}
-              />
-            </View>
-          );
-        })}
-      </View>
+        makeAlert(
+          "Congratulations",
+          "Your order has been placed, and the merchant has been notified, you can find your order in the order history. #Keep calm and be served."
+        );
+        // remove basket from redux cart
+        removeEnterCampaignBasketFromCart(campaignId, true);
+        setOrderHistory(response.data); // this request fetches all order history, so its safe to replace the data in redux with the response
+      })
+      .catch((e) => {
+        setLoading(false);
+        console.log("CAMPAIGN_BACKEND_CHECKOUT_ERROR", e?.toString());
+      });
+  };
+  const submitOrderForCampaign = ({ campaignId, total }) => {
+    const campaign = cart.basket[campaignId];
+    makeAlert(
+      "Checkout",
+      `Your cart for campaign #${campaignId} has items worth ${total}, would you like to proceed with checkout?`,
+      { cancelable: true },
+      () => sendOrderToBackend(campaign.orders, campaignId),
+      () => console.log("I am teh cancel buda"),
+      { okText: "Yes, Continue", cancelText: "No" }
     );
-  }
+  };
+  const removeEnterCampaignBasketFromCart = (
+    campaignId,
+    modifyRedux = false
+  ) => {
+    const basketAsArray = Object.entries(cart.basket);
+    const filteredAsArray = basketAsArray.filter(
+      ([campId, obj]) => campId !== campaignId.toString()
+    );
+    const obj = Object.fromEntries(filteredAsArray);
+
+    const res = filteredAsArray.length > 0 ? obj : null;
+    if (modifyRedux) return modifyCampaignCart({ ...cart, basket: res });
+    return res;
+  };
+  // Note To Self: check the donkomi cheatsheet on dropbox  paper to know more about the entire system....
+  const removeOrder = (campaignId, vendorId) => {
+    var campaignOrder = cart?.basket[campaignId.toString()]; // find the particular campaign  that has the order
+    const asArray = Object.entries(campaignOrder?.orders || {}); // change the object into an array of arrays
+    var newEstimatedTotal = 0;
+    var remAsArray = asArray?.filter(
+      ([key, obj]) => key !== vendorId?.toString()
+    ); // now filter out the vendor order the user wants to remove
+    remAsArray.forEach(
+      ([key, obj]) => (newEstimatedTotal += Number(obj.estimated_cost))
+    );
+    var remAsObject = Object.fromEntries(remAsArray); // change filtered back to objects
+    // fix the assembled object back into the campaign order
+    campaignOrder = {
+      ...campaignOrder,
+      orders: remAsObject,
+      summary: {
+        estimatedTotal: newEstimatedTotal,
+        numerOfOrders: remAsArray?.length || 0,
+      },
+    };
+    //put the campaign order back into the basket
+    if (remAsArray.length > 0) {
+      //only do this if the particular campaign order basket still has items in it
+      const newCart = {
+        ...cart,
+        basket: { ...cart.basket, [campaignId]: campaignOrder },
+      };
+      modifyCampaignCart(newCart);
+    } else
+      modifyCampaignCart({
+        ...cart,
+        basket: removeEnterCampaignBasketFromCart(campaignId),
+      });
+  };
+  if (!cart?.basket)
+    return (
+      <NotFound text="You will see your campaign orders here if you make any..." />
+    );
+  return (
+    <View style={{ flex: 1 }}>
+      {Object.keys(cart.basket || {}).map((campaignKey, index) => {
+        const campaignOrder = cart.basket[campaignKey];
+        return (
+          <View key={index.toString()}>
+            <MiniCarts
+              {...(campaignOrder || {})}
+              navigation={navigation}
+              removeOrder={removeOrder}
+              removeCampaign={removeEnterCampaignBasketFromCart}
+              submitOrderForCampaign={submitOrderForCampaign}
+              loading={loading}
+            />
+          </View>
+        );
+      })}
+    </View>
+  );
 }
+
+// ---------------------------------------------- MINI CARTS ------------------------------
 
 export const MiniCarts = ({
   navigation,
@@ -96,7 +138,10 @@ export const MiniCarts = ({
   campaign,
   removeOrder,
   removeCampaign,
+  submitOrderForCampaign,
+  loading,
 }) => {
+  const total = Number((summary?.estimatedTotal || 0) + Number(campaign?.fee));
   return (
     <View>
       <View
@@ -133,14 +178,24 @@ export const MiniCarts = ({
           </View>
         );
       })}
-      <FlatButton color="green" style={{}}>
+      <FlatButton
+        loading={loading === campaign?.id}
+        color={loading && loading !== campaign?.id ? "grey" : "green"}
+        style={{}}
+        onPress={() =>
+          !loading
+            ? submitOrderForCampaign({ campaignId: campaign?.id, total })
+            : null
+        }
+      >
         Submit Order (Rs
-        {" " + Number((summary?.estimatedTotal || 0) + Number(campaign?.fee))})
+        {" " + total})
       </FlatButton>
     </View>
   );
 };
 
+// ------------------------------------------------ CHECKOUT ITEM CARD ---------------------------
 const CheckoutItemCard = ({
   description,
   estimated_cost,
