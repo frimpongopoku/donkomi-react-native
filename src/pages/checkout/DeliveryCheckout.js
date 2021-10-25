@@ -9,7 +9,62 @@ import { Defaults } from "./../../shared/classes/Defaults";
 export default class DeliveryCheckout extends Component {
   render() {
     const { modifyCampaignCart, cart, navigation } = this.props;
-    console.log("I am the campaigncart", cart);
+
+    const removeEnterCampaignBasketFromCart = (
+      campaignId,
+      modifyRedux = false
+    ) => {
+      const basketAsArray = Object.entries(cart.basket);
+      const filteredAsArray = basketAsArray.filter(
+        ([campId, obj]) => campId !== campaignId.toString()
+      );
+      const obj = Object.fromEntries(filteredAsArray);
+
+      const res = filteredAsArray.length > 0 ? obj : null;
+      if (modifyRedux) return modifyCampaignCart({ ...cart, basket: res });
+      return res;
+    };
+    // Note To Self: check the donkomi cheatsheet on dropbox  paper to know more about the entire system....
+    const removeOrder = (campaignId, vendorId) => {
+      var campaignOrder = cart?.basket[campaignId.toString()]; // find the particular campaign  that has the order
+      const asArray = Object.entries(campaignOrder?.orders || {}); // change the object into an array of arrays
+      var newEstimatedTotal = 0;
+      var remAsArray = asArray?.filter(
+        ([key, obj]) => key !== vendorId?.toString()
+      ); // now filter out the vendor order the user wants to remove
+      remAsArray.forEach(
+        ([key, obj]) => (newEstimatedTotal += Number(obj.estimated_cost))
+      );
+      var remAsObject = Object.fromEntries(remAsArray); // change filtered back to objects
+      // fix the assembled object back into the campaign order
+      campaignOrder = {
+        ...campaignOrder,
+        orders: remAsObject,
+        summary: {
+          estimatedTotal: newEstimatedTotal,
+          numerOfOrders: remAsArray?.length || 0,
+        },
+      };
+      //put the campaign order back into the basket
+      if (remAsArray.length > 0) {
+        //only do this if the particular campaign order basket still has items in it
+        const newCart = {
+          ...cart,
+          basket: { ...cart.basket, [campaignId]: campaignOrder },
+        };
+        modifyCampaignCart(newCart);
+      } else {
+        // const basketAsArray = Object.entries(cart.basket);
+        // const filteredAsArray = basketAsArray.filter(
+        //   ([campId, obj]) => campId !== campaignId.toString()
+        // );
+        // const obj = Object.fromEntries(filteredAsArray);
+        modifyCampaignCart({
+          ...cart,
+          basket: removeEnterCampaignBasketFromCart(campaignId),
+        });
+      }
+    };
     if (!cart?.basket)
       return (
         <NotFound text="You will see your campaign orders here if you make any..." />
@@ -20,7 +75,12 @@ export default class DeliveryCheckout extends Component {
           const campaignOrder = cart.basket[campaignKey];
           return (
             <View key={index.toString()}>
-              <MiniCarts {...(campaignOrder || {})} navigation={navigation} />
+              <MiniCarts
+                {...(campaignOrder || {})}
+                navigation={navigation}
+                removeOrder={removeOrder}
+                removeCampaign={removeEnterCampaignBasketFromCart}
+              />
             </View>
           );
         })}
@@ -29,32 +89,53 @@ export default class DeliveryCheckout extends Component {
   }
 }
 
-export const MiniCarts = ({ navigation, summary, orders, campaign }) => {
+export const MiniCarts = ({
+  navigation,
+  summary,
+  orders,
+  campaign,
+  removeOrder,
+  removeCampaign,
+}) => {
   return (
     <View>
-      <Text
+      <View
         style={{
           borderBottomWidth: 2,
           borderColor: STYLES.theme.lightGrey,
           padding: 15,
-          fontWeight: "bold",
+
+          flexDirection: "row",
         }}
       >
-        {" "}
-        Orders For Trip #{campaign?.id || "..."}{" "}
+        <Text style={{ fontWeight: "bold" }}>
+          Orders For Trip #{campaign?.id || "..."}{" "}
+        </Text>
         <Text style={{ color: "red" }}> + Rs {campaign?.fee || 0.0} </Text>
-      </Text>
+
+        <TouchableOpacity
+          style={{ marginLeft: "auto" }}
+          onPress={() => removeCampaign(campaign?.id, true)}
+        >
+          <Text style={{ color: "red" }}>Clear</Text>
+        </TouchableOpacity>
+      </View>
       {Object.keys(orders || {}).map((key, index) => {
         const order = orders[key];
         return (
           <View key={index.toString()}>
-            <CheckoutItemCard {...(order || {})} campaign={campaign} />
+            <CheckoutItemCard
+              {...(order || {})}
+              campaign={campaign}
+              navigation={navigation}
+              removeOrder={removeOrder}
+            />
           </View>
         );
       })}
       <FlatButton color="green" style={{}}>
-        Submit Order For This Campaign (Rs{" "}
-        {Number((summary?.estimatedTotal || 0) + Number(campaign?.fee))})
+        Submit Order (Rs
+        {" " + Number((summary?.estimatedTotal || 0) + Number(campaign?.fee))})
       </FlatButton>
     </View>
   );
@@ -64,9 +145,10 @@ const CheckoutItemCard = ({
   description,
   estimated_cost,
   vendor,
+  navigation,
   campaign,
+  removeOrder,
 }) => {
-  const image = null;
   return (
     <View
       style={{
@@ -99,7 +181,7 @@ const CheckoutItemCard = ({
         </Text>
         <Text style={{}}>Estimated Cost</Text>
         <Text style={{ fontWeight: "bold", color: "red" }}>
-          Rs {estimated_cost || 560}
+          Rs {estimated_cost || 0}
         </Text>
 
         <View
@@ -108,10 +190,19 @@ const CheckoutItemCard = ({
             alignItems: "center",
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("singles", {
+                screen: "place-routine-order",
+                params: { campaign_id: campaign?.id },
+              })
+            }
+          >
             <Text style={{ color: STYLES.theme.primary }}>Make Changes</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => removeOrder(campaign?.id, vendor?.id)}
+          >
             <Text style={{ marginLeft: 25, color: "red" }}>Remove</Text>
           </TouchableOpacity>
         </View>

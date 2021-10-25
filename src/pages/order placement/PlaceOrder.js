@@ -45,7 +45,8 @@ class PlaceOrder extends Component {
   }
   fetchCampaignLocally() {
     const id = this.getId();
-    const { news } = this.props;
+    const { news, campaignCart } = this.props;
+    const campaignOrderInCart = campaignCart?.basket && campaignCart.basket[id];
     const campaign = (news || []).find(
       (item) => item.id === id && item.routine && item.involved_vendors
     );
@@ -56,6 +57,7 @@ class PlaceOrder extends Component {
       campaign,
       vendors,
       selectedVendor: vendors ? vendors[0] : null,
+      drafts: campaignOrderInCart?.orders,
     });
     this.fetchCampaignFromBackend();
   }
