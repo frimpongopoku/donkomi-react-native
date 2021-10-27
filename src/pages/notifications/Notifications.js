@@ -1,8 +1,29 @@
 import React, { Component } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
 import { Defaults } from "../../shared/classes/Defaults";
+import { makeHeaderRight } from "../../shared/utils";
 import { STYLES } from "./../../shared/ui";
-export default class Notifications extends Component {
+class Notifications extends Component {
+  setHeaderRight() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        { numberOfItems:  Number(cart?.numberOfItems)+ Number(campaignCart?.numberOfItems) }
+      ),
+    });
+  }
+  componentDidMount() {
+    this.setHeaderRight();
+  }
+  componentDidUpdate() {
+    this.setHeaderRight();
+  }
   render() {
     return (
       <ScrollView
@@ -57,13 +78,9 @@ export const NotificationItem = ({
     >
       <View style={{ flex: 2 }}>{media}</View>
       <View
-        style={
-          {
-            // ...STYLES.flex,
-            // flexDirection: "row",
-            flex: 10,
-          }
-        }
+        style={{
+          flex: 10,
+        }}
       >
         {/* <View style={{ flex: 2 }}>{media}</View> */}
         <View style={{ flex: 10 }}>{children}</View>
@@ -78,7 +95,6 @@ export const NotificationItem = ({
               borderRadius: 3,
               backgroundColor: STYLES.theme.lightGrey,
               fontSize: 13,
-             
             }}
           >
             {" "}
@@ -98,3 +114,15 @@ export const NotificationItem = ({
     </TouchableOpacity>
   );
 };
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({}, dispatch);
+};
+
+const mapStateToProps = (state) => {
+  return {
+    cart: state.cart,
+    campaignCart: state.campaignCart,
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Notifications);

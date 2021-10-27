@@ -306,5 +306,10 @@ const removeItemFromRedux = (list = [], key, value, type) => {
 };
 
 export const addToCampaignCartAction = (cart = {}) => {
-  return { type: UPDATE_CAMPAIGN_CART, payload: cart };
+  var numberOfItems = 0;
+  Object.keys(cart?.basket).forEach(
+    (key) =>
+      (numberOfItems += Number(cart.basket[key]?.summary.numberOfOrders || 0))
+  );
+  return { type: UPDATE_CAMPAIGN_CART, payload: { ...cart, numberOfItems } };
 };

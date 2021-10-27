@@ -24,7 +24,7 @@ import DateHandler from "./../../shared/classes/DateHandler";
 import Defaults from "./../../shared/classes/Defaults";
 import { addToCampaignCartAction } from "../../redux/actions/actions";
 import BottomSheet from "react-native-raw-bottom-sheet";
-import { makeAlert } from "../../shared/utils";
+import { makeAlert, makeHeaderRight } from "../../shared/utils";
 class PlaceOrder extends Component {
   constructor(props) {
     super(props);
@@ -38,6 +38,18 @@ class PlaceOrder extends Component {
     };
     this.sendToRedux = this.sendToRedux.bind(this);
     this.setDone = this.setDone.bind(this);
+  }
+
+  setHeaderRight() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        { numberOfItems: cart?.numberOfItems }
+      ),
+    });
   }
   getId() {
     const { route } = this.props;
@@ -86,6 +98,11 @@ class PlaceOrder extends Component {
 
   componentDidMount() {
     this.fetchCampaignLocally();
+    this.setHeaderRight();
+  }
+
+  componentDidUpdate() {
+    this.setHeaderRight();
   }
 
   handleChange(value, fieldName) {
@@ -112,11 +129,6 @@ class PlaceOrder extends Component {
   sendToRedux(params) {
     const { drafts, campaign } = this.state;
     const { campaignCart, addCampaignOrderToCart } = this.props;
-    // var { totalNumberOfOrdersInCart, estimatedTotalOfCartItems } =
-    //   campaignCart || {};
-    // totalNumberOfOrdersInCart = (totalNumberOfOrdersInCart || 0) + 1;
-    // estimatedTotalOfCartItems =
-    //   (estimatedTotalOfCartItems || 0) + (params?.estimatedTotal || 0);
     addCampaignOrderToCart({
       basket: {
         ...(campaignCart.basket || {}),
@@ -151,7 +163,6 @@ class PlaceOrder extends Component {
         <NotFound text="Sorry, we could not find the campaign you were looking for..." />
       );
 
-    console.log("I AM THE CMAPAING CART ---------> ", campaignCart);
     const { created_at, title, duration, run_time, fee, routine } =
       campaign || {};
     const description = this.getValue("description");
@@ -355,6 +366,7 @@ const mapStateToProps = (store) => {
     user: store.user,
     news: store.news,
     campaignCart: store.campaignCart,
+    cart: store.cart,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -421,7 +433,6 @@ const OrderSummary = ({
           style={{
             marginTop: 10,
             width: "60%",
-            // color: "green",
             fontWeight: "bold",
             marginBottom: 5,
           }}

@@ -1,19 +1,40 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { TabView } from "react-native-tab-view";
+import { connect } from "react-redux";
 import CustomTabView from "../../shared/components/CustomTabView";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import { STYLES } from "../../shared/ui";
+import { makeHeaderRight } from "../../shared/utils";
 import Campaigns from "./Campaigns";
 import Orders from "./Orders";
 import RiderManagement from "./RiderManagement";
 
-export default class RiderMainPage extends Component {
+class RiderMainPage extends Component {
   tabs = [
     { key: "campaigns", title: "Your Campaigns" },
     { key: "manage", title: "Management" },
     { key: "orders", title: "Orders" },
   ];
+
+  setHeaderRight() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        { numberOfItems: cart?.numberOfItems }
+      ),
+    });
+  }
+
+  componentDidMount() {
+    this.setHeaderRight();
+  }
+  componentDidUpdate() {
+    this.setHeaderRight();
+  }
 
   renderScene = ({ route }) => {
     switch (route.key) {
@@ -41,3 +62,11 @@ export default class RiderMainPage extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    cart: state.cart,
+    campaignCart: state.campaignCart,
+  };
+};
+export default connect(mapStateToProps, null)(RiderMainPage);

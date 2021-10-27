@@ -23,11 +23,32 @@ import {
   setNewsParamsAction,
 } from "../../redux/actions/actions";
 import { FULL_VIEW_PAGES } from "../full view/FullView";
+import { makeHeaderRight } from "../../shared/utils";
+
 class NewsMainPage extends Component {
   constructor(props) {
     super(props);
     this.state = { refreshing: false };
     this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  setHeaderInCart() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        { numberOfItems: Number(cart?.numberOfItems)+ Number(campaignCart?.numberOfItems)}
+      ),
+    });
+  }
+  componentDidMount() {
+    this.setHeaderInCart();
+  }
+
+  componentDidUpdate() {
+    this.setHeaderInCart();
   }
 
   onRefresh() {
@@ -58,7 +79,8 @@ class NewsMainPage extends Component {
   }
   render() {
     const { loading } = this.state;
-    const { news } = this.props;
+    const { news, cart, campaignCart } = this.props;
+    console.log("campaign cart", campaignCart);
     return (
       <ScrollView
         refreshControl={
@@ -95,6 +117,8 @@ const mapStateToProps = (state) => {
   return {
     news: state.news,
     user: state.user,
+    cart: state.cart,
+    campaignCart: state.campaignCart,
   };
 };
 const mapDispatchToProps = (dispatch) => {

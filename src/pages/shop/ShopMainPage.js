@@ -48,6 +48,7 @@ class ShopMainPage extends Component {
       setMarketParams,
       user,
       modifyCart,
+      campaignCart,
       cart,
     } = this.props;
     switch (route.key) {
@@ -63,6 +64,7 @@ class ShopMainPage extends Component {
             user={user}
             modifyCart={modifyCart}
             cart={cart}
+            campaignCart={campaignCart}
           />
         );
       case "your-products":
@@ -187,6 +189,7 @@ const mapStateToProps = (state) => {
     markeParams: state.marketParams,
     user: state.user,
     cart: state.cart,
+    campaignCart: state.campaignCart,
   };
 };
 const mapDispatchToProps = (dispatch) => {

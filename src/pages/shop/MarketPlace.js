@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import DateHandler from "./../../shared/classes/DateHandler";
 import InternetExplorer from "../../shared/classes/InternetExplorer";
 import { GET_MARKET_NEWS } from "../../shared/urls";
 import FlatButton from "../../components/FlatButton";
-import { pop } from "../../shared/utils";
+import { makeHeaderRight, pop } from "../../shared/utils";
 
 export const summariseCartContent = (arr = []) => {
   var number = 0,
@@ -34,9 +34,24 @@ export default function MarketPlace({
   cart,
   setMarketParams,
   modifyCart,
+  campaignCart,
 }) {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        {
+          numberOfItems:
+            Number(cart?.numberOfItems) + Number(campaignCart?.numberOfItems),
+        }
+      ),
+    });
+  }, [cart, campaignCart]);
 
   const loadMarketNews = () => {
     setRefreshing(true);

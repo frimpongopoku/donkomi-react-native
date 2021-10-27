@@ -1,7 +1,10 @@
-import { Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Alert, Text, TouchableOpacity } from "react-native";
 
 export const getDetailsFromProductOrders = (arr) => {
-  var shopString="", image;
+  var shopString = "",
+    image;
   var quantity = 0;
   var totalPrice = 0;
   if (!arr) return {};
@@ -16,26 +19,26 @@ export const getDetailsFromProductOrders = (arr) => {
   return { quantity, shopString, image, totalPrice };
 };
 
-
-
-export const getDetailsFromMerchantOrders = arr => { 
-  var vendorString = "", image, campaignName, campaignId; 
-  var totalEstimated = 0; 
+export const getDetailsFromMerchantOrders = (arr) => {
+  var vendorString = "",
+    image,
+    campaignName,
+    campaignId;
+  var totalEstimated = 0;
   if (!arr) return {};
-  arr.forEach( (item, index) => { 
-    if(!vendorString)  vendorString = item?.vendor?.name 
-    else vendorString = vendorString + " , " + item?.vendor?.name 
-    totalEstimated += Number(item.estimated_cost)
-    if (index === 0 ) { 
-      image = item?.vendor?.image; 
-      campaignName = item?.campaign?.title; 
+  arr.forEach((item, index) => {
+    if (!vendorString) vendorString = item?.vendor?.name;
+    else vendorString = vendorString + " , " + item?.vendor?.name;
+    totalEstimated += Number(item.estimated_cost);
+    if (index === 0) {
+      image = item?.vendor?.image;
+      campaignName = item?.campaign?.title;
       campaignId = item?.campaign?.id;
     }
-  })
+  });
 
-  return { vendorString, image, campaignName, campaignId, totalEstimated}
-  
-}
+  return { vendorString, image, campaignName, campaignId, totalEstimated };
+};
 export const getTotalPrice = (arr) => {
   if (!arr) return;
   var sum = 0;
@@ -98,4 +101,40 @@ export const pop = (value, field, array) => {
   })[0];
 
   return [found, rest, foundIndex];
+};
+
+export const makeHeaderRight = (
+  navigation,
+  destination = "singles",
+  routeParams = { screen: "checkout" },
+  params = {}
+) => {
+  return () => (
+    <TouchableOpacity
+      style={{ marginRight: 20 }}
+      onPress={() => navigation.navigate(destination, routeParams || {})}
+    >
+      {params?.numberOfItems && (
+        <Text
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            paddingLeft: 5,
+            paddingRight: 5,
+            paddingTop: 1,
+            paddingBottom: 1,
+            zIndex: 1,
+            borderRadius: 55,
+            backgroundColor: "green",
+            fontSize: 9,
+            color: "white",
+          }}
+        >
+          {params?.numberOfItems || 0}
+        </Text>
+      )}
+      <Ionicons name="cart-outline" size={24} color={"red"} />
+    </TouchableOpacity>
+  );
 };
