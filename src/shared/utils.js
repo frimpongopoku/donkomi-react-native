@@ -114,7 +114,7 @@ export const makeHeaderRight = (
       style={{ marginRight: 20 }}
       onPress={() => navigation.navigate(destination, routeParams || {})}
     >
-      {params?.numberOfItems && (
+      {params?.numberOfItems ? (
         <Text
           style={{
             position: "absolute",
@@ -133,7 +133,10 @@ export const makeHeaderRight = (
         >
           {params?.numberOfItems || 0}
         </Text>
+      ) : (
+        <></>
       )}
+
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
   );

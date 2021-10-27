@@ -50,7 +50,7 @@ export default class FormGenerator extends Component {
     if (field.label)
       return (
         <Text style={{ marginBottom: 6 }}>
-          {field.label}{" "}
+          {field.label}
           {(field.required || field.isRequired) && (
             <Text style={{ color: "red" }}>*</Text>
           )}

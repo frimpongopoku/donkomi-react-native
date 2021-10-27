@@ -47,7 +47,8 @@ export default function MarketPlace({
         { screen: "checkout" },
         {
           numberOfItems:
-            Number(cart?.numberOfItems) + Number(campaignCart?.numberOfItems),
+            Number(cart?.numberOfItems || 0) +
+            Number(campaignCart?.numberOfItems || 0),
         }
       ),
     });
@@ -227,7 +228,7 @@ export default function MarketPlace({
                   Rs {product?.price || 0.0}
                 </Text>
                 <Text style={{ fontWeight: "bold" }}>
-                  {product?.name || "..."}{" "}
+                  {product?.name || "..."}
                 </Text>
                 <Text style={{ color: "grey", fontSize: 13 }}>
                   {DateHandler.makeTimeAgo(new Date(product?.created_at))}

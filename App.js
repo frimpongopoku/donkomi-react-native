@@ -144,6 +144,7 @@ class App extends React.Component {
       this.setState({ loading: false });
     });
   }
+  
   render() {
     const { loading } = this.state;
     // ------ When user profile isnt retrieved from the backend -------------

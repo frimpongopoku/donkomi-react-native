@@ -154,7 +154,7 @@ export const MiniCarts = ({
         }}
       >
         <Text style={{ fontWeight: "bold" }}>
-          Orders For Trip #{campaign?.id || "..."}{" "}
+          Orders For Trip #{campaign?.id || "..."}
         </Text>
         <Text style={{ color: "red" }}> + Rs {campaign?.fee || 0.0} </Text>
 

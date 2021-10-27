@@ -14,7 +14,7 @@ class Notifications extends Component {
         navigation,
         "singles",
         { screen: "checkout" },
-        { numberOfItems:  Number(cart?.numberOfItems)+ Number(campaignCart?.numberOfItems) }
+        { numberOfItems:  Number(cart?.numberOfItems || 0)+ Number(campaignCart?.numberOfItems || 0) }
       ),
     });
   }
@@ -97,8 +97,7 @@ export const NotificationItem = ({
               fontSize: 13,
             }}
           >
-            {" "}
-            {type}{" "}
+            {type}
           </Text>
           <Text
             style={{

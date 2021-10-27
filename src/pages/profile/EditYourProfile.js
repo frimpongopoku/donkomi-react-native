@@ -192,7 +192,6 @@ class EditYourProfile extends Component {
         }}
       >
         <Text style={{ fontWeight: "bold", color: STYLES.theme.blue }}>
-          {" "}
           {user?.preferred_name}, edit your profile information here
         </Text>
 

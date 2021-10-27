@@ -308,7 +308,7 @@ class PlaceOrder extends Component {
             </View>
           </View>
           <Text style={{ paddingLeft: 20, paddingRight: 20 }}>
-            Trip organised and run by{" "}
+            Trip organised and run by
             <Text style={{ fontWeight: "bold" }}>
               @{routine?.creator?.preferred_name || "A Donkomi User..."}
             </Text>

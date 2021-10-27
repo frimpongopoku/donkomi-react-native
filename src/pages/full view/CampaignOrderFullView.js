@@ -225,7 +225,7 @@ const MerchantOrderItem = ({
             {real_cost && <Text style={{ color: "green" }}> , Real Cost</Text>}
           </Text>
           <Text style={{ color: STYLES.theme.deepOrange, fontWeight: "bold" }}>
-            Rs {estimated_cost || 0.0}{" "}
+            Rs {estimated_cost || 0.0}
             {real_cost && (
               <Text style={{ color: "green", fontWeight: "bold" }}>
                 , Rs {real_cost}

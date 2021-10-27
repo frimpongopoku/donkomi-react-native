@@ -6,7 +6,7 @@ export const TEST_URL =
   HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
 
 export const REGISTER_USER = HOST + "/user/create/";
-export const GET_REGISTERED_USER = HOST + "/user/get/";
+export const GET_REGISTERED_USER = HOST + "/user/get/"; 
 export const UPDATE_USER_PROFILE = HOST + "/user/update/";
 export const GET_CLIENT_CONTENT = HOST + "/user/client/get.content/";
 export const CREATE_A_SHOP = HOST + "/shop/create/";

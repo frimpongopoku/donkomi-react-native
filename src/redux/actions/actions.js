@@ -292,7 +292,7 @@ export const processAndDeleteVendor = (params) => {
 const removeRelatedStock = (vendor, stock = []) => {
   const items = stock.filter((s) => s.vendor !== vendor.id);
   return { type: SET_STOCK, payload: items };
-};
+}; 
 
 const deleteContentFromBackend = (URL, body) => {
   InternetExplorer.send(URL, "POST", body).catch((e) => {

@@ -92,7 +92,7 @@ const getTabIcons = (params) => {
   return TABS_AND_ICONS[tabName];
 };
 
- const makeHeaderRight = (
+const makeHeaderRight = (
   navigation,
   destination = "singles",
   routeParams = { screen: "checkout" },
