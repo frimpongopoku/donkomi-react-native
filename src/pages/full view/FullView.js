@@ -3,6 +3,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { deleteAProductFromBackend } from "../../redux/actions/actions";
+import { makeHeaderRight } from "../../shared/utils";
 import CampaignOrderFullView from "./CampaignOrderFullView";
 import OrderFullView from "./OrderFullView";
 import ProductFullView from "./ProductFullView";
@@ -35,7 +36,28 @@ class FullView extends Component {
     const { route } = this.props;
     return route?.params?.filterParams;
   }
+
+  setHeaderRight() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        {
+          numberOfItems:
+            Number(cart?.numberOfItems || 0) +
+            Number(campaignCart?.numberOfItems || 0),
+        }
+      ),
+    });
+  }
+
+  componentDidUpdate() {
+    this.setHeaderRight();
+  }
   componentDidMount() {
+    this.setHeaderRight();
     const page = this.getCurrentPage();
     this.setState({ page });
     this.fetchContentLocally(); // fetch data locally first
@@ -133,7 +155,13 @@ class FullView extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { news: state.news, user: state.user, history: state.orderHistory };
+  return {
+    news: state.news,
+    user: state.user,
+    history: state.orderHistory,
+    cart: state.cart,
+    campaignCart: state.campaignCart,
+  };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(

@@ -1,3 +1,8 @@
+import {
+  Entypo,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { TabView } from "react-native-tab-view";
@@ -12,9 +17,21 @@ import RiderManagement from "./RiderManagement";
 
 class RiderMainPage extends Component {
   tabs = [
-    { key: "campaigns", title: "Your Campaigns" },
-    { key: "manage", title: "Management" },
-    { key: "orders", title: "Orders" },
+    {
+      key: "campaigns",
+      title: "Your Campaigns",
+      icon: <Entypo name="megaphone" size={18} color="white" />,
+    },
+    {
+      key: "manage",
+      title: "Management",
+      icon: <MaterialCommunityIcons name="factory" size={18} color="white" />,
+    },
+    {
+      key: "orders",
+      title: "Orders",
+      icon: <FontAwesome name="handshake-o" size={18} color="white" />,
+    },
   ];
 
   setHeaderRight() {

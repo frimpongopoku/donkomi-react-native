@@ -23,14 +23,27 @@ export default function TabBarHeader({
     >
       {routes.map((route, index) => {
         return (
-          <TouchableOpacity key={index} onPress={() => onHeaderPress(index)}>
+          <TouchableOpacity
+            key={index}
+            onPress={() => onHeaderPress(index)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              borderBottomWidth:
+                activeTabIndex === index ? activeBorderBottomWidth : 0,
+              borderBottomColor: activeColor,
+            }}
+          >
+            {route?.icon}
             <Text
               style={{
                 color: textColor,
-                padding: 15,
-                borderBottomWidth:
-                  activeTabIndex === index ? activeBorderBottomWidth : 0,
-                borderBottomColor: activeColor,
+                marginLeft: 6,
+                paddingRight: 15,
+                paddingTop: 15,
+                paddingBottom:15,
+                // padding: 15,
                 alignSelf: "center",
               }}
             >

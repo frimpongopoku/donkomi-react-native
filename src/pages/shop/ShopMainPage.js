@@ -5,7 +5,7 @@ import TabBarHeader from "../../shared/components/TabBarHeader";
 import YourProducts from "./YourProducts";
 import ShopOrders from "./ShopOrders";
 import MarketPlace from "./MarketPlace";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import YourShops from "./YourShops";
 import { connect } from "react-redux";
@@ -29,10 +29,26 @@ class ShopMainPage extends Component {
   }
 
   routes = [
-    { key: "market", title: "Market" },
-    { key: "your-products", title: " Products" },
-    { key: "your-shops", title: " Shops" },
-    { key: "orders", title: "Orders" },
+    {
+      key: "market",
+      title: "Market",
+      icon: <Entypo name="shopping-bag" size={18} color="white" />,
+    },
+    {
+      key: "your-products",
+      title: " Products",
+      icon: <FontAwesome name="product-hunt" size={18} color="white" />,
+    },
+    {
+      key: "your-shops",
+      title: " Shops",
+      icon: <Entypo name="shop" size={18} color="white" />,
+    },
+    {
+      key: "orders",
+      title: "Orders",
+      icon: <FontAwesome name="handshake-o" size={18} color="white" />,
+    },
   ];
 
   renderScene = ({ route }) => {
