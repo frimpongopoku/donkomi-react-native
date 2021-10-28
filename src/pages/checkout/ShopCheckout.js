@@ -89,7 +89,7 @@ export default function ShopCheckout({ cart, modifyCart, checkout }) {
         containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
         style={{ fontWeight: "bold" }}
       >
-        Checkout ( Rs {cart?.totalPrice} )
+        Checkout ( Rs {cart?.totalPrice?.toFixed(2)} )
       </FlatButton>
     </View>
   );

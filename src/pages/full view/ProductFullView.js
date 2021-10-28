@@ -1,5 +1,5 @@
 import { Entypo } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import FlatButton from "../../components/FlatButton";
 import Subtitle from "../../components/Subtitle";
@@ -7,7 +7,7 @@ import { deleteAProductFromBackend } from "../../redux/actions/actions";
 import DateHandler from "../../shared/classes/DateHandler";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
-import { makeAlert } from "../../shared/utils";
+import { makeAlert, addToCart, removeFromCart } from "../../shared/utils";
 // import FormPlaceholder from "../forms/FormPlaceholder";
 import ShopCreationContainer, {
   Space,
@@ -27,7 +27,20 @@ export default function ProductFullView({
   navigation,
   id,
   deleteProduct,
+  modifyCart,
+  cart,
+  product,
 }) {
+  const [productInCart, setProductInCart] = useState({});
+
+  useEffect(() => {
+    console.log("I c ame here buda");
+    const found = cart?.basket?.find((p) => p.product_id === id);
+    setProductInCart({
+      totalPrice: found?.price,
+      qty: found?.qty,
+    });
+  }, []);
   const edit = (product) => {
     makeAlert(
       "Edit",
@@ -55,6 +68,14 @@ export default function ProductFullView({
     );
   };
 
+  const handleShopping = (product, params, remove = false) => {
+    var response;
+    if (!remove) response = addToCart(product, params);
+    else response = removeFromCart(product, params);
+    console.log("I am teh response", response);
+    setProductInCart({ qty: response?.qty, totalPrice: response?.price });
+  };
+
   const deleteProductFromBack = (product) => {
     deleteProduct({ product });
     // now navigate out of this page back to news feed
@@ -62,6 +83,7 @@ export default function ProductFullView({
   };
   const shop = (shops && shops[0]) || {};
   const isForUser = creator?.user_id === user?.user_id;
+  console.log("LE PRODUCT iN CART", productInCart);
   return (
     <View
       style={{
@@ -149,7 +171,7 @@ export default function ProductFullView({
           position: "absolute",
           elevation: 10,
           backgroundColor: "white",
-          height: 148.5,
+          height: 120.5,
           bottom: 0,
           width: "100%",
         }}
@@ -162,6 +184,12 @@ export default function ProductFullView({
             <Text style={{ fontSize: 30, fontWeight: "bold", color: "green" }}>
               {price || 0.0}
             </Text>
+            {productInCart?.qty && (
+              <Text style={{ color: "green" }}>
+                {productInCart?.qty} In Cart ( Rs{" "}
+                {Number(productInCart?.totalPrice)?.toFixed(2)} )
+              </Text>
+            )}
           </View>
 
           {isForUser ? (
@@ -199,7 +227,12 @@ export default function ProductFullView({
                 alignItems: "center",
               }}
             >
-              <TouchableOpacity style={{ padding: 6 }}>
+              <TouchableOpacity
+                style={{ padding: 6 }}
+                onPress={() =>
+                  handleShopping(product, { modifyCart, cart }, true)
+                }
+              >
                 <Entypo name="minus" size={35} color="red" />
               </TouchableOpacity>
               <Text
@@ -211,20 +244,24 @@ export default function ProductFullView({
                   color: "black",
                 }}
               >
-                1
+                {productInCart?.qty || 0}
               </Text>
-              <TouchableOpacity style={{ padding: 6 }}>
+              <TouchableOpacity
+                style={{ padding: 6 }}
+                onPress={() => handleShopping(product, { modifyCart, cart })}
+              >
                 <Entypo name="plus" size={35} color="green" />
               </TouchableOpacity>
             </View>
           )}
         </View>
-        <FlatButton
+        {/* <FlatButton
+          onPress={() => handleShopping(product, { modifyCart, cart })}
           color="green"
           containerStyle={{ opacity: isForUser ? 0.5 : 1 }}
         >
           Add To Cart
-        </FlatButton>
+        </FlatButton> */}
       </View>
     </View>
   );

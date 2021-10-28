@@ -84,7 +84,6 @@ class NewsMainPage extends Component {
   render() {
     const { loading } = this.state;
     const { news, cart, campaignCart } = this.props;
-    console.log("campaign cart", campaignCart);
     return (
       <ScrollView
         refreshControl={

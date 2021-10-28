@@ -124,7 +124,7 @@ export const makeHeaderRight = (
             paddingRight: 5,
             paddingTop: 1,
             paddingBottom: 1,
-            zIndex: 1,
+            zIndex: 3,
             borderRadius: 55,
             backgroundColor: "green",
             fontSize: 9,
@@ -140,4 +140,64 @@ export const makeHeaderRight = (
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
   );
+};
+
+
+// ---------------------------------------------
+
+
+export const summariseCartContent = (arr = []) => {
+  var number = 0,
+    price = 0;
+  arr.forEach((item) => {
+    number += item.qty;
+    price += Number(item.price);
+  });
+  return [number, price];
+};
+export const addToCart = (product, { modifyCart, cart }) => {
+  var [itemInCart, rest, index] = pop(
+    product.id,
+    "product_id",
+    cart?.basket || []
+  );
+  if (itemInCart) {
+    itemInCart.qty += 1;
+    itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
+    rest.splice(index, 0, itemInCart);
+    const [number, price] = summariseCartContent(rest || []);
+    modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+    return itemInCart;
+  }
+  // first time product is being added to cart
+  itemInCart = {
+    product_id: product?.id,
+    qty: 1,
+    price: Number(product?.price),
+    product,
+  };
+  const basket = [...(cart?.basket || []), itemInCart];
+
+  const [number, price] = summariseCartContent(basket || []);
+  modifyCart({ basket, numberOfItems: number, totalPrice: price });
+  return itemInCart;
+};
+
+export const removeFromCart = (product, { modifyCart, cart }) => {
+  const [itemInCart, rest, index] = pop(
+    product.id,
+    "product_id",
+    cart?.basket || []
+  );
+
+  if (itemInCart?.qty > 1) {
+    itemInCart.qty -= 1;
+    itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
+    rest.splice(index, 0, itemInCart); // put that item back at the same index
+    const [number, price] = summariseCartContent(rest || []);
+    modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
+    return itemInCart;
+  }
+  const [number, price] = summariseCartContent(rest || []);
+  modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
 };

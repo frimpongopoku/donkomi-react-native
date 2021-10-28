@@ -14,17 +14,14 @@ import DateHandler from "./../../shared/classes/DateHandler";
 import InternetExplorer from "../../shared/classes/InternetExplorer";
 import { GET_MARKET_NEWS } from "../../shared/urls";
 import FlatButton from "../../components/FlatButton";
-import { makeHeaderRight, pop } from "../../shared/utils";
+import {
+  addToCart,
+  makeHeaderRight,
+  pop,
+  removeFromCart,
+} from "../../shared/utils";
+import { FULL_VIEW_PAGES } from "../full view/FullView";
 
-export const summariseCartContent = (arr = []) => {
-  var number = 0,
-    price = 0;
-  arr.forEach((item) => {
-    number += item.qty;
-    price += Number(item.price);
-  });
-  return [number, price];
-};
 export default function MarketPlace({
   navigation,
   market,
@@ -67,53 +64,6 @@ export default function MarketPlace({
       .catch((error) =>
         console.log("REFRESH_MARKET_NEWS_ERRROR", error?.toString())
       );
-  };
-  const addToCart = (product) => {
-    const [itemInCart, rest, index] = pop(
-      product.id,
-      "product_id",
-      cart?.basket || []
-    );
-    if (itemInCart) {
-      itemInCart.qty += 1;
-      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
-      rest.splice(index, 0, itemInCart);
-      const [number, price] = summariseCartContent(rest || []);
-      modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
-      return;
-    }
-    // first time product is being added to cart
-    const basket = [
-      ...(cart?.basket || []),
-      {
-        product_id: product?.id,
-        qty: 1,
-        price: Number(product?.price),
-        product,
-      },
-    ];
-
-    const [number, price] = summariseCartContent(basket || []);
-    modifyCart({ basket, numberOfItems: number, totalPrice: price });
-  };
-
-  const removeFromCart = (product) => {
-    const [itemInCart, rest, index] = pop(
-      product.id,
-      "product_id",
-      cart?.basket || []
-    );
-
-    if (itemInCart?.qty > 1) {
-      itemInCart.qty -= 1;
-      itemInCart.price = (itemInCart.qty * itemInCart.product.price).toFixed(2);
-      rest.splice(index, 0, itemInCart); // put that item back at the same index
-      const [number, price] = summariseCartContent(rest || []);
-      modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
-      return;
-    }
-    const [number, price] = summariseCartContent(rest || []);
-    modifyCart({ basket: rest, numberOfItems: number, totalPrice: price });
   };
 
   return (
@@ -164,7 +114,7 @@ export default function MarketPlace({
               {/* ------- IN CART MARKER ------- */}
               {itemInCart && (
                 <TouchableOpacity
-                  onPress={() => removeFromCart(product)}
+                  onPress={() => removeFromCart(product, { modifyCart, cart })}
                   style={{
                     backgroundColor: "green",
                     borderRadius: 55,
@@ -187,7 +137,7 @@ export default function MarketPlace({
               {/* ------- ADD TO CART BUTTON ------- */}
               {product?.creator?.user_id !== user?.user_id && (
                 <TouchableOpacity
-                  onPress={() => addToCart(product)}
+                  onPress={() => addToCart(product, { modifyCart, cart })}
                   style={{
                     paddingLeft: 10,
                     paddingRight: 10,
@@ -218,6 +168,15 @@ export default function MarketPlace({
                 }}
               />
               <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("singles", {
+                    screen: "full-view",
+                    params: {
+                      page: FULL_VIEW_PAGES.PRODUCT_FROM_MARKET,
+                      id: product?.id,
+                    },
+                  })
+                }
                 style={{
                   padding: 10,
                   borderWidth: 2,
