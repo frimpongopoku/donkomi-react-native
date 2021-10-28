@@ -14,6 +14,7 @@ export const FULL_VIEW_PAGES = {
   PRODUCT: "product",
   PRODUCT_FROM_MARKET: "product_from_market",
   ORDER: "order-full-view",
+  SELLER_ORDER: "seller-full-view",
   MERCHANT_ORDER: "merchant-order-full-view",
 };
 class FullView extends Component {
@@ -69,7 +70,7 @@ class FullView extends Component {
   }
 
   fetchContentLocally() {
-    const { news = [], navigation, history, market } = this.props;
+    const { news = [], navigation, history, market, sellerOrders } = this.props;
     // console.log("I am teh market", market);
     const page = this.getCurrentPage();
     const params = this.getParams();
@@ -107,12 +108,17 @@ class FullView extends Component {
       this.setState({ content: order });
       return;
     }
+    if (page === FULL_VIEW_PAGES.SELLER_ORDER) {
+      const id = this.getId();
+      const order = (sellerOrders || []).find((o) => o.id === id);
+      this.setState({ content: order });
+      return;
+    }
     if (page === FULL_VIEW_PAGES.MERCHANT_ORDER) {
       const id = this.getId();
       const order = (history || []).find(
         (orderHistory) => orderHistory.id === id
       );
-
       this.setState({ content: order });
       return;
     }
@@ -146,11 +152,26 @@ class FullView extends Component {
             modifyCart={modifyCart}
             cart={cart}
             product={content}
+            isFromMarket
+          />
+        );
+      case FULL_VIEW_PAGES.SELLER_ORDER:
+        return (
+          <OrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            isSeller
           />
         );
       case FULL_VIEW_PAGES.ORDER:
         return (
-          <OrderFullView {...content} navigation={navigation} user={user} />
+          <OrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            isCustomer
+          />
         );
       case FULL_VIEW_PAGES.MERCHANT_ORDER:
         return (
@@ -194,6 +215,7 @@ const mapStateToProps = (state) => {
     cart: state.cart,
     campaignCart: state.campaignCart,
     market: state.market,
+    sellerOrders: state.sellerOrders,
   };
 };
 const mapDispatchToProps = (dispatch) => {

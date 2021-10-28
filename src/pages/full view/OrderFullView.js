@@ -6,43 +6,50 @@ import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
 import Subtitle from "../../components/Subtitle";
 import { Space } from "../shop/creation/ShopCreationContainer";
-import { getDetailsFromMerchantOrders, getDetailsFromProductOrders } from "../../shared/utils";
+import {
+  getDetailsFromMerchantOrders,
+  getDetailsFromProductOrders,
+} from "../../shared/utils";
 import DateHandler from "../../shared/classes/DateHandler";
+import FlatButton from "../../components/FlatButton";
 export default class OrderFullView extends Component {
   componentDidMount() {
-    const { id, navigation } = this.props;
-    navigation.setOptions({
-      title: "Order #" + id,
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 20 }}
-          onPress={() => this.bottomSheet?.open()}
-        >
-          <Text>Talk To Seller</Text>
-        </TouchableOpacity>
-      ),
-    });
+    // const { id, navigation } = this.props;
+    // navigation.setOptions({
+    //   title: "Order #" + id,
+    //   headerRight: () => (
+    //     <TouchableOpacity
+    //       style={{ marginRight: 20 }}
+    //       onPress={() => this.bottomSheet?.open()}
+    //     >
+    //       <Text>Talk To Seller</Text>
+    //     </TouchableOpacity>
+    //   ),
+    // });
   }
 
   render() {
     const {
       product_orders,
       seller,
-      user,
+      customer,
       created_at,
       completed,
       time_until_complete,
+      isSeller,
     } = this.props;
 
     const details = getDetailsFromProductOrders(product_orders);
     const { totalPrice, shopString, quantity } = details || {};
+    const contactee = isSeller ? customer : seller;
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
           <View style={{ flexDirection: "row", marginBottom: 10, padding: 15 }}>
             <View>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                From {seller?.preferred_name}'s shop(s)
+                {isSeller && "Order "} From {contactee?.preferred_name}
+                {!isSeller && "'s shop(s)"}
               </Text>
               <Text
                 style={{
@@ -56,7 +63,9 @@ export default class OrderFullView extends Component {
                 Rs {totalPrice}
               </Text>
               <Text style={{ color: "black" }}>
-                You ordered {quantity} Items
+                {!isSeller ? "You ordered " : "Customer ordered "} {quantity}{" "}
+                Item
+                {quantity !== 1 && "s"}
               </Text>
               <View
                 style={{
@@ -120,7 +129,7 @@ export default class OrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              A list of the items in your order
+              A list of the items in the order
             </Text>
             <View style={{ padding: 15 }}>
               {product_orders?.map((productOrderObj, index) => {
@@ -142,18 +151,37 @@ export default class OrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              Contact details for {seller?.preferred_name}
+              Contact details for {contactee?.preferred_name}
             </Text>
             <View style={{ padding: 15 }}>
-              <Text>You can contact the seller on any of these platforms</Text>
+              <Text>
+                You can contact the {isSeller ? "customer" : "seller"} on any of
+                these platforms
+              </Text>
               <Subtitle text="Phone Number" />
-              <Text>{seller?.phone || "Not Provided"}</Text>
+              <Text>{contactee?.phone || "Not Provided"}</Text>
               <Space bottom={5} />
               <Subtitle text="Whatsapp Number" />
-              <Text>{seller?.whatsapp_number || "Not Provided"}</Text>
+              <Text>{contactee?.whatsapp_number || "Not Provided"}</Text>
+
+              {isSeller && (
+                <Text style={{ marginTop: 20, color: STYLES.theme.blue }}>
+                  You may mark the order as complete if the customer has paid,
+                  and the item has been successfully delivered{" "}
+                </Text>
+              )}
             </View>
           </View>
         </ScrollView>
+        {isSeller && (
+          <FlatButton
+            color="green"
+            containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
+          >
+            {" "}
+            Mark Order As Complete
+          </FlatButton>
+        )}
         <BottomSheet
           ref={(el) => (this.bottomSheet = el)}
           closeOnDragDown={true}
@@ -194,9 +222,9 @@ const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
 
       <View style={{ marginBottom: 10 }}>
         <Text style={{ fontSize: 16 }}>{product?.name}</Text>
-        <Text style={{ fontSize: 14, color: "grey" }}>
+        {/* <Text style={{ fontSize: 14, color: "grey" }}>
           From {shop?.name || "..."}
-        </Text>
+        </Text> */}
         <Text
           style={{
             fontSize: 12,
@@ -213,7 +241,7 @@ const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
             color: STYLES.theme.blue,
           }}
         >
-          Intermat
+          From {shop?.name || "..."}
         </Text>
       </View>
       <View style={{ marginLeft: "auto", marginRight: 10 }}>

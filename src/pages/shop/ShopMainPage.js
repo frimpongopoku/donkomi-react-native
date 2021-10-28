@@ -66,6 +66,7 @@ class ShopMainPage extends Component {
       modifyCart,
       campaignCart,
       cart,
+      sellerOrders
     } = this.props;
     switch (route.key) {
       case "market":
@@ -92,7 +93,7 @@ class ShopMainPage extends Component {
           />
         );
       case "orders":
-        return <ShopOrders navigation={navigation} />;
+        return <ShopOrders navigation={navigation} sellerOrders = {sellerOrders} />;
       case "your-shops":
         return (
           <YourShops
@@ -206,6 +207,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     cart: state.cart,
     campaignCart: state.campaignCart,
+    sellerOrders: state.sellerOrders
   };
 };
 const mapDispatchToProps = (dispatch) => {

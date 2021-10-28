@@ -22,9 +22,11 @@ import {
   setFirebaseAuthUserAction,
   setMarketNewsAction,
   setMarketNewsParamsAction,
+  setMerchantOrdersAction,
   setNewsParamsAction,
   setOrderHistoryAction,
   setRoutinesAction,
+  setSellerOrdersAction,
   setStockAction,
   setUserShopItemsAction,
   setUserShopsAction,
@@ -60,6 +62,8 @@ class App extends React.Component {
         this.props.setRoutines(data.routines);
         this.props.setCampaigns(data.campaigns);
         this.props.loadOrderHistory(data.client_order_history);
+        this.props.setSellerOrders(data.seller_orders);
+        this.props.setMerchantOrders(data.merchant_orders);
         this.setState({ loading: false });
       })
       .catch((e) => {
@@ -144,7 +148,7 @@ class App extends React.Component {
       this.setState({ loading: false });
     });
   }
-  
+
   render() {
     const { loading } = this.state;
     // ------ When user profile isnt retrieved from the backend -------------
@@ -242,6 +246,8 @@ const mapDispatchToProps = (dispatch) => {
       setMarketNews: setMarketNewsAction,
       setMarketNewsParams: setMarketNewsParamsAction,
       loadOrderHistory: setOrderHistoryAction,
+      setSellerOrders: setSellerOrdersAction,
+      setMerchantOrders: setMerchantOrdersAction,
     },
     dispatch
   );

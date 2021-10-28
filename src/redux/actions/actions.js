@@ -11,9 +11,11 @@ import {
   SET_FIREBASE_AUTH_USER,
   SET_MARKET_NEWS,
   SET_MARKET_NEWS_PARAMS,
+  SET_MERCHANT_ORDERS,
   SET_NEWS_PARAMS,
   SET_ORDER_HISTORY,
   SET_ROUTINES,
+  SET_SELLER_ORDERS,
   SET_STOCK,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
@@ -172,7 +174,7 @@ export const modifyMerchantCartAction = (data = {}) => {
 
 export const setUserShopsAction = (shops = null) => {
   return { type: SET_USER_SHOPS, payload: shops };
-};
+};  
 export const setUserShopItemsAction = (items = null) => {
   return { type: SET_USER_SHOP_ITEMS, payload: items };
 };
@@ -189,6 +191,12 @@ export const setRoutinesAction = (data = []) => {
 
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
+};
+export const setSellerOrdersAction = (data = []) => {
+  return { type: SET_SELLER_ORDERS, payload: data };
+};
+export const setMerchantOrdersAction = (data = []) => {
+  return { type: SET_MERCHANT_ORDERS, payload: data };
 };
 
 export const setCampaignAction = (data = []) => {
