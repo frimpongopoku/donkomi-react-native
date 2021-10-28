@@ -28,29 +28,34 @@ class ShopMainPage extends Component {
     this.renderTabBar = this.renderTabBar.bind(this);
   }
 
-  routes = [
-    {
-      key: "market",
-      title: "Market",
-      icon: <Entypo name="shopping-bag" size={16} color="white" />,
-    },
-    {
-      key: "your-products",
-      title: " Products",
-      icon: <FontAwesome name="product-hunt" size={16} color="white" />,
-    },
-    {
-      key: "your-shops",
-      title: " Shops",
-      icon: <Entypo name="shop" size={16} color="white" />,
-    },
-    {
-      key: "orders",
-      title: "Orders",
-      icon: <FontAwesome name="handshake-o" size={16} color="white" />,
-      badgeNumber:5
-    },
-  ];
+  routes = this.makeRoutes();
+
+  makeRoutes() {
+    const { sellerOrders } = this.props;
+    return [
+      {
+        key: "market",
+        title: "Market",
+        icon: <Entypo name="shopping-bag" size={16} color="white" />,
+      },
+      {
+        key: "your-products",
+        title: " Products",
+        icon: <FontAwesome name="product-hunt" size={16} color="white" />,
+      },
+      {
+        key: "your-shops",
+        title: " Shops",
+        icon: <Entypo name="shop" size={16} color="white" />,
+      },
+      {
+        key: "orders",
+        title: "Orders",
+        icon: <FontAwesome name="handshake-o" size={16} color="white" />,
+        badgeNumber: sellerOrders?.length,
+      },
+    ];
+  }
 
   renderScene = ({ route }) => {
     const {
@@ -67,7 +72,7 @@ class ShopMainPage extends Component {
       modifyCart,
       campaignCart,
       cart,
-      sellerOrders
+      sellerOrders,
     } = this.props;
     switch (route.key) {
       case "market":
@@ -94,7 +99,9 @@ class ShopMainPage extends Component {
           />
         );
       case "orders":
-        return <ShopOrders navigation={navigation} sellerOrders = {sellerOrders} />;
+        return (
+          <ShopOrders navigation={navigation} sellerOrders={sellerOrders} />
+        );
       case "your-shops":
         return (
           <YourShops
@@ -208,7 +215,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     cart: state.cart,
     campaignCart: state.campaignCart,
-    sellerOrders: state.sellerOrders
+    sellerOrders: state.sellerOrders,
   };
 };
 const mapDispatchToProps = (dispatch) => {

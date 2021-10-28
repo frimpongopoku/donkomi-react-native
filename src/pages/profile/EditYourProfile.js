@@ -36,6 +36,18 @@ const fields = [
     name: "residence_name",
     label: "Add your residence name...",
   },
+  {
+    dbName: "whatsapp_number",
+    placeholder: "Eg. 57432911",
+    name: "whatsapp number",
+    label: "Add a working whatsapp number.",
+  },
+  {
+    dbName: "mcb_juice_number",
+    placeholder: "Eg. 57432911",
+    name: "residence_name",
+    label: "Add MCM juice number or account number",
+  },
 ];
 class EditYourProfile extends Component {
   state = {

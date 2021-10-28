@@ -1,3 +1,4 @@
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { connect } from "react-redux";
@@ -15,12 +16,29 @@ import OrderHistory from "./OrderHistory";
 import ShopCheckout from "./ShopCheckout";
 
 class Checkout extends Component {
-  tabs = [
-    { key: "shop", title: "Shopping Cart" },
-    { key: "delivery", title: "Delivery Cart" },
-    { key: "history", title: "Order History" },
-  ];
-
+  tabs = this.makeTabs();
+  makeTabs() {
+    const { cart, campaignCart } = this.props;
+    return [
+      {
+        key: "shop",
+        title: "Shopping Cart",
+        icon: <AntDesign name="shoppingcart" size={16} color="white" />,
+        badgeNumber: cart?.numberOfItems,
+      },
+      {
+        key: "delivery",
+        title: "Delivery Cart",
+        icon: <MaterialIcons name="delivery-dining" size={16} color="white" />,
+      },
+      {
+        key: "history",
+        title: "Order History",
+        icon: <FontAwesome name="history" size={16} color="white" />,
+        badgeNumber: campaignCart.numberOfItems,
+      },
+    ];
+  }
   renderScene = ({ route }) => {
     const {
       cart,
