@@ -1,6 +1,13 @@
 import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
@@ -14,8 +21,16 @@ import {
 import DateHandler from "../../shared/classes/DateHandler";
 import FlatButton from "../../components/FlatButton";
 import InternetExplorer from "../../shared/classes/InternetExplorer";
-import { MARK_ORDER_AS_COMPLETE } from "../../shared/urls";
+import {
+  MARK_ORDER_AS_COMPLETE,
+  REMOVE_UNAVAILABLE_ITEM_FROM_ORDER,
+} from "../../shared/urls";
+import { isThisMonth } from "date-fns";
 export default class OrderFullView extends Component {
+  constructor(props) {
+    super(props);
+    this.removeUnavailable = this.removeUnavailable.bind(this);
+  }
   state = { loading: false };
   componentDidMount() {
     const { id, navigation } = this.props;
@@ -69,9 +84,54 @@ export default class OrderFullView extends Component {
         this.setState({ loading: false });
       });
   }
+  removeUnavailable(product_order_id, order_id) {
+    makeAlert(
+      "Notice",
+      "You are removing an item from your customer's order, they will be notified that this item is unavailable and if this is the remaining item in the order, the order will be removed from the system",
+      { cancelable: true },
+      () => this.removeUnavailableFromBackend(product_order_id, order_id),
+      () => null,
+      { okText: "PROCEED" }
+    );
+  }
 
+  removeUnavailableFromBackend(product_order_id, order_id) {
+    const { sellerOrders, setSellerOrdersInRedux } = this.props;
+    this.setState({ loadingRemoval: true });
+    InternetExplorer.roamAndFind(REMOVE_UNAVAILABLE_ITEM_FROM_ORDER, "POST", {
+      user_id: this.props.user?.user_id,
+      product_order_id,
+      order_id,
+    })
+      .then((response) => {
+        this.setState({ loadingRemoval: false });
+        if (!response || !response.success)
+          return makeAlert("Sorry", response?.error?.message?.toString());
+        const modifiedOrder = response.data;
+        if (modifiedOrder) {
+          var index;
+          const rem = sellerOrders?.filter((item, i) => {
+            const found = item.id === id;
+            if (found) index = i;
+            return !found;
+          });
+          rem.splice(index, 0, modifiedOrder); //put the modified order that just came from backend inside the list in the same index,
+          setSellerOrdersInRedux(rem);
+        } else {
+          const rem = sellerOrders?.filter((item) => item.id !== order_id);
+          setSellerOrdersInRedux(rem); // seller removed the last item fro the order, so remove the whole order from teh UI list
+          this.props.navigation.navigate.goBack();
+        }
+      })
+
+      .catch((error) => {
+        this.setState({ loadingRemoval: false });
+        console.log("REMOVING_UNAVAILALBE_ERROR", error?.toString());
+      });
+  }
   render() {
     const {
+      id,
       product_orders,
       seller,
       customer,
@@ -181,6 +241,9 @@ export default class OrderFullView extends Component {
                       {...productOrderObj}
                       seller={seller}
                       isSeller={isSeller}
+                      removeUnavailable={this.removeUnavailable}
+                      orderId={id}
+                      loadingRemoval={this.state.loadingRemoval}
                     />
                   </View>
                 );
@@ -253,12 +316,16 @@ export default class OrderFullView extends Component {
 }
 
 const OrderProductItem = ({
+  id,
   product,
   quantity,
   shop,
   total_price,
   seller,
   isSeller,
+  removeUnavailable,
+  loadingRemoval,
+  orderId,
 }) => {
   return (
     <View
@@ -308,7 +375,18 @@ const OrderProductItem = ({
           From {shop?.name || "..."}
         </Text>
         {isSeller && (
-          <TouchableOpacity style={{ marginTop: 6 }}>
+          <TouchableOpacity
+            style={{ marginTop: 6, flexDirection: "row" }}
+            onPress={() => removeUnavailable(id, orderId)}
+          >
+            {loadingRemoval && (
+              <View style={{ marginRight: 4 }}>
+                <ActivityIndicator
+                  size="small"
+                  color={STYLES.theme.deepOrange}
+                />
+              </View>
+            )}
             <Text
               style={{
                 fontSize: 12,
