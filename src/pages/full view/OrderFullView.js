@@ -9,23 +9,65 @@ import { Space } from "../shop/creation/ShopCreationContainer";
 import {
   getDetailsFromMerchantOrders,
   getDetailsFromProductOrders,
+  makeAlert,
 } from "../../shared/utils";
 import DateHandler from "../../shared/classes/DateHandler";
 import FlatButton from "../../components/FlatButton";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { MARK_ORDER_AS_COMPLETE } from "../../shared/urls";
 export default class OrderFullView extends Component {
+  state = { loading: false };
   componentDidMount() {
-    // const { id, navigation } = this.props;
-    // navigation.setOptions({
-    //   title: "Order #" + id,
-    //   headerRight: () => (
-    //     <TouchableOpacity
-    //       style={{ marginRight: 20 }}
-    //       onPress={() => this.bottomSheet?.open()}
-    //     >
-    //       <Text>Talk To Seller</Text>
-    //     </TouchableOpacity>
-    //   ),
-    // });
+    const { id, navigation } = this.props;
+    navigation.setOptions({
+      title: "Order #" + id,
+      // headerRight: () => (
+      //   <TouchableOpacity
+      //     style={{ marginRight: 20 }}
+      //     onPress={() => this.bottomSheet?.open()}
+      //   >
+      //     <Text>Talk To Seller</Text>
+      //   </TouchableOpacity>
+      // ),
+    });
+  }
+
+  markOrderAsComplete() {
+    const { id } = this.props;
+    makeAlert(
+      "Finalising Order...",
+      "You are sure I have delivered the product, the customer has paid, and therefore, the order is completed.",
+      { cancelable: true },
+      () => this.markAsCompleteInBackend(id),
+      () => null,
+      { okText: "PROCEED" }
+    );
+  }
+
+  removeCompletedFromList(id) {
+    const { sellerOrders, setSellerOrdersInRedux } = this.props;
+    const rem = sellerOrders?.filter((item) => item.id !== id);
+    setSellerOrdersInRedux(rem);
+  }
+  markAsCompleteInBackend(id) {
+    this.setState({ loading: true });
+    InternetExplorer.roamAndFind(MARK_ORDER_AS_COMPLETE, "POST", {
+      user_id: this.props.user?.user_id,
+      order_id: id,
+    })
+      .then((response) => {
+        if (!response || !response.success)
+          makeAlert("Sorry", response.error?.message);
+        this.setState({ loading: false });
+        if (response.success) {
+          this.removeCompletedFromList(id);
+          this.props.navigation.goBack();
+        }
+      })
+      .catch((error) => {
+        console.log("MARK_ASCOMPLETE_ERROR", error?.toString());
+        this.setState({ loading: false });
+      });
   }
 
   render() {
@@ -135,7 +177,11 @@ export default class OrderFullView extends Component {
               {product_orders?.map((productOrderObj, index) => {
                 return (
                   <View key={index.toString()}>
-                    <OrderProductItem {...productOrderObj} seller={seller} />
+                    <OrderProductItem
+                      {...productOrderObj}
+                      seller={seller}
+                      isSeller={isSeller}
+                    />
                   </View>
                 );
               })}
@@ -165,7 +211,16 @@ export default class OrderFullView extends Component {
               <Text>{contactee?.whatsapp_number || "Not Provided"}</Text>
 
               {isSeller && (
-                <Text style={{ marginTop: 20, color: STYLES.theme.blue }}>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    color: "grey",
+                    borderWidth: 1,
+                    padding: 10,
+                    borderRadius: 5,
+                    borderColor: "grey",
+                  }}
+                >
                   You may mark the order as complete if the customer has paid,
                   and the item has been successfully delivered{" "}
                 </Text>
@@ -175,6 +230,8 @@ export default class OrderFullView extends Component {
         </ScrollView>
         {isSeller && (
           <FlatButton
+            loading={this.state.loading}
+            onPress={() => this.markOrderAsComplete()}
             color="green"
             containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
           >
@@ -195,7 +252,14 @@ export default class OrderFullView extends Component {
   }
 }
 
-const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
+const OrderProductItem = ({
+  product,
+  quantity,
+  shop,
+  total_price,
+  seller,
+  isSeller,
+}) => {
   return (
     <View
       style={{
@@ -243,6 +307,21 @@ const OrderProductItem = ({ product, quantity, shop, total_price, seller }) => {
         >
           From {shop?.name || "..."}
         </Text>
+        {isSeller && (
+          <TouchableOpacity style={{ marginTop: 6 }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "bold",
+                borderBottomColor: STYLES.theme.deepOrange,
+                borderBottomWidth: 1,
+                color: STYLES.theme.deepOrange,
+              }}
+            >
+              Click to remove if unavailable
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={{ marginLeft: "auto", marginRight: 10 }}>
         <Text
