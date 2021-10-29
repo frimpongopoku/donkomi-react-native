@@ -18,14 +18,14 @@ export default class CampaignOrderFullView extends Component {
     const { id, navigation } = this.props;
     navigation.setOptions({
       title: "Order #" + id,
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 20 }}
-          onPress={() => this.bottomSheet?.open()}
-        >
-          <Text>Talk To Merchant</Text>
-        </TouchableOpacity>
-      ),
+      // headerRight: () => (
+      //   <TouchableOpacity
+      //     style={{ marginRight: 20 }}
+      //     onPress={() => this.bottomSheet?.open()}
+      //   >
+      //     <Text>Talk To Merchant</Text>
+      //   </TouchableOpacity>
+      // ),
     });
   }
 
@@ -37,10 +37,13 @@ export default class CampaignOrderFullView extends Component {
       created_at,
       completed,
       time_until_complete,
+      customer,
+      isCustomer,
     } = this.props;
 
     const merchantDetails = getDetailsFromMerchantOrders(merchant_orders);
     const { totalEstimated, campaignName, campaignId } = merchantDetails || {};
+    const contactee = isCustomer ? seller : customer;
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView>
@@ -53,7 +56,7 @@ export default class CampaignOrderFullView extends Component {
                 style={{
                   fontWeight: "bold",
                   fontSize: 20,
-                  color: "red",
+                  color: isCustomer ? "red" : "green",
                   marginTop: 6,
                   marginBottom: 6,
                 }}
@@ -127,13 +130,19 @@ export default class CampaignOrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              A list of orders you made to each vendor
+              {isCustomer
+                ? "A list of orders you made to each vendor"
+                : "A list of orders for vendors you need to buy from"}
             </Text>
             <View style={{ padding: 15 }}>
               {merchant_orders?.map((merchOrderObj, index) => {
                 return (
                   <View key={index.toString()}>
-                    <MerchantOrderItem {...merchOrderObj} seller={seller} />
+                    <MerchantOrderItem
+                      {...merchOrderObj}
+                      seller={seller}
+                      isCustomer={isCustomer}
+                    />
                   </View>
                 );
               })}
@@ -148,15 +157,18 @@ export default class CampaignOrderFullView extends Component {
                 fontWeight: "bold",
               }}
             >
-              Contact details for {seller?.preferred_name}
+              Contact details for {contactee?.preferred_name}
             </Text>
             <View style={{ padding: 15 }}>
-              <Text>You can contact the seller on any of these platforms</Text>
+              <Text>
+                You can contact the {isCustomer ? "seller" : "customer"} on any
+                of these platforms
+              </Text>
               <Subtitle text="Phone Number" />
-              <Text>{seller?.phone || "Not Provided"}</Text>
+              <Text>{contactee?.phone || "Not Provided"}</Text>
               <Space bottom={5} />
               <Subtitle text="Whatsapp Number" />
-              <Text>{seller?.whatsapp_number || "Not Provided"}</Text>
+              <Text>{contactee?.whatsapp_number || "Not Provided"}</Text>
             </View>
           </View>
         </ScrollView>
@@ -178,6 +190,7 @@ const MerchantOrderItem = ({
   vendor,
   description,
   real_cost = 456,
+  isCustomer,
 }) => {
   return (
     <View
@@ -220,7 +233,12 @@ const MerchantOrderItem = ({
         </Text>
 
         <View style={{ marginTop: 10 }}>
-          <Text style={{ fontWeight: "bold", color: STYLES.theme.deepOrange }}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: isCustomer ? "red" : STYLES.theme.deepOrange,
+            }}
+          >
             Estimated Cost
             {real_cost && <Text style={{ color: "green" }}> , Real Cost</Text>}
           </Text>

@@ -56,7 +56,12 @@ class RiderMainPage extends Component {
   renderScene = ({ route }) => {
     switch (route.key) {
       case "orders":
-        return <Orders navigation={this.props.navigation} />;
+        return (
+          <Orders
+            navigation={this.props.navigation}
+            merchantOrders={this.props.merchantOrders}
+          />
+        );
       case "manage":
         return <RiderManagement navigation={this.props.navigation} />;
       case "campaigns":
@@ -84,6 +89,7 @@ const mapStateToProps = (state) => {
   return {
     cart: state.cart,
     campaignCart: state.campaignCart,
+    merchantOrders: state.merchantOrders,
   };
 };
 export default connect(mapStateToProps, null)(RiderMainPage);

@@ -17,6 +17,7 @@ export const FULL_VIEW_PAGES = {
   ORDER: "order-full-view",
   SELLER_ORDER: "seller-full-view",
   MERCHANT_ORDER: "merchant-order-full-view",
+  ORDER_FOR_MERCHANT: "merchant-order-full-view-for-merchant",
 };
 class FullView extends Component {
   PAGES = FULL_VIEW_PAGES;
@@ -71,7 +72,14 @@ class FullView extends Component {
   }
 
   fetchContentLocally() {
-    const { news = [], navigation, history, market, sellerOrders } = this.props;
+    const {
+      news = [],
+      navigation,
+      history,
+      market,
+      sellerOrders,
+      merchantOrders,
+    } = this.props;
     // console.log("I am teh market", market);
     const page = this.getCurrentPage();
     const params = this.getParams();
@@ -118,6 +126,14 @@ class FullView extends Component {
     if (page === FULL_VIEW_PAGES.MERCHANT_ORDER) {
       const id = this.getId();
       const order = (history || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+      this.setState({ content: order });
+      return;
+    }
+    if (page === FULL_VIEW_PAGES.ORDER_FOR_MERCHANT) {
+      const id = this.getId();
+      const order = (merchantOrders || []).find(
         (orderHistory) => orderHistory.id === id
       );
       this.setState({ content: order });
@@ -184,12 +200,21 @@ class FullView extends Component {
             isCustomer
           />
         );
+      case FULL_VIEW_PAGES.ORDER_FOR_MERCHANT:
+        return (
+          <CampaignOrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+          />
+        );
       case FULL_VIEW_PAGES.MERCHANT_ORDER:
         return (
           <CampaignOrderFullView
             {...content}
             navigation={navigation}
             user={user}
+            isCustomer
           />
         );
       default:
@@ -227,6 +252,7 @@ const mapStateToProps = (state) => {
     campaignCart: state.campaignCart,
     market: state.market,
     sellerOrders: state.sellerOrders,
+    merchantOrders: state.merchantOrders,
   };
 };
 const mapDispatchToProps = (dispatch) => {
