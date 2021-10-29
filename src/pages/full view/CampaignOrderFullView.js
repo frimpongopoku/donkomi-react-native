@@ -5,7 +5,14 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import React, { Component } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Defaults } from "../../shared/classes/Defaults";
 import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
@@ -16,7 +23,8 @@ import DateHandler from "../../shared/classes/DateHandler";
 import FlatButton from "../../components/FlatButton";
 import { Picker } from "@react-native-picker/picker";
 import TextBox from "../../components/TextBox";
-import { MARK_ORDER_AS_COMPLETE } from "../../shared/urls";
+import { GET_ONE_ORDER, MARK_ORDER_AS_COMPLETE } from "../../shared/urls";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
 
 export const ORDER_STATES = {
   FULFILLED: "Fully Fulfilled",
@@ -26,24 +34,26 @@ export const ORDER_STATES = {
 export default class CampaignOrderFullView extends Component {
   constructor(props) {
     super(props);
-    this.state = { loading: false };
+    this.state = { loading: false, refreshing: false, order: null };
+    this.onRefresh = this.onRefresh.bind(this);
   }
   componentDidMount() {
     const { id, navigation } = this.props;
     navigation.setOptions({
       title: "Order #" + id,
     });
-  }  
+  }
 
   markOrderAsComplete(estimatedTotal) {
     // setup backend to take in these extra things
     const { id } = this.props;
     this.setState({ loading: true });
+
     InternetExplorer.roamAndFind(MARK_ORDER_AS_COMPLETE, "POST", {
       user_id: this.props.user?.user_id,
       order_id: id,
       type: "MERCHANT_ORDER",
-      order_state: this.state.orderState,
+      order_state: this.state.orderState || ORDER_STATES.FULFILLED,
       real_cost: this.state.realValue || estimatedTotal,
     })
       .then((response) => {
@@ -67,24 +77,63 @@ export default class CampaignOrderFullView extends Component {
     setMerchantOrdersInRedux(rem);
   }
 
+  onRefresh() {
+    this.setState({ refreshing: true });
+    const { merchantOrders, setMerchantOrdersInRedux, user, id } = this.props;
+    InternetExplorer.roamAndFind(GET_ONE_ORDER, "POST", {
+      user_id: user?.user_id,
+      order_id: id,
+    })
+      .then((response) => {
+        this.setState({ refreshing: false });
+        if (!response || !response.success) {
+          console.log(
+            "ERROR_REFRESH_ONE_ORDER",
+            response.error?.message?.toString()
+          );
+          return makeAlert("Refresh", "Sorry could not refresh");
+        }
+        var index = -1;
+        var rem = (merchantOrders || []).filter((o, i) => {
+          if (o.id === id) index = i;
+          return o.id !== id;
+        });
+        this.setState({ order: response.data });
+        rem.splice(index, 0, response.data);
+        setMerchantOrdersInRedux(rem);
+      })
+      .catch((e) => {
+        this.setState({ refreshing: false });
+        console.log("ERROR_REFRESH_ONE_ORDER", e?.toString());
+      });
+  }
+
   render() {
     const {
       merchant_orders,
       seller,
-      user,
+
       created_at,
       completed,
       time_until_complete,
       customer,
       isCustomer,
-    } = this.props;
+    } = this.state.order || this.props;
 
     const merchantDetails = getDetailsFromMerchantOrders(merchant_orders);
     const { totalEstimated, campaignName, campaignId } = merchantDetails || {};
     const contactee = isCustomer ? seller : customer;
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              colors={["red"]}
+              onRefresh={this.onRefresh}
+            />
+          }
+        >
           <View style={{ flexDirection: "row", marginBottom: 10, padding: 15 }}>
             <View>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
@@ -272,6 +321,7 @@ export default class CampaignOrderFullView extends Component {
           </View>
 
           <FlatButton
+            loading={this.state.loading}
             onPress={() => this.markOrderAsComplete(totalEstimated)}
             color="green"
             containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
