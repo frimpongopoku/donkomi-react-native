@@ -33,7 +33,7 @@ export default class CampaignOrderFullView extends Component {
     navigation.setOptions({
       title: "Order #" + id,
     });
-  }
+  }  
 
   markOrderAsComplete(estimatedTotal) {
     // setup backend to take in these extra things
