@@ -11,22 +11,60 @@ import { STYLES } from "../../shared/ui";
 import BottomSheet from "react-native-raw-bottom-sheet";
 import Subtitle from "../../components/Subtitle";
 import { Space } from "../shop/creation/ShopCreationContainer";
-import { getDetailsFromMerchantOrders } from "../../shared/utils";
+import { getDetailsFromMerchantOrders, makeAlert } from "../../shared/utils";
 import DateHandler from "../../shared/classes/DateHandler";
+import FlatButton from "../../components/FlatButton";
+import { Picker } from "@react-native-picker/picker";
+import TextBox from "../../components/TextBox";
+import { MARK_ORDER_AS_COMPLETE } from "../../shared/urls";
+
+export const ORDER_STATES = {
+  FULFILLED: "Fully Fulfilled",
+  SOME: "Partly Fulfilled",
+  NOT_FULFILLED: "Not Fulfilled",
+};
 export default class CampaignOrderFullView extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { loading: false };
+  }
   componentDidMount() {
     const { id, navigation } = this.props;
     navigation.setOptions({
       title: "Order #" + id,
-      // headerRight: () => (
-      //   <TouchableOpacity
-      //     style={{ marginRight: 20 }}
-      //     onPress={() => this.bottomSheet?.open()}
-      //   >
-      //     <Text>Talk To Merchant</Text>
-      //   </TouchableOpacity>
-      // ),
     });
+  }
+
+  markOrderAsComplete(estimatedTotal) {
+    // setup backend to take in these extra things
+    const { id } = this.props;
+    this.setState({ loading: true });
+    InternetExplorer.roamAndFind(MARK_ORDER_AS_COMPLETE, "POST", {
+      user_id: this.props.user?.user_id,
+      order_id: id,
+      type: "MERCHANT_ORDER",
+      order_state: this.state.orderState,
+      real_cost: this.state.realValue || estimatedTotal,
+    })
+      .then((response) => {
+        if (!response || !response.success)
+          makeAlert("Sorry", response.error?.message);
+        this.setState({ loading: false });
+        if (response.success) {
+          this.removeCompletedFromList(id);
+          this.props.navigation.goBack();
+        }
+      })
+      .catch((error) => {
+        console.log("MARK_ASCOMPLETE_MERCHANT_ERROR", error?.toString());
+        this.setState({ loading: false });
+      });
+  }
+
+  removeCompletedFromList(id) {
+    const { merchantOrders, setMerchantOrdersInRedux } = this.props;
+    const rem = merchantOrders?.filter((item) => item.id !== id);
+    setMerchantOrdersInRedux(rem);
   }
 
   render() {
@@ -172,11 +210,74 @@ export default class CampaignOrderFullView extends Component {
             </View>
           </View>
         </ScrollView>
+        <FlatButton
+          onPress={() => this.bottomSheet?.open()}
+          color="green"
+          containerStyle={{ bottom: 0, width: "100%" }}
+        >
+          Close Order
+        </FlatButton>
         <BottomSheet
           ref={(el) => (this.bottomSheet = el)}
           closeOnDragDown={true}
+          height={360}
         >
-          <Text>I am the first item here bro</Text>
+          <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10 }}>
+            <Subtitle text="Clarify a few things and then proceed to mark as complete" />
+            <View>
+              <Text>What is the state of this order </Text>
+              <View
+                style={{
+                  borderWidth: 1,
+                  marginTop: 10,
+                  marginBottom: 10,
+                  borderColor: STYLES.theme.blue,
+                }}
+              >
+                <Picker
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                    color: STYLES.theme.blue,
+                  }}
+                  onValueChange={(value) =>
+                    this.setState({ orderState: value })
+                  }
+                  mode="dropdown"
+                >
+                  <Picker.Item
+                    label={ORDER_STATES.FULFILLED}
+                    value={ORDER_STATES.FULFILLED}
+                  />
+                  <Picker.Item
+                    label={ORDER_STATES.SOME}
+                    value={ORDER_STATES.SOME}
+                  />
+                  <Picker.Item
+                    label={ORDER_STATES.NOT_FULFILLED}
+                    value={ORDER_STATES.NOT_FULFILLED}
+                  />
+                </Picker>
+              </View>
+              <Text style={{ marginBottom: 10 }}>
+                Enter real amount the customer paid for this order if available
+              </Text>
+              <TextBox
+                placeholder="Enter value here..."
+                keyboardType="numeric"
+                onChangeText={(text) => this.setState({ realValue: text })}
+                value={this.state.realValue || totalEstimated?.toString() || ""}
+              />
+            </View>
+          </View>
+
+          <FlatButton
+            onPress={() => this.markOrderAsComplete(totalEstimated)}
+            color="green"
+            containerStyle={{ position: "absolute", bottom: 0, width: "100%" }}
+          >
+            {this.state.loading ? "Processing..." : "Proceed"}
+          </FlatButton>
         </BottomSheet>
       </View>
     );

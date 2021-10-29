@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 import {
   deleteAProductFromBackend,
   modifyCartAction,
+  setMerchantOrdersAction,
   setSellerOrdersAction,
 } from "../../redux/actions/actions";
 import { makeHeaderRight } from "../../shared/utils";
@@ -206,6 +207,8 @@ class FullView extends Component {
             {...content}
             navigation={navigation}
             user={user}
+            merchantOrders={this.props.merchantOrders}
+            setMerchantOrdersInRedux={this.props.setMerchantOrdersInRedux}
           />
         );
       case FULL_VIEW_PAGES.MERCHANT_ORDER:
@@ -261,6 +264,7 @@ const mapDispatchToProps = (dispatch) => {
       deleteProcuct: deleteAProductFromBackend,
       modifyCart: modifyCartAction,
       setSellerOrdersInRedux: setSellerOrdersAction,
+      setMerchantOrdersInRedux: setMerchantOrdersAction,
     },
     dispatch
   );

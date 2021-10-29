@@ -98,6 +98,7 @@ const mapStateToProps = (state) => {
     merchantOrders: state.merchantOrders,
     user: state.user,
     campaigns: state.campaigns,
+    merchantOrders: state.merchantOrders,
   };
 };
 const mapDispatchToProps = (dispatch) => {
