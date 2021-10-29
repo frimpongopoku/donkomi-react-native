@@ -7,6 +7,8 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { TabView } from "react-native-tab-view";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { setMerchantOrdersAction } from "../../redux/actions/actions";
 import CustomTabView from "../../shared/components/CustomTabView";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import { STYLES } from "../../shared/ui";
@@ -21,6 +23,7 @@ class RiderMainPage extends Component {
       key: "campaigns",
       title: "Your Campaigns",
       icon: <Entypo name="megaphone" size={18} color="white" />,
+      badgeNumber: this.props.campaigns?.length,
     },
     {
       key: "manage",
@@ -31,6 +34,7 @@ class RiderMainPage extends Component {
       key: "orders",
       title: "Orders",
       icon: <FontAwesome name="handshake-o" size={18} color="white" />,
+      badgeNumber: this.props.merchantOrders?.length,
     },
   ];
 
@@ -60,6 +64,8 @@ class RiderMainPage extends Component {
           <Orders
             navigation={this.props.navigation}
             merchantOrders={this.props.merchantOrders}
+            setMerchantOrders={this.props.setMerchantOrders}
+            user={this.props.user}
           />
         );
       case "manage":
@@ -90,6 +96,16 @@ const mapStateToProps = (state) => {
     cart: state.cart,
     campaignCart: state.campaignCart,
     merchantOrders: state.merchantOrders,
+    user: state.user,
+    campaigns: state.campaigns,
   };
 };
-export default connect(mapStateToProps, null)(RiderMainPage);
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      setMerchantOrders: setMerchantOrdersAction,
+    },
+    dispatch
+  );
+};
+export default connect(mapStateToProps, mapDispatchToProps)(RiderMainPage);

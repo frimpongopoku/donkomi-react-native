@@ -1,13 +1,46 @@
 import React, { Component } from "react";
-import { Image, Text, TextInput, View, TouchableOpacity } from "react-native";
+import {
+  Image,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import NotFound from "../../components/NotFound";
 import Subtitle from "../../components/Subtitle";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { GET_SELLER_ORDERS } from "../../shared/urls";
 import { getDetailsFromProductOrders } from "../../shared/utils";
 import { FULL_VIEW_PAGES } from "../full view/FullView";
 import burger from "./../../shared/images/burger.jpg";
 import { STYLES } from "./../../shared/ui";
 
 export default class ShopOrders extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { refreshing: false };
+    this.onRefresh = this.onRefresh.bind(this);
+  }
+  onRefresh() {
+    const { setSellerOrders, user } = this.props;
+    this.setState({ refreshing: true });
+
+    InternetExplorer.roamAndFind(GET_SELLER_ORDERS, "POST", {
+      user_id: user?.user_id,
+    })
+      .then((response) => {
+        if (response.success) setSellerOrders(response.data);
+        this.setState({ refreshing: false });
+      })
+      .catch((e) => {
+        console.log("ERROR_HERE_LOADING_SELLER_ORDERS", e?.toString());
+        this.setState({
+          refreshing: false,
+        });
+      });
+  }
   render() {
     const { sellerOrders, navigation } = this.props;
     if (!sellerOrders)
@@ -15,7 +48,16 @@ export default class ShopOrders extends Component {
         <NotFound text="Customers have not ordered from any of your shops yet..." />
       );
     return (
-      <View style={{ padding: 15, backgroundColor: "white", flex: 1 }}>
+      <ScrollView
+        style={{ padding: 15, backgroundColor: "white", flex: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            colors={["red"]}
+            onRefresh={this.onRefresh}
+          />
+        }
+      >
         <Subtitle text="Customers have ordered these from your shop(s)" />
         {sellerOrders?.map((productOrder, index) => {
           const { customer, product_orders, id, completed } = productOrder;
@@ -79,7 +121,7 @@ export default class ShopOrders extends Component {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
     );
   }
 }

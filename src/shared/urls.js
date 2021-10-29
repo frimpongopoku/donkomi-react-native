@@ -1,6 +1,6 @@
 // const HOST = "192.168.0.38:8000";
 // const HOST = "127.0.0.1:8000";
-const HOST = "http://a3d8-102-115-237-92.ngrok.io" + "/api/donkomi";
+const HOST = "http://2d45-102-115-237-92.ngrok.io" + "/api/donkomi";
 
 export const TEST_URL =
   HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
@@ -36,5 +36,8 @@ export const GET_ONE_CAMPAIGN = HOST + "/get/one.campaign/";
 export const CHECKOUT_CAMPAIGN_ORDER = HOST + "/user/campaign.checkout/";
 export const CHECKOUT_ONE_CAMPAIGN_ORDER_BASKET =
   HOST + "/user/campaign.checkout.one.basket/";
-export const MARK_ORDER_AS_COMPLETE = HOST +"/seller/mark.order.as.complete/"; 
-export const REMOVE_UNAVAILABLE_ITEM_FROM_ORDER = HOST + "/seller/remove.unavailable.item/";
+export const MARK_ORDER_AS_COMPLETE = HOST + "/seller/mark.order.as.complete/";
+export const REMOVE_UNAVAILABLE_ITEM_FROM_ORDER =
+  HOST + "/seller/remove.unavailable.item/";
+export const GET_MERCHANT_ORDERS = HOST + "/user/get.merchant.orders/";
+export const GET_SELLER_ORDERS = HOST + "/user/get.seller.orders/";

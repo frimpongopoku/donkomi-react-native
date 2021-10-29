@@ -16,6 +16,7 @@ import {
   modifyCartAction,
   setMarketNewsAction,
   setMarketNewsParamsAction,
+  setSellerOrdersAction,
 } from "../../redux/actions/actions";
 import ShopCreationContainer from "./creation/ShopCreationContainer";
 
@@ -100,7 +101,12 @@ class ShopMainPage extends Component {
         );
       case "orders":
         return (
-          <ShopOrders navigation={navigation} sellerOrders={sellerOrders} />
+          <ShopOrders
+            navigation={navigation}
+            sellerOrders={sellerOrders}
+            setSellerOrders={this.props.setSellerOrders}
+            user={this.props.user}
+          />
         );
       case "your-shops":
         return (
@@ -226,6 +232,7 @@ const mapDispatchToProps = (dispatch) => {
       setMarketContent: setMarketNewsAction,
       setMarketParams: setMarketNewsParamsAction,
       modifyCart: modifyCartAction,
+      setSellerOrders: setSellerOrdersAction,
     },
     dispatch
   );

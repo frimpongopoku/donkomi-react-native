@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { STYLES } from "../../shared/ui";
 import burger from "./../../shared/images/burger.jpg";
@@ -8,13 +15,15 @@ import { getDetailsFromMerchantOrders } from "../../shared/utils";
 import DateHandler from "./../../shared/classes/DateHandler";
 import { Defaults } from "../../shared/classes/Defaults";
 import { FULL_VIEW_PAGES } from "../full view/FullView";
+import InternetExplorer from "../../shared/classes/InternetExplorer";
+import { GET_MERCHANT_ORDERS } from "../../shared/urls";
 export default class Orders extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { refreshing: false };
+    this.onRefresh = this.onRefresh.bind(this);
   }
 
-  shops = ["McDonalds", "Ricardos", "Tipos", "Jumbo", "Super U"];
   getVendorsFromList() {
     const { merchantOrders } = this.props;
     const vendors = {};
@@ -39,14 +48,42 @@ export default class Orders extends Component {
     });
     return arr?.length ? arr : this.props.merchantOrders;
   }
+  onRefresh() {
+    const { setMerchantOrders, user } = this.props;
+    this.setState({ refreshing: true });
+    InternetExplorer.roamAndFind(GET_MERCHANT_ORDERS, "POST", {
+      user_id: user?.user_id,
+    })
+      .then((response) => {
+        if (response.success) setMerchantOrders(response.data);
+        this.setState({
+          refreshing: false,
+        });
+      })
+      .catch((e) => {
+        console.log("GETTING_MORE_USER_ORDERS_ERROR", e?.toString());
+        this.setState({
+          refreshing: false,
+        });
+      });
+  }
+
   render() {
     const { navigation } = this.props;
     const shuffledOrders = this.getVendorsFromList();
     const vendors = shuffledOrders.entries;
-    console.log("I am the vendors buda", vendors);
     const content = this.filterContent(shuffledOrders.arr);
     return (
-      <View style={{ padding: 15, backgroundColor: "white", flex: 1 }}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            colors={["red"]}
+            onRefresh={this.onRefresh}
+          />
+        }
+        style={{ padding: 15, backgroundColor: "white", flex: 1 }}
+      >
         <Subtitle text="Orders are grouped by vendors" />
         <View
           style={{
@@ -173,7 +210,7 @@ export default class Orders extends Component {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
     );
   }
 }
