@@ -4,6 +4,7 @@ import {
   MODIFY_CART,
   MODIFY_MERCHANT_CART,
   NOTHING,
+  SET_APPLICATION_TOKEN,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
@@ -128,6 +129,11 @@ export const setSellerOrdersReducer = (state = {}, action) => {
 };
 export const setMerchantOrdersReducer = (state = {}, action) => {
   if (action.type === SET_MERCHANT_ORDERS) return action.payload;
+
+  return state;
+};
+export const setApplicationTokenReducer = (state = null, action) => {
+  if (action.type === SET_APPLICATION_TOKEN) return action.payload;
 
   return state;
 };

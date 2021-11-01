@@ -6,6 +6,7 @@ import {
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
+  SET_APPLICATION_TOKEN,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
@@ -84,6 +85,14 @@ export const setNewsParamsAction = (newsResponse = {}) => {
   };
 };
 
+export const setApplicationTokenAction = (token) => {
+  return (dispatch, getState) => {
+    const fireAuth = getState().fireAuth; 
+    // use fire auth that you collect here
+    //use the uid to send a request to the backend and see if user has a a device token registered to their name, if there is
+    dispatch({ type: SET_APPLICATION_TOKEN, payload: token });
+  };
+};
 const compareAndGet = (values = [], comparisonType) => {
   const value1 = values[0];
   const value2 = values[1];
@@ -174,7 +183,7 @@ export const modifyMerchantCartAction = (data = {}) => {
 
 export const setUserShopsAction = (shops = null) => {
   return { type: SET_USER_SHOPS, payload: shops };
-};  
+};
 export const setUserShopItemsAction = (items = null) => {
   return { type: SET_USER_SHOP_ITEMS, payload: items };
 };
@@ -300,7 +309,7 @@ export const processAndDeleteVendor = (params) => {
 const removeRelatedStock = (vendor, stock = []) => {
   const items = stock.filter((s) => s.vendor !== vendor.id);
   return { type: SET_STOCK, payload: items };
-}; 
+};
 
 const deleteContentFromBackend = (URL, body) => {
   InternetExplorer.send(URL, "POST", body).catch((e) => {

@@ -120,6 +120,7 @@ const mapStateToProps = (state) => {
     user: state.user,
     cart: state.cart,
     campaignCart: state.campaignCart,
+    token: state.deviceToken,
   };
 };
 const mapDispatchToProps = (dispatch) => {

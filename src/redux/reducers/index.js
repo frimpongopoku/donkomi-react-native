@@ -21,6 +21,7 @@ import {
   campaignCartReducer,
   setSellerOrdersReducer,
   setMerchantOrdersReducer,
+  setApplicationTokenReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -44,5 +45,6 @@ export default combineReducers({
   orderHistory: setOrderHistoryReducer,
   campaignCart: campaignCartReducer, 
   sellerOrders: setSellerOrdersReducer, 
-  merchantOrders: setMerchantOrdersReducer
+  merchantOrders: setMerchantOrdersReducer,
+  deviceToken: setApplicationTokenReducer, //fcm device token
 });

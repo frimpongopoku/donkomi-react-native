@@ -225,6 +225,7 @@ const mapStateToProps = (state) => {
     fireAuthUser: state.fireAuth,
     user: state.user,
     modal: state.modal,
+    token: state.deviceToken,
   };
 };
 
