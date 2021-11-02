@@ -35,6 +35,7 @@ import {
   DELETE_A_VENDOR,
   DELETE_STOCK,
   REGISTER_USER,
+  VERIFY_DEVICE_TOKEN,
 } from "../../shared/urls";
 
 export const doNothingAction = () => {
@@ -85,11 +86,19 @@ export const setNewsParamsAction = (newsResponse = {}) => {
   };
 };
 
-export const setApplicationTokenAction = (token) => {
+export const setApplicationTokenAction = (token = {}) => {
   return (dispatch, getState) => {
-    const fireAuth = getState().fireAuth; 
-    // use fire auth that you collect here
-    //use the uid to send a request to the backend and see if user has a a device token registered to their name, if there is
+    const fireAuth = getState().fireAuth;
+    InternetExplorer.send(VERIFY_DEVICE_TOKEN, "POST", {
+      ...token,
+      user_id: fireAuth?.uid,
+    })
+      .then((response) => {
+        if (response.data) dispatch(setDonkomiUserAction(response.data));
+      })
+      .catch((e) =>
+        console.log("VERIFYING_DEVICE_TOKEN_FAILED", e?.toString())
+      );
     dispatch({ type: SET_APPLICATION_TOKEN, payload: token });
   };
 };

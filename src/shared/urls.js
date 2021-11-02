@@ -1,6 +1,6 @@
 // const HOST = "192.168.0.38:8000";
 // const HOST = "127.0.0.1:8000";
-const HOST = "http://1637-102-115-235-27.ngrok.io" + "/api/donkomi";
+const HOST = "http://b2f5-102-115-235-99.ngrok.io" + "/api/donkomi";
 
 export const TEST_URL =
   HOST + "/account/user/get/hnxuThJP3EdCHmTYrK3qlr2yBl32/";
@@ -42,3 +42,4 @@ export const REMOVE_UNAVAILABLE_ITEM_FROM_ORDER =
 export const GET_MERCHANT_ORDERS = HOST + "/user/get.merchant.orders/";
 export const GET_SELLER_ORDERS = HOST + "/user/get.seller.orders/";
 export const GET_ONE_ORDER = HOST + "/user/get.one.order/";
+export const VERIFY_DEVICE_TOKEN = HOST + "/user/verify.device.token/";
