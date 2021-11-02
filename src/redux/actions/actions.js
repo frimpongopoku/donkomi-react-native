@@ -6,22 +6,28 @@ import {
   NOTHING,
   REMOVE_DONKOMI_USER_AUTH,
   REMOVE_FIREBASE_AUTH,
+  SET_APPLICATION_TOKEN,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_MARKET_NEWS,
   SET_MARKET_NEWS_PARAMS,
+  SET_MERCHANT_ORDERS,
   SET_NEWS_PARAMS,
+  SET_ORDER_HISTORY,
   SET_ROUTINES,
+  SET_SELLER_ORDERS,
   SET_STOCK,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
   SHOW_FLOATING_MODAL,
+  UPDATE_CAMPAIGN_CART,
 } from "./constants";
 
 import InternetExplorer from "./../../shared/classes/InternetExplorer";
 import {
+  CHECKOUT_PRODUCTS,
   DELETE_A_CAMPAIGN,
   DELETE_A_PRODUCT,
   DELETE_A_ROUTINE,
@@ -29,6 +35,7 @@ import {
   DELETE_A_VENDOR,
   DELETE_STOCK,
   REGISTER_USER,
+  VERIFY_DEVICE_TOKEN,
 } from "../../shared/urls";
 
 export const doNothingAction = () => {
@@ -79,11 +86,28 @@ export const setNewsParamsAction = (newsResponse = {}) => {
   };
 };
 
+export const setApplicationTokenAction = (token = {}) => {
+  return (dispatch, getState) => {
+    const fireAuth = getState().fireAuth;
+    InternetExplorer.send(VERIFY_DEVICE_TOKEN, "POST", {
+      ...token,
+      user_id: fireAuth?.uid,
+    })
+      .then((response) => {
+        if (response.data) dispatch(setDonkomiUserAction(response.data));
+      })
+      .catch((e) =>
+        console.log("VERIFYING_DEVICE_TOKEN_FAILED", e?.toString())
+      );
+    dispatch({ type: SET_APPLICATION_TOKEN, payload: token });
+  };
+};
 const compareAndGet = (values = [], comparisonType) => {
   const value1 = values[0];
   const value2 = values[1];
   if (comparisonType === "min") {
-    if (value1 < value2 && value1 !== 0) return value1; // no db id is ever equal to 0, so it just means this is the first time, return value2
+    if (value1 < value2 && value1 !== 0) return value1;
+    // no db id is ever equal to 0, so it just means this is the first time, return value2
     else return value2;
   }
   if (comparisonType === "max") {
@@ -94,6 +118,9 @@ const compareAndGet = (values = [], comparisonType) => {
 };
 export const setDonkomiUserAction = (user = null) => {
   return { type: SET_DONKOMI_USER, payload: user };
+};
+export const setOrderHistoryAction = (data = []) => {
+  return { type: SET_ORDER_HISTORY, payload: data };
 };
 
 export const removeDonkomiUserAuthAction = () => {
@@ -107,16 +134,59 @@ export const logoutAction = () => {
   };
 };
 
+export const checkoutAction = (successJsx) => {
+  return (dispatch, getState) => {
+    const { cart, user, orderHistory } = getState();
+    const basket = cart?.basket || [];
+    const packet = {};
+    // group all products according to sellers
+    basket.forEach((item) => {
+      const user_id = item?.product?.creator.user_id;
+      const sellerContent = packet[user_id];
+      const obj = {
+        qty: item.qty,
+        total_price: item.price,
+        product_id: item.product.id,
+        shop: item?.product?.shops[0].id,
+      };
+      if (sellerContent) packet[user_id] = [...sellerContent, obj];
+      else packet[user_id] = [obj];
+    });
+
+    InternetExplorer.roamAndFind(CHECKOUT_PRODUCTS, "POST", {
+      user_id: user?.user_id,
+      order_type: "PRODUCT_ORDER",
+      cart: packet,
+    })
+      .then((response) => {
+        if (!response) return;
+        if (!response.success)
+          return console.log(
+            "BACKEND_CHECKOUT_ERROR",
+            response.error?.message?.toString()
+          );
+        dispatch(modifyCartAction({})); // clear cart
+        //shop notification of checkout success
+        dispatch(
+          showFloatingModalActions({ show: true, Jsx: successJsx, close: true })
+        );
+        // update order history in store with response data
+        dispatch(setOrderHistoryAction([...orderHistory, response.data]));
+      })
+      .catch((e) => console.log("CHECKOUT_ERROR", e?.toString()));
+  };
+};
+
 export const showFloatingModalActions = (
   props = { show: false, Jsx: null, close: true }
 ) => {
   return { type: SHOW_FLOATING_MODAL, payload: props };
 };
 
-export const modifyCartAction = (data =[]) => {
+export const modifyCartAction = (data = {}) => {
   return { type: MODIFY_CART, payload: data };
 };
-export const modifyMerchantCartAction = (data =[]) => {
+export const modifyMerchantCartAction = (data = {}) => {
   return { type: MODIFY_MERCHANT_CART, payload: data };
 };
 
@@ -140,6 +210,12 @@ export const setRoutinesAction = (data = []) => {
 export const setStockAction = (data = []) => {
   return { type: SET_STOCK, payload: data };
 };
+export const setSellerOrdersAction = (data = []) => {
+  return { type: SET_SELLER_ORDERS, payload: data };
+};
+export const setMerchantOrdersAction = (data = []) => {
+  return { type: SET_MERCHANT_ORDERS, payload: data };
+};
 
 export const setCampaignAction = (data = []) => {
   return { type: SET_CAMPAIGNS, payload: data };
@@ -147,7 +223,7 @@ export const setCampaignAction = (data = []) => {
 export const setMarketNewsAction = (data = []) => {
   return { type: SET_MARKET_NEWS, payload: data };
 };
-export const setMarketNewsParamsAction = (response ={}) => {
+export const setMarketNewsParamsAction = (response = {}) => {
   return { type: SET_MARKET_NEWS_PARAMS, payload: response };
 };
 
@@ -253,4 +329,13 @@ const deleteContentFromBackend = (URL, body) => {
 const removeItemFromRedux = (list = [], key, value, type) => {
   const rem = list.filter((itm) => itm[key] !== value);
   return { type, payload: rem };
+};
+
+export const addToCampaignCartAction = (cart = {}) => {
+  var numberOfItems = 0;
+  Object.keys(cart?.basket).forEach(
+    (key) =>
+      (numberOfItems += Number(cart.basket[key]?.summary.numberOfOrders || 0))
+  );
+  return { type: UPDATE_CAMPAIGN_CART, payload: { ...cart, numberOfItems } };
 };

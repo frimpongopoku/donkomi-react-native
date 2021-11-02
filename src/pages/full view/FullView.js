@@ -2,10 +2,23 @@ import React, { Component } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { deleteAProductFromBackend } from "../../redux/actions/actions";
+import {
+  deleteAProductFromBackend,
+  modifyCartAction,
+  setMerchantOrdersAction,
+  setSellerOrdersAction,
+} from "../../redux/actions/actions";
+import { makeHeaderRight } from "../../shared/utils";
+import CampaignOrderFullView from "./CampaignOrderFullView";
+import OrderFullView from "./OrderFullView";
 import ProductFullView from "./ProductFullView";
 export const FULL_VIEW_PAGES = {
   PRODUCT: "product",
+  PRODUCT_FROM_MARKET: "product_from_market",
+  ORDER: "order-full-view",
+  SELLER_ORDER: "seller-full-view",
+  MERCHANT_ORDER: "merchant-order-full-view",
+  ORDER_FOR_MERCHANT: "merchant-order-full-view-for-merchant",
 };
 class FullView extends Component {
   PAGES = FULL_VIEW_PAGES;
@@ -31,7 +44,28 @@ class FullView extends Component {
     const { route } = this.props;
     return route?.params?.filterParams;
   }
+
+  setHeaderRight() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        {
+          numberOfItems:
+            Number(cart?.numberOfItems || 0) +
+            Number(campaignCart?.numberOfItems || 0),
+        }
+      ),
+    });
+  }
+
+  componentDidUpdate() {
+    this.setHeaderRight();
+  }
   componentDidMount() {
+    this.setHeaderRight();
     const page = this.getCurrentPage();
     this.setState({ page });
     this.fetchContentLocally(); // fetch data locally first
@@ -39,10 +73,27 @@ class FullView extends Component {
   }
 
   fetchContentLocally() {
-    const { news = [], navigation } = this.props;
+    const {
+      news = [],
+      navigation,
+      history,
+      market,
+      sellerOrders,
+      merchantOrders,
+    } = this.props;
+    // console.log("I am teh market", market);
     const page = this.getCurrentPage();
     const params = this.getParams();
     var content;
+    if (page === FULL_VIEW_PAGES.PRODUCT_FROM_MARKET) {
+      content = market.find((item) => item?.id === this.getId());
+      if (content)
+        navigation?.setOptions({
+          title: content?.name || content?.title || "...",
+        });
+      this.setState({ content });
+      return;
+    }
     if (page === FULL_VIEW_PAGES.PRODUCT) {
       content = news.find(
         (item) =>
@@ -55,6 +106,39 @@ class FullView extends Component {
           title: content?.name || content?.title || "...",
         });
       this.setState({ content });
+      return;
+    }
+
+    if (page === FULL_VIEW_PAGES.ORDER) {
+      const id = this.getId();
+      const order = (history || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+
+      this.setState({ content: order });
+      return;
+    }
+    if (page === FULL_VIEW_PAGES.SELLER_ORDER) {
+      const id = this.getId();
+      const order = (sellerOrders || []).find((o) => o.id === id);
+      this.setState({ content: order });
+      return;
+    }
+    if (page === FULL_VIEW_PAGES.MERCHANT_ORDER) {
+      const id = this.getId();
+      const order = (history || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+      this.setState({ content: order });
+      return;
+    }
+    if (page === FULL_VIEW_PAGES.ORDER_FOR_MERCHANT) {
+      const id = this.getId();
+      const order = (merchantOrders || []).find(
+        (orderHistory) => orderHistory.id === id
+      );
+      this.setState({ content: order });
+      return;
     }
   }
 
@@ -62,15 +146,78 @@ class FullView extends Component {
 
   getComponentWithPage() {
     const { page, content } = this.state;
-    const { navigation, deleteProduct } = this.props;
+    const {
+      navigation,
+      deleteProduct,
+      user,
+      modifyCart,
+      cart,
+      sellerOrders,
+      setSellerOrdersInRedux,
+    } = this.props;
     switch (page) {
       case FULL_VIEW_PAGES.PRODUCT:
         return (
           <ProductFullView
             {...content}
-            user={this.props.user}
+            user={user}
             navigation={navigation}
-            deleteProduct = {deleteProduct}
+            deleteProduct={deleteProduct}
+            product={content}
+            modifyCart={modifyCart}
+            cart={cart}
+          />
+        );
+      case FULL_VIEW_PAGES.PRODUCT_FROM_MARKET:
+        return (
+          <ProductFullView
+            {...content}
+            user={user}
+            navigation={navigation}
+            deleteProduct={deleteProduct}
+            modifyCart={modifyCart}
+            cart={cart}
+            product={content}
+            isFromMarket
+          />
+        );
+      case FULL_VIEW_PAGES.SELLER_ORDER:
+        return (
+          <OrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            sellerOrders={sellerOrders}
+            setSellerOrdersInRedux={setSellerOrdersInRedux}
+            isSeller
+          />
+        );
+      case FULL_VIEW_PAGES.ORDER:
+        return (
+          <OrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            isCustomer
+          />
+        );
+      case FULL_VIEW_PAGES.ORDER_FOR_MERCHANT:
+        return (
+          <CampaignOrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            merchantOrders={this.props.merchantOrders}
+            setMerchantOrdersInRedux={this.props.setMerchantOrdersInRedux}
+          />
+        );
+      case FULL_VIEW_PAGES.MERCHANT_ORDER:
+        return (
+          <CampaignOrderFullView
+            {...content}
+            navigation={navigation}
+            user={user}
+            isCustomer
           />
         );
       default:
@@ -100,12 +247,24 @@ class FullView extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { news: state.news, user: state.user };
+  return {
+    news: state.news,
+    user: state.user,
+    history: state.orderHistory,
+    cart: state.cart,
+    campaignCart: state.campaignCart,
+    market: state.market,
+    sellerOrders: state.sellerOrders,
+    merchantOrders: state.merchantOrders,
+  };
 };
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
     {
       deleteProcuct: deleteAProductFromBackend,
+      modifyCart: modifyCartAction,
+      setSellerOrdersInRedux: setSellerOrdersAction,
+      setMerchantOrdersInRedux: setMerchantOrdersAction,
     },
     dispatch
   );

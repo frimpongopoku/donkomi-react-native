@@ -24,7 +24,7 @@ export class Defaults {
     return locked;
   }
 
-  static getMotorImage(){ 
+  static getMotorImage() {
     return motor;
   }
 }

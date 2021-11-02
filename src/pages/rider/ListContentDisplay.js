@@ -4,7 +4,7 @@ import { TabView } from "react-native-tab-view";
 import CustomTabView from "../../shared/components/CustomTabView";
 import TabBarHeader from "../../shared/components/TabBarHeader";
 import { STYLES } from "../../shared/ui";
-import { Feather } from "@expo/vector-icons";
+import { Entypo, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import burger from "./../../shared/images/burger.jpg";
 import { MaterialIcons } from "@expo/vector-icons";
 import NotFound from "../../components/NotFound";
@@ -13,9 +13,17 @@ import { getPropsArrayFromJsonArray, makeAlert } from "../../shared/utils";
 import FormPlaceholder from "../forms/FormPlaceholder";
 export default class ListContentDisplay extends Component {
   tabs = [
-    { key: "vendors", title: "Vendors" },
+    {
+      key: "vendors",
+      title: "Vendors",
+      icon: <Entypo name="shopping-bag" size={18} color="orange" />,
+    },
     // { key: "stock", title: "Stock" },
-    { key: "routines", title: "Routines" },
+    {
+      key: "routines",
+      title: "Routines",
+      icon: <MaterialCommunityIcons name="recycle" size={18} color="orange" />,
+    },
   ];
 
   renderScene = ({ route }) => {

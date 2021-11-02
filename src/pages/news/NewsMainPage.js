@@ -23,11 +23,36 @@ import {
   setNewsParamsAction,
 } from "../../redux/actions/actions";
 import { FULL_VIEW_PAGES } from "../full view/FullView";
+import { makeHeaderRight } from "../../shared/utils";
+
 class NewsMainPage extends Component {
   constructor(props) {
     super(props);
     this.state = { refreshing: false };
     this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  setHeaderInCart() {
+    const { navigation, cart, campaignCart } = this.props;
+    navigation.setOptions({
+      headerRight: makeHeaderRight(
+        navigation,
+        "singles",
+        { screen: "checkout" },
+        {
+          numberOfItems:
+            Number(cart?.numberOfItems || 0) +
+            Number(campaignCart?.numberOfItems || 0),
+        }
+      ),
+    });
+  }
+  componentDidMount() {
+    this.setHeaderInCart();
+  }
+
+  componentDidUpdate() {
+    this.setHeaderInCart();
   }
 
   onRefresh() {
@@ -58,7 +83,7 @@ class NewsMainPage extends Component {
   }
   render() {
     const { loading } = this.state;
-    const { news } = this.props;
+    const { news, cart, campaignCart } = this.props;
     return (
       <ScrollView
         refreshControl={
@@ -75,9 +100,7 @@ class NewsMainPage extends Component {
             <View key={index.toString()}>{this.getCardToDisplay(one)}</View>
           );
         })}
-        {/* <CampaignNewsCard navigation={this.props.navigation} />
-        <ShopNewsCard navigation={this.props.navigation} />
-        <CampaignNewsCard navigation={this.props.navigation} /> */}
+
         <FlatButton
           onPress={() => this.setState({ loading: true })}
           containerStyle={{ backgroundColor: "whitesmoke" }}
@@ -95,6 +118,9 @@ const mapStateToProps = (state) => {
   return {
     news: state.news,
     user: state.user,
+    cart: state.cart,
+    campaignCart: state.campaignCart,
+    token: state.deviceToken,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -163,87 +189,6 @@ export const ShopNewsCard = ({ navigation, price, shops, name, image, id }) => {
   );
 };
 
-export const NewsTweet = (props) => {
-  return (
-    <View>
-      <View style={{ padding: 15 }}>
-        <View style={{ flexDirection: "row" }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "bold",
-              color: STYLES.theme.blue,
-            }}
-          >
-            Frimpong O.A
-          </Text>
-          <Text style={{ marginLeft: "auto", color: STYLES.theme.lightGrey }}>
-            3 mins ago
-          </Text>
-        </View>
-        <Text style={{ textAlign: "justify", lineHeight: 20 }}>
-          Make a type specimen book. It has survived not only five centuries,
-          but also the leap into electronic typesetting, remaining essentially
-          unchanged. It was popularised in the 1960s with the release of
-          Letraset sheets containing Lorem Ipsum passages, and more recently
-          with desktop publishing software like Aldus PageMaker including
-          versions of Lorem Ipsum Make a type specimen book. It has survived not
-          only five centuries, but also the leap into electronic typesetting,
-          remaining essentially unchanged. It was popularised in the 1960s with
-          the release of Letraset sheets containing Lorem Ipsum passages, and
-          more recently with desktop publishing software like Aldus PageMaker
-          including versions of Lorem
-        </Text>
-
-        <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            borderTopWidth: 2,
-            borderBottomWidth: 2,
-            borderLeftWidth: 2,
-            justifyContent: "flex-end",
-            marginTop: 10,
-            borderColor: STYLES.theme.maroon,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              padding: 10,
-              borderLeftWidth: 2,
-              borderRightWidth: 2,
-              borderColor: STYLES.theme.maroon,
-              color: "red",
-            }}
-          >
-            <AntDesign
-              name="dislike2"
-              size={20}
-              color={STYLES.theme.maroon}
-              style={{ marginRight: 6 }}
-            />
-            <Text style={{ color: STYLES.theme.maroon }}>13</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              padding: 10,
-              borderRightWidth: 2,
-              borderColor: STYLES.theme.maroon,
-            }}
-          >
-            <Ionicons name="heart" size={20} color="green" />
-            <Text style={{ color: "green" }}>45</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-};
-
 export const CampaignNewsCard = ({
   navigation,
   title,
@@ -252,8 +197,8 @@ export const CampaignNewsCard = ({
   created_at,
   involved_vendors,
   run_time,
+  id,
 }) => {
-  // console.log("I am the involved vendros", involved_vendors);
   return (
     <View style={{ width: "100%" }}>
       <View style={{ padding: 15 }}>
@@ -294,22 +239,11 @@ export const CampaignNewsCard = ({
                 </Text>
               );
             })}
-
-            {/* <Text style={{ marginRight: 10 }}>SUPER U</Text>
-            <Text style={{ marginRight: 10 }}>JUMBO</Text> */}
           </View>
           <Text style={{ color: "green", fontWeight: "bold" }}>
             TRIP DURATION: {duration}
           </Text>
           <Text style={{ color: "grey" }}>Posted 30 minutes ago </Text>
-          {/* <View>
-            <Text style={{ color: "grey" }}>You can only order </Text>
-            <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Text style={{ marginRight: 10 }}>FOOD</Text>
-              <Text style={{ marginRight: 10 }}>GROCERIES</Text>
-              <Text style={{ marginRight: 10 }}>CHIPS</Text>
-            </View>
-          </View> */}
         </View>
 
         {/* -------- CAR AND TIME LEAVING ----------- */}
@@ -335,7 +269,10 @@ export const CampaignNewsCard = ({
 
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("singles", { screen: "place-routine-order" })
+          navigation.navigate("singles", {
+            screen: "place-routine-order",
+            params: { campaign_id: id },
+          })
         }
         style={{
           padding: 15,

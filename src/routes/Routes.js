@@ -10,7 +10,7 @@ import {
   AntDesign,
   Entypo,
   Feather,
-  Ionicons, 
+  Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
 import ShopMainPage from "../pages/shop/ShopMainPage";
@@ -36,7 +36,6 @@ const Tabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const MainAppStack = createStackNavigator();
 const MyDrawer = createDrawerNavigator();
-// const TaxiStack = createStackNavigator();
 export const AuthStack = () => (
   <NavigationContainer>
     <Stack.Navigator>
@@ -96,13 +95,34 @@ const getTabIcons = (params) => {
 const makeHeaderRight = (
   navigation,
   destination = "singles",
-  routeParams = { screen: "checkout" }
+  routeParams = { screen: "checkout" },
+  params = {}
 ) => {
   return () => (
     <TouchableOpacity
       style={{ marginRight: 20 }}
       onPress={() => navigation.navigate(destination, routeParams || {})}
     >
+      {params?.numberOfItems && (
+        <Text
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            paddingLeft: 5,
+            paddingRight: 5,
+            paddingTop: 1,
+            paddingBottom: 1,
+            zIndex: 1,
+            borderRadius: 55,
+            backgroundColor: "green",
+            fontSize: 9,
+            color: "white",
+          }}
+        >
+          {params?.numberOfItems || 0}
+        </Text>
+      )}
       <Ionicons name="cart-outline" size={24} color={"red"} />
     </TouchableOpacity>
   );
@@ -133,7 +153,7 @@ export const ApplicationStack = () => (
       component={NewsMainPage}
       options={({ navigation }) => ({
         title: "News",
-        headerRight: makeHeaderRight(navigation),
+        // headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
@@ -142,7 +162,7 @@ export const ApplicationStack = () => (
       component={ShopMainPage}
       options={({ navigation }) => ({
         title: "Market Place",
-        headerRight: makeHeaderRight(navigation),
+        // headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
@@ -151,7 +171,7 @@ export const ApplicationStack = () => (
       component={Notifications}
       options={({ navigation }) => ({
         title: "Notifications",
-        headerRight: makeHeaderRight(navigation),
+        // headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
@@ -160,7 +180,7 @@ export const ApplicationStack = () => (
       component={Settings}
       options={({ navigation }) => ({
         title: "Your Profile",
-        headerRight: makeHeaderRight(navigation),
+        // headerRight: makeHeaderRight(navigation),
         headerLeft: makeHamburgerLeft({ navigation }),
       })}
     />
@@ -281,7 +301,7 @@ export const AppContainerStack = () => {
           component={RiderMainPage}
           options={({ navigation }) => ({
             title: "Merchant",
-            headerRight: makeHeaderRight(navigation),
+            // headerRight: makeHeaderRight(navigation),
             headerLeft: makeHamburgerLeft({ navigation }),
           })}
         />

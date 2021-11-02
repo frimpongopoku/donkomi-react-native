@@ -19,5 +19,7 @@ export const STYLES = {
     purple: "#261942",
     lightPurple: "#e5dcfc",
     success: "#D1FFCD",
+    deepOrange: "#DD6E0F",
+    primary: "#0096FF",
   },
 };

@@ -9,7 +9,7 @@ export default function FlatButton({
   onPress,
   props = {},
   loading = false,
-  loaderColor = "white"
+  loaderColor = "white",
 }) {
   return (
     <TouchableOpacity

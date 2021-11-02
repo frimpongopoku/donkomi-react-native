@@ -36,8 +36,7 @@ export default NotFound = ({
           ...style,
         }}
       >
-        {" "}
-        {text}{" "}
+        {text}
       </Text>
 
       {action && (

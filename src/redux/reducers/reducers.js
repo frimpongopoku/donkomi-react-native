@@ -4,17 +4,22 @@ import {
   MODIFY_CART,
   MODIFY_MERCHANT_CART,
   NOTHING,
+  SET_APPLICATION_TOKEN,
   SET_CAMPAIGNS,
   SET_DONKOMI_USER,
   SET_FIREBASE_AUTH_USER,
   SET_MARKET_NEWS,
   SET_MARKET_NEWS_PARAMS,
+  SET_MERCHANT_ORDERS,
+  SET_ORDER_HISTORY,
   SET_ROUTINES,
+  SET_SELLER_ORDERS,
   SET_STOCK,
   SET_USER_SHOPS,
   SET_USER_SHOP_ITEMS,
   SET_VENDORS,
   SHOW_FLOATING_MODAL,
+  UPDATE_CAMPAIGN_CART,
 } from "../actions/constants";
 
 export const doNothingReducer = (state = null, action) => {
@@ -97,13 +102,40 @@ export const marketNewsParamsReducer = (state = null, action) => {
 
   return state;
 };
-export const cartReducer = (state = null, action) => {
+export const cartReducer = (state = {}, action) => {
   if (action.type === MODIFY_CART) return action.payload;
 
   return state;
 };
-export const merchantCartReducer = (state = null, action) => {
+export const merchantCartReducer = (state = {}, action) => {
   if (action.type === MODIFY_MERCHANT_CART) return action.payload;
 
   return state;
 };
+export const setOrderHistoryReducer = (state = [], action) => {
+  if (action.type === SET_ORDER_HISTORY) return action.payload;
+
+  return state;
+};
+export const campaignCartReducer = (state = {}, action) => {
+  if (action.type === UPDATE_CAMPAIGN_CART) return action.payload;
+
+  return state;
+};
+export const setSellerOrdersReducer = (state = {}, action) => {
+  if (action.type === SET_SELLER_ORDERS) return action.payload;
+
+  return state;
+};
+export const setMerchantOrdersReducer = (state = {}, action) => {
+  if (action.type === SET_MERCHANT_ORDERS) return action.payload;
+
+  return state;
+};
+export const setApplicationTokenReducer = (state = null, action) => {
+  if (action.type === SET_APPLICATION_TOKEN) return action.payload;
+
+  return state;
+};
+
+

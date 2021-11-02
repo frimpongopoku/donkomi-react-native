@@ -17,6 +17,11 @@ import {
   marketNewsParamsReducer,
   merchantCartReducer,
   cartReducer,
+  setOrderHistoryReducer,
+  campaignCartReducer,
+  setSellerOrdersReducer,
+  setMerchantOrdersReducer,
+  setApplicationTokenReducer,
 } from "./reducers";
 
 export default combineReducers({
@@ -37,4 +42,9 @@ export default combineReducers({
   marketParams: marketNewsParamsReducer,
   cart: cartReducer,
   merchantCar: merchantCartReducer,
+  orderHistory: setOrderHistoryReducer,
+  campaignCart: campaignCartReducer, 
+  sellerOrders: setSellerOrdersReducer, 
+  merchantOrders: setMerchantOrdersReducer,
+  deviceToken: setApplicationTokenReducer, //fcm device token
 });

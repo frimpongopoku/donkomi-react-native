@@ -5,7 +5,7 @@ import TabBarHeader from "../../shared/components/TabBarHeader";
 import YourProducts from "./YourProducts";
 import ShopOrders from "./ShopOrders";
 import MarketPlace from "./MarketPlace";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Ionicons } from "@expo/vector-icons";
 import FormPlaceholder from "../forms/FormPlaceholder";
 import YourShops from "./YourShops";
 import { connect } from "react-redux";
@@ -16,6 +16,7 @@ import {
   modifyCartAction,
   setMarketNewsAction,
   setMarketNewsParamsAction,
+  setSellerOrdersAction,
 } from "../../redux/actions/actions";
 import ShopCreationContainer from "./creation/ShopCreationContainer";
 
@@ -28,12 +29,34 @@ class ShopMainPage extends Component {
     this.renderTabBar = this.renderTabBar.bind(this);
   }
 
-  routes = [
-    { key: "market", title: "Market" },
-    { key: "your-products", title: " Products" },
-    { key: "your-shops", title: " Shops" },
-    { key: "orders", title: "Orders" },
-  ];
+  routes = this.makeRoutes();
+
+  makeRoutes() {
+    const { sellerOrders } = this.props;
+    return [
+      {
+        key: "market",
+        title: "Market",
+        icon: <Entypo name="shopping-bag" size={16} color="white" />,
+      },
+      {
+        key: "your-products",
+        title: " Products",
+        icon: <FontAwesome name="product-hunt" size={16} color="white" />,
+      },
+      {
+        key: "your-shops",
+        title: " Shops",
+        icon: <Entypo name="shop" size={16} color="white" />,
+      },
+      {
+        key: "orders",
+        title: "Orders",
+        icon: <FontAwesome name="handshake-o" size={16} color="white" />,
+        badgeNumber: sellerOrders?.length,
+      },
+    ];
+  }
 
   renderScene = ({ route }) => {
     const {
@@ -48,6 +71,9 @@ class ShopMainPage extends Component {
       setMarketParams,
       user,
       modifyCart,
+      campaignCart,
+      cart,
+      sellerOrders,
     } = this.props;
     switch (route.key) {
       case "market":
@@ -61,6 +87,8 @@ class ShopMainPage extends Component {
             setMarketParams={setMarketParams}
             user={user}
             modifyCart={modifyCart}
+            cart={cart}
+            campaignCart={campaignCart}
           />
         );
       case "your-products":
@@ -72,7 +100,14 @@ class ShopMainPage extends Component {
           />
         );
       case "orders":
-        return <ShopOrders navigation={navigation} />;
+        return (
+          <ShopOrders
+            navigation={navigation}
+            sellerOrders={sellerOrders}
+            setSellerOrders={this.props.setSellerOrders}
+            user={this.props.user}
+          />
+        );
       case "your-shops":
         return (
           <YourShops
@@ -111,12 +146,14 @@ class ShopMainPage extends Component {
         return this.openShopCreationPage("is product");
       case 2:
         return this.openShopCreationPage();
-
       default:
         break;
     }
   }
-  openCartPage() {}
+  openCartPage() {
+    const { navigation } = this.props;
+    navigation.navigate("singles", { screen: "checkout" });
+  }
   openShopCreationPage(isProduct) {
     const { navigation } = this.props;
     navigation.navigate("singles", {
@@ -127,6 +164,7 @@ class ShopMainPage extends Component {
   render() {
     const { index } = this.state;
     const isMarket = index === 0;
+    const { cart } = this.props;
     return (
       <>
         <TabView
@@ -153,7 +191,17 @@ class ShopMainPage extends Component {
             }}
           >
             {isMarket ? (
-              <Ionicons name="cart-outline" size={24} color="green" />
+              <>
+                {cart?.numberOfItems ? (
+                  <Text
+                    style={{ fontWeight: "bold", color: "green", fontSize: 17 }}
+                  >
+                    {cart?.numberOfItems}
+                  </Text>
+                ) : (
+                  <Ionicons name="cart-outline" size={24} color="green" />
+                )}
+              </>
             ) : (
               <Entypo name="plus" size={24} color="white" />
             )}
@@ -172,6 +220,8 @@ const mapStateToProps = (state) => {
     markeParams: state.marketParams,
     user: state.user,
     cart: state.cart,
+    campaignCart: state.campaignCart,
+    sellerOrders: state.sellerOrders,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -182,6 +232,7 @@ const mapDispatchToProps = (dispatch) => {
       setMarketContent: setMarketNewsAction,
       setMarketParams: setMarketNewsParamsAction,
       modifyCart: modifyCartAction,
+      setSellerOrders: setSellerOrdersAction,
     },
     dispatch
   );
