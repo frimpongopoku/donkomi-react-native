@@ -3,6 +3,8 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  ScrollView,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -22,15 +24,54 @@ import {
 import { connect } from "react-redux";
 import ImageUploader from "../../shared/classes/ImageUploader";
 import { makeAlert } from "../../shared/utils";
-
+import NotificationConstants from "../../shared/classes/NotificationConstants";
 class Settings extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
     this.logout = this.logout.bind(this);
     this.state = { profilePhoto: null, loading: false };
     this.chooseProfilePhoto = this.chooseProfilePhoto.bind(this);
     this.removeProfilePhoto = this.removeProfilePhoto.bind(this);
   }
+  settingsThatToggle = [
+    {
+      title: "Food Notifications",
+      key: "food-sub",
+      desc: "Receive notifications when food vendors are done cooking",
+      topic: NotificationConstants.Topics.FoodActivity,
+    },
+    {
+      title: "Merchant Notifications",
+      key: "merch-sub",
+      desc: "Receive notifications when merchants send updates about your order or a campaign",
+      topic: NotificationConstants.Topics.MerchantActivity,
+    },
+    {
+      title: "News Broadcasting Notifications",
+      key: "news-sub",
+      desc: "Receive notifications when important messages are sent by admins",
+      topic: NotificationConstants.Topics.NewsBroadcasting,
+    },
+    {
+      title: "Shop Related Notifications",
+      key: "shop-sub",
+      desc: "Receive notifications when your order status changes",
+      topic: NotificationConstants.Topics.ShoppingActivity,
+    },
+    {
+      title: "Messaging Notifications",
+      key: "messaging-sub",
+      desc: "Receive notifications when shop owners or merchants sends you a direct message about your order",
+      topic: NotificationConstants.Topics.MessagingActivity,
+    },
+    {
+      key: "other-sub",
+      title: "Other non categorised notifications",
+      desc: "Receive notifications hot deals, and promotions and new changes about the application",
+      topic: NotificationConstants.Topics.MiscellaneousActivity,
+    },
+  ];
   logout() {
     auth()
       .signOut()
@@ -38,6 +79,10 @@ class Settings extends Component {
         this.props.reduxLogout();
         this.props.navigation.navigate("Login");
       });
+  }
+
+  setToggleContent(name, value) {
+    this.setState({ [name]: value });
   }
 
   startUploadingImage(image) {
@@ -91,7 +136,13 @@ class Settings extends Component {
     const { profilePhoto, loading } = this.state;
     const photo = profilePhoto ? { uri: profilePhoto?.path } : avatar;
     return (
-      <View style={{ height: "100%", backgroundColor: "white", padding: 20 }}>
+      <ScrollView
+        style={{
+          height: "100%",
+          backgroundColor: "white",
+          padding: 20,
+        }}
+      >
         <View
           style={{
             alignItems: "center",
@@ -254,7 +305,45 @@ class Settings extends Component {
             />
           </View>
         </TouchableOpacity>
-      </View>
+
+        {/* --------- Notification Settings --------------------- */}
+        <View style={{ marginTop: 10, marginBottom: 60 }}>
+          <Text style={{ fontSize: 18, color: "black", marginBottom: 15 }}>
+            Notification Settings
+          </Text>
+
+          {this.settingsThatToggle.map((set, index) => {
+            const value = this.state[set.key];
+            return (
+              <View style={{ marginBottom: 10 }} index={index?.toString()}>
+                <View style={{ marginBottom: 5, flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "bold",
+                      color: STYLES.theme.blue,
+                    }}
+                  >
+                    {set.title}
+                  </Text>
+
+                  <Switch
+                    style={{ marginLeft: "auto" }}
+                    trackColor={"whitesmoke"}
+                    thumbColor={value ? "green" : STYLES.theme.blue}
+                    ios_backgroundColor="whitesmoke"
+                    value={value}
+                    onValueChange={(value) =>
+                      this.setToggleContent(set.key, value)
+                    }
+                  />
+                </View>
+                <Text style={{ color: "grey" }}>{set.desc}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
     );
   }
 }
