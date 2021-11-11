@@ -67,7 +67,7 @@ class Settings extends Component {
     },
     {
       key: "other-sub",
-      title: "Other non categorised notifications",
+      title: "Other Non Categorised Notifications",
       desc: "Receive notifications hot deals, and promotions and new changes about the application",
       topic: NotificationConstants.Topics.MiscellaneousActivity,
     },
@@ -84,6 +84,9 @@ class Settings extends Component {
   setToggleContent(name, value) {
     this.setState({ [name]: value });
   }
+
+  // subscribeToNotification(){}
+  // unsubscribeToNotification(){}
 
   startUploadingImage(image) {
     ImageUploader.uploadProfilePhoto(
@@ -315,7 +318,7 @@ class Settings extends Component {
           {this.settingsThatToggle.map((set, index) => {
             const value = this.state[set.key];
             return (
-              <View style={{ marginBottom: 10 }} index={index?.toString()}>
+              <View style={{ marginBottom: 10 }} key={index?.toString()}>
                 <View style={{ marginBottom: 5, flexDirection: "row" }}>
                   <Text
                     style={{
