@@ -59,7 +59,7 @@ export default class ShopOrders extends Component {
         }
       >
         <Subtitle text="Customers have ordered these from your shop(s)" />
-        {sellerOrders?.map((productOrder, index) => {
+        {sellerOrders && sellerOrders.map((productOrder, index) => {
           const { customer, product_orders, id, completed } = productOrder;
           const { shopString, totalPrice } =
             getDetailsFromProductOrders(product_orders);
