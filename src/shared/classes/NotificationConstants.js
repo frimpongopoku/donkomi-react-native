@@ -9,11 +9,38 @@ export default class NotificationConstants {
   };
 
   static Channels = {
-    NewsBroadcasting: "News Broadcasting",
-    MessagingActivity: "Messaging",
-    ShoppingActivity: "Shopping",
-    MerchantActivity: "Merchant Activity",
-    FoodActivity: "FoodActivity",
-    MiscellaneousActivity: "Miscellaneous",
+    NewsBroadcasting: {
+      id: "News-Broadcasting",
+      name: "News Broadcasting",
+      description: "Receive notifications when your order status changes",
+    },
+    MessagingActivity: {
+      id: "Messaging",
+      name: "Messaging",
+      description:
+        "Receive notifications when shop owners or merchants sends you a direct message about your order",
+    },
+    ShoppingActivity: {
+      id: "Shopping",
+      name: "Shopping",
+      description: "Receive notifications when your order status changes",
+    },
+    MerchantActivity: {
+      id: "Merchant-Activity",
+      name: "Merchant Activity",
+      description:
+        "Receive notifications when merchants send updates about your order or a campaign",
+    },
+    FoodActivity: {
+      id: "Food-Activity",
+      name: "Food Related Activities",
+      description: "Receive notifications when food vendors are done cooking",
+    },
+    MiscellaneousActivity: {
+      id: "Miscellaneous",
+      name: "Miscellaneous",
+      description:
+        "Receive notifications hot deals, and promotions and new changes about the application",
+    },
   };
 }

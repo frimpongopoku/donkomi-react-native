@@ -7,7 +7,19 @@ import { AppRegistry } from "react-native";
 import PushNotification from "react-native-push-notification";
 import store from "./src/redux/store";
 import { setApplicationTokenAction } from "./src/redux/actions/actions";
+import NotificationConstants from "./src/shared/classes/NotificationConstants";
 const DEFAULT_CHANNEL = "fcm_fallback_notification_channel";
+PushNotification.getChannels((channelIds) =>
+  Object.keys(NotificationConstants.Channels).forEach((key) => {
+    const channel = NotificationConstants.Channels[key];
+    if (!channelIds.includes(channel.name))
+      PushNotification.createChannel({
+        channelId: channel.id,
+        name: channel.name,
+        description: channel.description,
+      });
+  })
+);
 PushNotification.configure({
   // (optional) Called when Token is generated (iOS and Android)
   onRegister: function (token) {
