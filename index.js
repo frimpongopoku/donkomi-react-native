@@ -7,19 +7,12 @@ import { AppRegistry } from "react-native";
 import PushNotification from "react-native-push-notification";
 import store from "./src/redux/store";
 import { setApplicationTokenAction } from "./src/redux/actions/actions";
-import NotificationConstants from "./src/shared/classes/NotificationConstants";
+import { setupNotificationChannels } from "./src/shared/notification helpers/notification-utils";
 const DEFAULT_CHANNEL = "fcm_fallback_notification_channel";
-PushNotification.getChannels((channelIds) =>
-  Object.keys(NotificationConstants.Channels).forEach((key) => {
-    const channel = NotificationConstants.Channels[key];
-    if (!channelIds.includes(channel.name))
-      PushNotification.createChannel({
-        channelId: channel.id,
-        name: channel.name,
-        description: channel.description,
-      });
-  })
-);
+
+// --------------- SETUP NOTIFICATION CHANNELS HERE FIRST ------------------------
+setupNotificationChannels();
+// -------------------------------------------------------------------------------
 PushNotification.configure({
   // (optional) Called when Token is generated (iOS and Android)
   onRegister: function (token) {
@@ -32,7 +25,7 @@ PushNotification.configure({
     const data = notification.data;
 
     PushNotification.localNotification({
-      channelId: DEFAULT_CHANNEL,
+      channelId: notification.channel_id,
       title: data?.title,
       message: data?.message,
     });
@@ -48,5 +41,5 @@ PushNotification.configure({
 // It also ensures that whether you load the app in Expo Go or in a native build,
 // the environment is set up appropriately
 
-// registerRootComponent(Root);
+// -------------------------------registerRootComponent(Root);-------------------------
 AppRegistry.registerComponent("main", () => Root);
