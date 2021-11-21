@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
   loadNewsAction,
+  logoutAction,
   putContentInStore,
   setAvailableRolesAction,
   setCampaignAction,
@@ -188,6 +189,15 @@ class App extends React.Component {
           >
             <Text style={{ textAlign: "center", color: "white" }}>Retry</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.logout();
+            }}
+          >
+            <Text style={{ textAlign: "center", margin: 10 }}>
+              Start From Scratch
+            </Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -249,6 +259,7 @@ const mapDispatchToProps = (dispatch) => {
       loadOrderHistory: setOrderHistoryAction,
       setSellerOrders: setSellerOrdersAction,
       setMerchantOrders: setMerchantOrdersAction,
+      logout: logoutAction,
     },
     dispatch
   );
