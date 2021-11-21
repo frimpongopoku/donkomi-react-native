@@ -25,7 +25,7 @@ PushNotification.configure({
     const data = notification.data;
 
     PushNotification.localNotification({
-      channelId: notification.channel_id,
+      channelId: data?.channel_id,
       title: data?.title,
       message: data?.message,
     });

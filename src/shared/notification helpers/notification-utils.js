@@ -7,6 +7,7 @@ const createChannel = (channel) => {
     channelId: channel.id,
     channelName: channel.name,
     channelDescription: channel.description,
+    importance: channel.importance,
   });
 };
 export const setupNotificationChannels = () => {
