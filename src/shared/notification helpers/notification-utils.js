@@ -22,3 +22,16 @@ export const setupNotificationChannels = () => {
   createChannel(merchant);
   createChannel(shopping);
 };
+
+export const getChannelNotificationIcon = (channelId) => {
+  switch (channelId) {
+    case NotificationConstants.Channels.NewsBroadcasting.id:
+      return "broadcast_logo_ico";
+    case NotificationConstants.Channels.ShoppingActivity.id:
+      return "shop_logo_ico";
+    case NotificationConstants.Channels.MerchantActivity.id:
+      return "delivery_logo_ico";
+    default:
+      return "ic_launcher";
+  }
+};

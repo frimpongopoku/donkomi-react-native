@@ -1,4 +1,5 @@
 {
   "html.format.preserveNewLines": false,
-  "pretty-formatter.preserve": 1
+  "pretty-formatter.preserve": 1,
+  "editor.fontFamily": "Monaco,Menlo, Monaco, 'Courier New', monospace"
 }
